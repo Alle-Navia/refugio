@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Refugio — Sistema Alejandra</title>
+<meta name="theme-color" content="#2B2438">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Refugio</title>
 <style>
   :root{
     --trabajo:#5FA845; --trabajo-d:#3B6D22; --trabajo-bg:#EAF3DE;
@@ -2228,6 +2233,11 @@ renderPausas();
 setInterval(tickAvisos, 20000);
 tickAvisos();
 initDragLayout();
+
+// ============ PWA ============
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>

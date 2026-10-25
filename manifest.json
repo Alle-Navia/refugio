@@ -1,0 +1,25 @@
+{
+  "name": "Refugio",
+  "short_name": "Refugio",
+  "description": "Tu espacio seguro de productividad y bienestar",
+  "start_url": "/refugio/",
+  "scope": "/refugio/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAF7FC",
+  "theme_color": "#2B2438",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
