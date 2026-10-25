@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refugio — Sistema Alejandra</title>
+<style>
+  :root{
+    --trabajo:#5FA845; --trabajo-d:#3B6D22; --trabajo-bg:#EAF3DE;
+    --proyectos:#8B5CF6; --proyectos-d:#4E2A9E; --proyectos-bg:#EEEAFB;
+    --educacion:#F0A81E; --educacion-d:#8A5B06; --educacion-bg:#FBEED9;
+    --cuidado:#E86A9B; --cuidado-d:#932B53; --cuidado-bg:#FBE7F0;
+    --tinta:#2B2438; --gris:#786E86; --gris-cl:#B8AEC6;
+    --hueso:#FAF7FC; --panel:#FFFFFF; --linea:#ECE4F5;
+    --radio:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--hueso); color:var(--tinta); line-height:1.5;
+    padding-bottom:88px; max-width:1400px; margin:0 auto;
+  }
+  h1,h2,h3{font-weight:700;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+
+  /* ---- top bar ---- */
+  .top{padding:20px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
+  .top .fecha{font-size:.82rem;color:var(--gris);text-transform:capitalize;}
+  .top h1{font-size:1.5rem;letter-spacing:-.02em;}
+  .racha{background:#fff;border:1px solid var(--linea);border-radius:20px;padding:6px 12px;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+
+  /* ---- vistas ---- */
+  .vista{display:none;padding:8px 14px 20px;animation:fade .25s;}
+  .vista.activa{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ---- ciclo banner ---- */
+  .ciclo{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px 16px;margin-bottom:16px;}
+  .ciclo-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .ciclo-fase{font-weight:700;font-size:1rem;}
+  .ciclo-sug{font-size:.86rem;color:var(--gris);margin-top:6px;}
+  .fase-pills{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
+  .fase-pill{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:5px 11px;font-size:.78rem;color:var(--gris);transition:.15s;}
+  .fase-pill.on{background:var(--cuidado-bg);border-color:var(--cuidado);color:var(--cuidado-d);font-weight:600;}
+  .energia-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
+  .energia-row .lbl{font-size:.78rem;color:var(--gris);margin-right:2px;}
+  .en-pill{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:4px 12px;font-size:.78rem;color:var(--gris);}
+  .en-pill.on{background:var(--tinta);color:#fff;border-color:var(--tinta);font-weight:600;}
+
+  /* ---- seccion titulo ---- */
+  .sec-tit{display:flex;justify-content:space-between;align-items:baseline;margin:20px 2px 10px;}
+  .sec-tit h2{font-size:1.05rem;}
+  .sec-tit .hint{font-size:.76rem;color:var(--gris-cl);}
+
+  /* ---- retos del dia ---- */
+  .reto{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:.15s;}
+  .reto.hecho{opacity:.55;}
+  .reto.hecho .reto-txt{text-decoration:line-through;}
+  .check{width:26px;height:26px;border-radius:50%;border:2px solid var(--gris-cl);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;font-size:14px;color:#fff;}
+  .reto.hecho .check{background:var(--trabajo);border-color:var(--trabajo);}
+  .reto-body{flex:1;min-width:0;}
+  .reto-txt{font-size:.95rem;font-weight:500;}
+  .reto-meta{display:flex;gap:8px;align-items:center;margin-top:3px;}
+  .eje-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .reto-eje{font-size:.74rem;color:var(--gris);}
+  .estrellas{font-size:.74rem;letter-spacing:1px;}
+  .reto-del{color:var(--gris-cl);font-size:1.1rem;padding:2px 4px;line-height:1;}
+
+  .vacio{text-align:center;padding:32px 16px;color:var(--gris);}
+  .vacio .em{font-size:2rem;display:block;margin-bottom:8px;}
+  .vacio p{font-size:.9rem;}
+
+  /* ---- captura ---- */
+  .cap-box{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:16px;margin-bottom:16px;}
+  .cap-box textarea{width:100%;border:1px solid var(--linea);border-radius:12px;padding:12px;font-family:inherit;font-size:.95rem;resize:none;color:var(--tinta);}
+  .cap-box textarea:focus{outline:none;border-color:var(--proyectos);}
+  .btn-primary{background:var(--tinta);color:#fff;border-radius:12px;padding:11px 18px;font-weight:600;font-size:.9rem;width:100%;margin-top:10px;transition:.15s;}
+  .btn-primary:active{transform:scale(.98);}
+  .parq-item{background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:12px 14px;margin-bottom:9px;}
+  .parq-txt{font-size:.92rem;margin-bottom:9px;}
+  .parq-acc{display:flex;gap:6px;flex-wrap:wrap;}
+  .mini{border:1px solid var(--linea);border-radius:14px;padding:5px 11px;font-size:.76rem;font-weight:600;transition:.15s;display:flex;align-items:center;gap:5px;}
+  .mini:active{transform:scale(.96);}
+  .parq-del{margin-left:auto;color:var(--gris-cl);font-size:.76rem;border:none;}
+
+  /* ---- ejes ---- */
+  .eje-card{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:16px;margin-bottom:14px;}
+  .eje-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .mascota-mini{width:48px;height:48px;flex-shrink:0;}
+  .eje-info{flex:1;}
+  .eje-nombre{font-weight:700;font-size:1.02rem;}
+  .eje-sub{font-size:.78rem;color:var(--gris);}
+  .eje-nivel{font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:12px;}
+  .barra{height:8px;border-radius:5px;overflow:hidden;margin-top:4px;}
+  .barra-fill{height:100%;transition:width .4s;}
+  .eje-estado{font-size:.78rem;margin-top:7px;font-weight:500;}
+  .eje-tareas{margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);}
+  .et{display:flex;align-items:center;gap:8px;padding:7px 0;flex-wrap:wrap;}
+  .et .check{width:22px;height:22px;font-size:12px;}
+  .et.hecho .check{background:var(--trabajo);border-color:var(--trabajo);}
+  .et.hecho .et-txt{text-decoration:line-through;opacity:.5;}
+  .et-txt{flex:1;font-size:.88rem;}
+  .et-star{font-size:.7rem;}
+  .et-del{color:var(--gris-cl);font-size:1rem;padding:2px 5px;line-height:1;opacity:0;transition:.15s;flex-shrink:0;}
+  .et:hover .et-del{opacity:1;}
+  .tag-prog{font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
+  .tag-x{color:inherit;opacity:.6;font-size:.85rem;line-height:1;}
+  .tag-x:hover{opacity:1;}
+  .add-tarea{display:flex;gap:6px;margin-top:10px;}
+  .add-tarea input{flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:.85rem;}
+  .add-tarea input:focus{outline:none;border-color:var(--proyectos);}
+  .add-tarea select{border:1px solid var(--linea);border-radius:10px;padding:0 6px;font-family:inherit;font-size:.8rem;background:#fff;}
+  .add-tarea button{background:var(--tinta);color:#fff;border-radius:10px;width:38px;font-size:1.1rem;flex-shrink:0;}
+
+  /* ---- refugio ---- */
+  .ref-intro{font-size:.86rem;color:var(--gris);margin-bottom:16px;}
+  .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .ref-card{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px;text-align:center;}
+  .ref-card .mascota-mini{width:64px;height:64px;margin:0 auto 8px;}
+  .ref-nombre{font-weight:700;font-size:.95rem;}
+  .ref-eje{font-size:.72rem;color:var(--gris);margin-bottom:8px;}
+  .ref-card .barra{margin-top:8px;}
+  .ref-estado{font-size:.74rem;margin-top:6px;font-weight:500;}
+  .ref-nivel{font-size:.7rem;color:var(--gris);margin-top:2px;}
+  .ref-foot{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px 16px;margin-top:14px;font-size:.84rem;color:var(--gris);display:flex;align-items:center;gap:10px;}
+
+  /* ---- escena casita del refugio ---- */
+  .casa{background:linear-gradient(180deg,#F3EEFB 0%,#FBEEF4 100%);border:1px solid var(--linea);border-radius:20px;padding:0;overflow:hidden;margin-bottom:14px;}
+  .casa-escena{position:relative;width:100%;}
+  .casa-hab{display:grid;grid-template-columns:1fr 1fr;}
+  .hab{padding:20px 14px 16px;text-align:center;position:relative;width:100%;display:block;cursor:pointer;transition:.15s;}
+  .hab:hover{background:rgba(255,255,255,.4);}
+  .hab:nth-child(1){border-right:1px dashed #E6D8F2;border-bottom:1px dashed #E6D8F2;}
+  .hab:nth-child(2){border-bottom:1px dashed #E6D8F2;}
+  .hab:nth-child(3){border-right:1px dashed #E6D8F2;}
+  .hab .mascota-casa{width:88px;height:88px;margin:0 auto;transition:transform .3s;}
+  .hab .mascota-casa:hover{transform:translateY(-4px) scale(1.05);}
+  .hab-nombre{font-weight:700;font-size:.92rem;margin-top:4px;}
+  .hab-eje{font-size:.68rem;color:var(--gris);}
+  .hab-barra{height:6px;border-radius:4px;overflow:hidden;margin:8px auto 0;max-width:120px;}
+  .hab-estado{font-size:.7rem;margin-top:5px;font-weight:500;}
+
+  /* ---- panel de detalle de mascota (refugio) ---- */
+  .mascota-panel{background:var(--panel);border:1.5px solid var(--linea);border-radius:var(--radio);padding:16px;margin-bottom:14px;animation:fade .2s;}
+  .semana-graf{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;height:64px;padding:0 4px;}
+  .semana-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%;gap:3px;}
+  .semana-num{font-size:.68rem;color:var(--gris);font-weight:600;min-height:12px;}
+  .semana-bar{width:100%;max-width:22px;border-radius:4px 4px 2px 2px;transition:height .3s;}
+  .semana-dia{font-size:.68rem;color:var(--gris-cl);margin-top:2px;}
+
+  /* ---- informe semanal ---- */
+  .informe-panel{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:16px;margin-top:10px;}
+  .informe-resumen{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--linea);}
+  .informe-stat{background:var(--hueso);border-radius:10px;padding:8px 12px;font-size:.76rem;color:var(--gris);}
+  .informe-stat b{color:var(--tinta);font-size:1rem;display:block;}
+  .informe-dia{padding:10px 0;border-bottom:1px solid var(--linea);}
+  .informe-dia:last-child{border-bottom:none;}
+  .informe-dia-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .informe-dia-nombre{font-weight:700;font-size:.86rem;}
+  .informe-energia-pill{font-size:.68rem;font-weight:600;padding:2px 9px;border-radius:10px;text-transform:capitalize;}
+  .informe-vacio{font-size:.78rem;color:var(--gris-cl);padding:2px 0;}
+  .informe-item{font-size:.8rem;color:var(--gris);padding:2px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .casa-techo{height:44px;background:linear-gradient(180deg,#9657FE 0%,#7B45D8 100%);clip-path:polygon(0 100%, 50% 0, 100% 100%);margin:0 auto -1px;width:70%;}
+  .casa-suelo{height:14px;background:linear-gradient(180deg,#E8B98F,#D9A574);}
+
+  /* ---- calendario ---- */
+  .cal{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px 16px;margin-bottom:16px;}
+  .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .cal-head span{font-weight:700;font-size:.95rem;text-transform:capitalize;}
+  .cal-head button{width:30px;height:30px;border-radius:8px;background:var(--hueso);color:var(--tinta);font-size:1.1rem;font-weight:700;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .cal-dow{text-align:center;font-size:.66rem;color:var(--gris-cl);font-weight:600;padding:2px 0;}
+  .cal-dia{aspect-ratio:1.5;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.8rem;border-radius:8px;position:relative;cursor:pointer;transition:.12s;color:var(--tinta);}
+  .cal-dia:hover{background:var(--hueso);}
+  .cal-dia.otro{color:var(--gris-cl);opacity:.4;}
+  .cal-dia.hoy{background:var(--tinta);color:#fff;font-weight:700;}
+  .cal-dia.sangrado::after{content:'';position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--cuidado);}
+  .cal-dia.hoy.sangrado::after{background:#fff;}
+  .cal-dia.con-evento{box-shadow:inset 0 0 0 1.5px var(--proyectos);}
+  .cal-eventos{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
+  .cal-ev{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:8px 10px;background:var(--hueso);border-radius:10px;}
+  .cal-ev .ev-fecha{font-size:.7rem;color:var(--gris);flex-shrink:0;}
+  .cal-ev .ev-del{margin-left:auto;color:var(--gris-cl);font-size:.74rem;}
+
+  /* ---- toggle mes/semana ---- */
+  .cal-modo-toggle{display:flex;gap:6px;margin-bottom:12px;}
+  .cal-modo-btn{flex:1;border:1px solid var(--linea);background:#fff;border-radius:10px;padding:7px;font-size:.78rem;font-weight:600;color:var(--gris);transition:.15s;}
+  .cal-modo-btn.on{background:var(--tinta);color:#fff;border-color:var(--tinta);}
+
+  /* ---- vista semana ---- */
+  .cal-semana{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .sem-dia{background:var(--hueso);border:1px solid var(--linea);border-radius:10px;padding:7px 5px;min-height:92px;cursor:pointer;transition:.15s;}
+  .sem-dia:hover{border-color:var(--proyectos);}
+  .sem-dia.hoy{background:var(--tinta);}
+  .sem-dia-head{display:flex;flex-direction:column;align-items:center;gap:1px;margin-bottom:5px;font-size:.68rem;color:var(--gris);}
+  .sem-dia.hoy .sem-dia-head{color:#fff;}
+  .sem-dia-num{font-size:.9rem;font-weight:700;color:var(--tinta);}
+  .sem-dia.hoy .sem-dia-num{color:#fff;}
+  .sem-sangrado-dot{width:5px;height:5px;border-radius:50%;background:var(--cuidado);margin-top:1px;}
+  .sem-eventos{display:flex;flex-direction:column;gap:3px;}
+  .sem-ev{font-size:.64rem;background:#fff;border-radius:5px;padding:3px 4px;color:var(--tinta);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sem-dia.hoy .sem-ev{background:rgba(255,255,255,.14);color:#fff;}
+  .sem-ev-mas{font-size:.62rem;color:var(--gris-cl);padding:1px 4px;}
+  .sem-dia.hoy .sem-ev-mas{color:rgba(255,255,255,.7);}
+  .sem-vacio{font-size:.66rem;color:var(--gris-cl);text-align:center;padding-top:6px;}
+  .sem-dia.hoy .sem-vacio{color:rgba(255,255,255,.5);}
+  @media (max-width:640px){
+    .sem-dia{min-height:70px;padding:5px 3px;}
+    .sem-ev{font-size:.58rem;}
+  }
+
+  /* ---- festivos colombianos ---- */
+  .cal-dia.festivo::before{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--educacion);}
+  .sem-fest-dot{width:5px;height:5px;border-radius:50%;background:var(--educacion);margin-top:1px;}
+
+  /* ---- selector de día (programar tarea en la semana) ---- */
+  .dia-picker{display:flex;gap:4px;margin-top:6px;margin-bottom:4px;width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
+  .dia-pill{flex-shrink:0;min-width:36px;display:flex;flex-direction:column;align-items:center;gap:1px;border:1px solid var(--linea);background:var(--hueso);border-radius:9px;padding:5px 4px;transition:.12s;}
+  .dia-pill:hover{border-color:var(--proyectos);background:#fff;}
+  .dia-pill.festivo{border-color:var(--educacion);}
+  .dp-dow{font-size:.6rem;color:var(--gris);font-weight:600;text-transform:capitalize;}
+  .dp-num{font-size:.78rem;font-weight:700;color:var(--tinta);}
+  .dp-fest{font-size:.6rem;line-height:1;}
+
+  /* ---- mi semana (resumen en Hoy) ---- */
+  .ms-row{display:flex;justify-content:space-between;gap:3px;}
+  .ms-dia{flex:1;text-align:center;padding:5px 2px;border-radius:9px;min-width:0;}
+  .ms-dia.hoy{background:var(--hueso);}
+  .ms-dow{font-size:.6rem;color:var(--gris-cl);text-transform:capitalize;}
+  .ms-num{font-size:.78rem;font-weight:700;color:var(--tinta);}
+  .ms-dots{display:flex;justify-content:center;gap:2px;margin-top:4px;min-height:9px;flex-wrap:wrap;}
+  .ms-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .ms-vacio{color:var(--gris-cl);font-size:.62rem;}
+  .ms-mas{font-size:.56rem;color:var(--gris-cl);align-self:center;}
+  .ms-dia{cursor:pointer;transition:.12s;}
+  .ms-dia:hover{background:var(--hueso);}
+
+  /* ---- modal: tareas de un día (desde Mi semana) ---- */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(43,36,56,.45);z-index:200;align-items:flex-end;justify-content:center;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--panel);border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:78vh;overflow-y:auto;animation:fade .2s;}
+  @media (min-width:640px){
+    .modal-overlay{align-items:center;}
+    .modal-box{border-radius:20px;max-width:420px;}
+  }
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .modal-head h3{font-size:1rem;text-transform:capitalize;}
+  .modal-close{color:var(--gris-cl);font-size:1.3rem;padding:2px 6px;line-height:1;}
+  .modal-item{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--linea);}
+  .modal-item:last-child{border-bottom:none;}
+  .modal-item-txt{flex:1;font-size:.88rem;}
+  .modal-fest{background:var(--educacion-bg);color:var(--educacion-d);border-radius:10px;padding:8px 10px;font-size:.8rem;font-weight:600;margin-bottom:10px;}
+
+  /* ---- banner energía discreto + layout hoy ---- */
+  .energia-banner{width:100%;background:linear-gradient(100deg,var(--proyectos-bg),var(--cuidado-bg));border:1px solid var(--linea);border-radius:14px;padding:13px 16px;font-size:.9rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;text-align:left;}
+  .energia-banner .chevron{color:var(--gris);font-size:1rem;transition:transform .2s;flex-shrink:0;}
+  .energia-banner.abierto .chevron{transform:rotate(180deg);}
+  .hoy-layout{display:grid;grid-template-columns:minmax(240px,1fr) 16px minmax(240px,1fr) 16px minmax(240px,1fr);align-items:start;}
+  /* posición fija por columna: así un .col-resizer oculto (display:none fuera del modo editar) no corre la asignación automática de columnas */
+  .hoy-layout > [data-zona="col1"]{grid-column:1;}
+  .hoy-layout > [data-idx="0"]{grid-column:2;}
+  .hoy-layout > [data-zona="col2"]{grid-column:3;}
+  .hoy-layout > [data-idx="1"]{grid-column:4;}
+  .hoy-layout > [data-zona="col3"]{grid-column:5;}
+  .hoy-col{display:flex;flex-direction:column;gap:14px;position:sticky;top:16px;min-height:40px;}
+  .hoy-side{display:flex;flex-direction:column;gap:14px;position:sticky;top:16px;}
+  .side-card{background:var(--panel);border:1px solid var(--linea);border-radius:var(--radio);padding:14px;}
+  .side-tit{font-size:.82rem;font-weight:700;color:var(--tinta);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .side-tit span{font-size:.72rem;color:var(--gris);font-weight:600;}
+  .side-nota{font-size:.74rem;color:var(--gris);margin-top:10px;line-height:1.45;}
+  .side-sub{font-size:.72rem;color:var(--gris-cl);margin-bottom:8px;line-height:1.4;}
+  .rapida-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .energia-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .habito{display:flex;align-items:center;gap:9px;padding:7px 0;}
+  .habito .check{width:22px;height:22px;font-size:12px;}
+  .habito.hecho .check{background:var(--cuidado);border-color:var(--cuidado);}
+  .habito.hecho .habito-txt{text-decoration:line-through;opacity:.5;}
+  .habito-txt{flex:1;font-size:.86rem;}
+  .habito-del{color:var(--gris-cl);font-size:.9rem;padding:0 3px;opacity:0;transition:.15s;}
+  .habito:hover .habito-del{opacity:1;}
+  .add-habito{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--linea);}
+  .add-habito input{flex:1;border:1px solid var(--linea);border-radius:9px;padding:7px 9px;font-family:inherit;font-size:.8rem;}
+  .add-habito input:focus{outline:none;border-color:var(--cuidado);}
+  .add-habito button{background:var(--cuidado);color:#fff;border-radius:9px;width:32px;font-size:1rem;flex-shrink:0;}
+  .hora-select{border:none;background:transparent;font-family:inherit;font-size:.82rem;color:var(--tinta);padding:8px 2px;font-weight:600;}
+  .hora-select:focus{outline:none;}
+  .hora-select:focus, #evento-hora-wrap:focus-within{border-color:var(--proyectos);}
+  @media (max-width:960px){
+    .hoy-layout{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:640px){
+    .hoy-layout{grid-template-columns:1fr;}
+    .hoy-col{position:static;}
+  }
+
+  /* ---- acomodar secciones (editar layout) ---- */
+  .editar-layout-btn{display:block;margin:0 0 14px auto;background:#fff;border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris);}
+  .editar-layout-btn.on{background:var(--tinta);color:#fff;border-color:var(--tinta);}
+  .panel-drag{position:relative;margin-bottom:16px;}
+  .panel-drag:last-child{margin-bottom:0;}
+  body.editando-layout .panel-drag{border:1.5px dashed var(--proyectos);border-radius:18px;padding:8px;cursor:grab;}
+  body.editando-layout .panel-drag.dragging{opacity:.35;}
+  body.editando-layout .zona-drag{min-height:60px;border-radius:14px;transition:background .15s;}
+  body.editando-layout .zona-drag.sobre{background:var(--proyectos-bg);}
+  .drag-handle{display:none;position:absolute;top:-11px;left:12px;background:var(--proyectos);color:#fff;font-size:.68rem;border-radius:8px;padding:2px 8px;letter-spacing:1px;z-index:2;}
+  body.editando-layout .drag-handle{display:inline-block;}
+  body.editando-layout .panel-drag{resize:vertical;overflow:auto;min-height:90px;max-height:85vh;width:100%!important;}
+  body.editando-layout .hoy-col{overflow:visible;}
+  body.editando-layout .hoy-layout{overflow-x:visible;}
+
+  /* ---- divisor entre columnas: arrastrar para ajustar el ancho de toda la columna ---- */
+  .col-resizer{width:10px;display:none;position:relative;cursor:col-resize;align-self:stretch;}
+  body.editando-layout .col-resizer{display:block;}
+  .col-resizer::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--linea);transform:translateX(-50%);}
+  .col-resizer:hover::after, .col-resizer.activo::after{background:var(--proyectos);width:3px;}
+  @media (max-width:960px){ .col-resizer{display:none!important;} }
+  body.editando-layout .side-card, body.editando-layout .cal, body.editando-layout .sec-tit{pointer-events:none;}
+
+  /* ---- nav ---- */
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;border-radius:20px 20px 0 0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--linea);display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:50;}
+  .nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;color:var(--gris-cl);font-size:.68rem;font-weight:600;border-radius:12px;transition:.15s;}
+  .nav button.on{color:var(--proyectos-d);}
+  .nav .ic{font-size:1.35rem;line-height:1;}
+
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--tinta);color:#fff;padding:11px 20px;border-radius:24px;font-size:.86rem;font-weight:600;opacity:0;transition:.3s;z-index:100;pointer-events:none;white-space:nowrap;}  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .modo-bajo{background:var(--cuidado-bg);border:1px solid var(--cuidado);border-radius:14px;padding:12px 14px;margin-top:12px;display:flex;align-items:center;gap:10px;font-size:.84rem;color:var(--cuidado-d);}
+  .modo-bajo button{margin-left:auto;background:var(--cuidado);color:#fff;border-radius:10px;padding:6px 12px;font-size:.76rem;font-weight:600;flex-shrink:0;}
+
+  /* ---- hora de los retos ---- */
+  .reto-meta{flex-wrap:wrap;}
+  .hora-chip{border:1px dashed var(--gris-cl);border-radius:10px;padding:1px 8px;font-size:.72rem;font-weight:600;color:var(--gris);}
+  .hora-chip.con-hora{border-style:solid;border-color:var(--proyectos);background:var(--proyectos-bg);color:var(--proyectos-d);}
+  .hora-chip:hover{border-color:var(--proyectos);}
+  .tag-curso{font-size:.68rem;font-weight:700;color:#fff;background:var(--proyectos);border-radius:10px;padding:1px 8px;}
+  .reto.en-curso{border-color:var(--proyectos);box-shadow:0 0 0 2px var(--proyectos-bg);}
+  .hora-editor{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--linea);}
+  .hora-editor input,.hora-editor select{border:1px solid var(--linea);border-radius:9px;padding:6px 8px;font-family:inherit;font-size:.82rem;color:var(--tinta);background:#fff;}
+  .hora-ok{background:var(--tinta);color:#fff;border-radius:9px;padding:7px 12px;font-size:.78rem;font-weight:600;}
+  .hora-quitar{color:var(--gris);font-size:.76rem;padding:6px 6px;}
+
+  /* ---- pausas activas + aviso flotante ---- */
+  .pausa-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .pausa-switch{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:5px 12px;font-size:.78rem;font-weight:600;color:var(--gris);}
+  .pausa-switch.on{background:var(--cuidado-bg);border-color:var(--cuidado);color:var(--cuidado-d);}
+  .pausa-sel{border:1px solid var(--linea);border-radius:10px;padding:5px 8px;font-family:inherit;font-size:.78rem;background:#fff;color:var(--tinta);}
+  .aviso{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);width:calc(100% - 28px);max-width:440px;background:#fff;border:1.5px solid var(--proyectos);border-radius:18px;padding:14px 16px;box-shadow:0 12px 36px rgba(43,36,56,.22);z-index:150;gap:12px;align-items:flex-start;animation:fade .2s;}
+  .aviso-ic{font-size:1.6rem;line-height:1;}
+  .aviso-body{flex:1;min-width:0;}
+  .aviso-tit{font-weight:700;font-size:.95rem;}
+  .aviso-txt{font-size:.86rem;color:var(--gris);margin-top:3px;word-break:break-word;}
+  .aviso-acc{display:flex;gap:8px;margin-top:11px;}
+  .aviso-btn{border:1px solid var(--linea);border-radius:10px;padding:7px 13px;font-size:.8rem;font-weight:600;color:var(--gris);background:#fff;}
+  .aviso-btn.pri{background:var(--tinta);border-color:var(--tinta);color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <div class="fecha" id="fecha"></div>
+    <h1 id="saludo">Refugio</h1>
+  </div>
+  <div class="racha" id="racha">🔥 <span id="racha-n">0</span></div>
+</div>
+
+<!-- ============ HOY ============ -->
+<section class="vista activa" id="v-hoy">
+  <!-- mensaje de energía discreto (desplegable) -->
+  <button class="energia-banner" id="energia-banner" onclick="toggleCiclo()">
+    <span id="energia-msg">Cargando tu energía…</span>
+    <span class="chevron" id="ciclo-chevron">⌄</span>
+  </button>
+
+  <div class="ciclo" id="ciclo-detalle" style="display:none;">
+    <div class="ciclo-top">
+      <div>
+        <div class="ciclo-fase" id="fase-nombre">Fase folicular</div>
+        <div class="ciclo-sug" id="fase-sug"></div>
+        <div class="ciclo-proximo" id="fase-proximo" style="font-size:.78rem;color:var(--gris);margin-top:6px;"></div>
+      </div>
+    </div>
+    <div class="fase-pills" id="fase-pills"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);">
+      <button id="toggle-registro" style="width:100%;background:var(--cuidado-bg);color:var(--cuidado-d);border-radius:12px;padding:9px;font-size:.82rem;font-weight:600;">🩸 Registrar un periodo</button>
+      <div id="registro-panel" style="display:none;margin-top:10px;">
+        <div style="font-size:.8rem;color:var(--gris);margin-bottom:7px;">Elige la fecha en que empezó:</div>
+        <div style="display:flex;gap:6px;">
+          <input type="date" id="fecha-periodo" style="flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:.85rem;color:var(--tinta);">
+          <button id="guardar-periodo" style="background:var(--cuidado);color:#fff;border-radius:10px;padding:8px 14px;font-size:.82rem;font-weight:600;flex-shrink:0;">Guardar</button>
+        </div>
+        <div id="lista-periodos" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:14px;">
+    <button id="restablecer-layout" onclick="restablecerLayout()" style="background:#fff;border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris-cl);">↺ Restablecer diseño</button>
+    <button id="toggle-editar-layout" class="editar-layout-btn" style="margin:0;" onclick="toggleEditarLayout()">✥ Acomodar secciones</button>
+  </div>
+  <div class="hoy-layout">
+    <!-- columna 1: retos + calendario -->
+    <div class="hoy-col zona-drag" data-zona="col1">
+    <div class="panel-drag" data-card="cal">
+      <span class="drag-handle">⠿⠿</span>
+      <button id="toggle-cal" style="width:100%;margin-bottom:16px;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📅 Ver mi mes <span id="cal-badge" style="font-size:.72rem;color:var(--gris);font-weight:500;"></span></button>
+      <div class="cal" id="cal-panel" style="display:none;">
+        <div class="cal-modo-toggle" id="cal-modo-toggle">
+          <button data-modo="mes" class="cal-modo-btn">Mes</button>
+          <button data-modo="semana" class="cal-modo-btn">Semana</button>
+        </div>
+        <div class="cal-head">
+          <button onclick="calNav(-1)" aria-label="Anterior">‹</button>
+          <span id="cal-titulo"></span>
+          <button onclick="calNav(1)" aria-label="Siguiente">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-semana" id="cal-semana" style="display:none;"></div>
+        <div class="cal-eventos" id="cal-eventos"></div>
+        <button id="cal-add" style="width:100%;margin-top:8px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:8px;font-size:.8rem;font-weight:600;color:var(--gris);">+ Añadir evento</button>
+
+        <div id="evento-form" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--linea);">
+          <div style="font-size:.78rem;color:var(--gris);margin-bottom:8px;" id="evento-form-fecha"></div>
+          <input type="text" id="evento-txt" placeholder="¿Qué evento o tarea?" style="width:100%;border:1px solid var(--linea);border-radius:10px;padding:9px 10px;font-family:inherit;font-size:.85rem;margin-bottom:8px;color:var(--tinta);">
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <div id="evento-hora-wrap" style="flex:1;display:flex;gap:4px;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:0 8px;background:#fff;">
+              <select id="evento-hora-h" class="hora-select" aria-label="Hora">
+                <option value="">--</option>
+              </select>
+              <span style="color:var(--gris-cl);font-weight:700;">:</span>
+              <select id="evento-hora-m" class="hora-select" aria-label="Minutos">
+                <option value="">--</option>
+              </select>
+            </div>
+            <select id="evento-eje" style="flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:#fff;color:var(--tinta);">
+              <option value="">Sin eje (solo evento)</option>
+            </select>
+            <select id="evento-dif" style="border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:#fff;">
+              <option value="1">⭐</option>
+              <option value="2">⭐⭐</option>
+              <option value="3">⭐⭐⭐</option>
+            </select>
+          </div>
+          <div style="font-size:.7rem;color:var(--gris-cl);margin-bottom:8px;">Si eliges un eje, aparecerá solo en "Mis retos de hoy" el día del evento.</div>
+          <div style="display:flex;gap:6px;">
+            <button onclick="cerrarFormEvento()" style="flex:1;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:9px;font-size:.82rem;font-weight:600;color:var(--gris);">Cancelar</button>
+            <button onclick="guardarEvento()" style="flex:2;background:var(--tinta);color:#fff;border-radius:10px;padding:9px;font-size:.82rem;font-weight:600;">Guardar</button>
+          </div>
+        </div>
+
+        <div style="font-size:.7rem;color:var(--gris-cl);margin-top:8px;text-align:center;">Google Calendar se vinculará en la versión completa</div>
+      </div>
+    </div>
+
+    <div class="panel-drag" data-card="retos">
+      <span class="drag-handle">⠿⠿</span>
+      <div class="sec-tit">
+        <h2>Mis retos de hoy</h2>
+        <span class="hint" id="retos-hint">máx 3 · la #1 es sagrada</span>
+      </div>
+      <div id="retos-hoy"></div>
+      <button class="btn-primary" style="background:#fff;color:var(--tinta);border:1px solid var(--linea);" onclick="irA('ejes')">+ Tomar un reto de mis ejes</button>
+      <div style="margin-top:8px;">
+        <button class="btn-primary" style="background:var(--cuidado-bg);color:var(--cuidado-d);" onclick="activarModoBajo()" id="btn-modo-bajo">🌸 Hoy es día de descanso</button>
+      </div>
+      <div class="modo-bajo" id="modo-bajo" style="display:none;">
+        <span>🌸 Día difícil. Hoy basta con estar. Tu racha está protegida.</span>
+        <button onclick="salirModoBajo()">Salir</button>
+      </div>
+    </div>
+    </div>
+
+    <div class="col-resizer" data-idx="0"></div>
+
+    <!-- columna 2: mi semana + energía -->
+    <div class="hoy-col zona-drag" data-zona="col2">
+      <div class="panel-drag" data-card="semana">
+        <span class="drag-handle">⠿⠿</span>
+        <div class="side-card">
+          <div class="side-tit">Mi semana <span id="ms-hint" style="font-size:.68rem;color:var(--gris-cl);font-weight:500;">toca ✦ Ejes para programar</span></div>
+          <div class="ms-row" id="mi-semana"></div>
+        </div>
+      </div>
+      <div class="panel-drag" data-card="energia">
+        <span class="drag-handle">⠿⠿</span>
+        <div class="side-card">
+          <div class="side-tit">Energía de hoy</div>
+          <div class="energia-row" id="energia-row"></div>
+          <div class="side-nota" id="side-circadiano"></div>
+        </div>
+      </div>
+      <div class="panel-drag" data-card="pausas">
+        <span class="drag-handle">⠿⠿</span>
+        <div class="side-card" id="pausas-cont"></div>
+      </div>
+    </div>
+
+    <div class="col-resizer" data-idx="1"></div>
+
+    <!-- columna 3: hábitos + rápidas -->
+    <div class="hoy-col zona-drag" data-zona="col3">
+      <div class="panel-drag" data-card="habitos">
+        <span class="drag-handle">⠿⠿</span>
+        <div class="side-card">
+          <div class="side-tit">Hábitos diarios <span id="habitos-prog"></span></div>
+          <div id="habitos-lista"></div>
+          <div class="add-habito">
+            <input id="add-habito-inp" placeholder="Nuevo hábito..." onkeydown="if(event.key==='Enter')addHabito()">
+            <button onclick="addHabito()">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel-drag" data-card="rapidas">
+        <span class="drag-handle">⠿⠿</span>
+        <div class="side-card">
+          <div class="side-tit">Rápidas <span id="rapidas-prog"></span></div>
+          <div class="side-sub">Recados de &lt;5 min. Siguen aquí hasta que las marques.</div>
+          <div id="rapidas-lista"></div>
+          <div class="add-habito">
+            <input id="add-rapida-inp" placeholder="Ej: responder a Frank..." onkeydown="if(event.key==='Enter')addRapida()">
+            <button onclick="addRapida()" style="background:var(--tinta)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPTURA ============ -->
+<section class="vista" id="v-captura">
+  <div class="sec-tit"><h2>Parqueadero de ideas</h2></div>
+  <p style="font-size:.86rem;color:var(--gris);margin-bottom:12px;">Suelta lo que llegue a tu cabeza. No decidas nada ahora — solo sácalo. Después lo repartes a cada mascota.</p>
+  <div class="cap-box">
+    <textarea id="cap-input" rows="2" placeholder="Una idea, una tarea, un pendiente..."></textarea>
+    <button class="btn-primary" onclick="capturar()">Soltar en el parqueadero</button>
+  </div>
+  <div class="sec-tit"><h2 style="font-size:.95rem;">Por repartir</h2><span class="hint" id="parq-count"></span></div>
+  <div id="parqueadero"></div>
+</section>
+
+<!-- ============ EJES ============ -->
+<section class="vista" id="v-ejes">
+  <div class="sec-tit"><h2>Mis 4 ejes</h2><span class="hint">toca una mascota para sus tareas</span></div>
+  <div id="ejes-lista"></div>
+</section>
+
+<!-- ============ REFUGIO ============ -->
+<section class="vista" id="v-refugio">
+  <div class="sec-tit"><h2>El Refugio</h2></div>
+  <p class="ref-intro">Tu casita donde viven Tobi, Fofo, Uma y Nubi. Cómo se ven refleja cuánto has atendido cada área de tu vida. Toca una mascota para ver su detalle.</p>
+  <div class="casa">
+    <div class="casa-techo"></div>
+    <div class="casa-escena">
+      <div class="casa-hab" id="casa-hab"></div>
+    </div>
+    <div class="casa-suelo"></div>
+  </div>
+  <div id="mascota-detalle" style="display:none;"></div>
+  <div class="ref-foot" id="ref-foot"></div>
+
+  <button id="toggle-informe" style="width:100%;margin-top:14px;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📊 Ver informe semanal</button>
+  <div id="informe-semanal" style="display:none;"></div>
+</section>
+
+<nav class="nav">
+  <button class="on" data-v="hoy" onclick="irA('hoy')"><span class="ic">☀️</span>Hoy</button>
+  <button data-v="captura" onclick="irA('captura')"><span class="ic">💭</span>Parqueadero</button>
+  <button data-v="ejes" onclick="irA('ejes')"><span class="ic">✦</span>Ejes</button>
+  <button data-v="refugio" onclick="irA('refugio')"><span class="ic">🏡</span>Refugio</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+<div class="aviso" id="aviso" style="display:none;" role="alert"></div>
+
+<div class="modal-overlay" id="dia-modal-overlay" onclick="if(event.target===this)cerrarDiaModal()">
+  <div class="modal-box" id="dia-modal-box"></div>
+</div>
+
+<script>
+// ============ MODELO DE DATOS ============
+// Estructura pensada para migrar a Claude Code + Notion (read-only) después.
+// Cada tarea tiene notionId:null reservado para el enlace futuro.
+
+const EJES = {
+  trabajo:   {nombre:'Tobi',  eje:'Trabajo',          color:'#5FA845', d:'#3B6D22', bg:'#EAF3DE', desc:'El más constante. No es el más rápido, pero nunca falla: aparece todos los días, sin drama. "Un paso, como siempre."'},
+  proyectos: {nombre:'Fofo',  eje:'Proyectos',        color:'#8B5CF6', d:'#4E2A9E', bg:'#EEEAFB', desc:'La chispa inventora. Se emociona fácil con ideas nuevas y te ayuda a elegir una semilla en vez de encenderlas todas. "¿Y si construimos...?"'},
+  educacion: {nombre:'Uma',   eje:'Educación',        color:'#F0A81E', d:'#8A5B06', bg:'#FBEED9', desc:'Aprende contigo. Sabia pero nada solemne: se equivoca, pregunta, disfruta no saber. "Curiosidad, no perfección."'},
+  cuidado:   {nombre:'Nubi',  eje:'Cuidado personal', color:'#E86A9B', d:'#932B53', bg:'#FBE7F0', desc:'La protectora. Atenta a tu energía, es la única que a veces te dice "hoy no". "Estar bien también cuenta."'},
+};
+const FASES = {
+  menstrual:  {n:'Fase menstrual',  sug:'Energía hacia adentro. Buen día para planear, cerrar y admin suave.'},
+  folicular:  {n:'Fase folicular',  sug:'Energía subiendo. Ideal para arrancar lo nuevo y difícil.'},
+  ovulatoria: {n:'Fase ovulatoria', sug:'Pico social. Ideal para llamadas, reuniones y presentar.'},
+  lutea:      {n:'Fase lútea',      sug:'Foco en detalle. Ideal para terminar, pulir y ordenar.'},
+};
+const ESTRELLAS = {1:'⭐',2:'⭐⭐',3:'⭐⭐⭐'};
+
+// fechaISO: fecha en YYYY-MM-DD según el calendario LOCAL del dispositivo (evita el bug de UTC)
+function fechaISO(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+const HOY = fechaISO(new Date());
+const MANANA = (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return fechaISO(d); })();
+const DOW_CORTO = ['dom','lun','mar','mié','jue','vie','sáb']; // Date.getDay(): 0=domingo
+
+// ============ FESTIVOS DE COLOMBIA ============
+// Domingo de Pascua (algoritmo de Gauss/Meeus, calendario gregoriano)
+function pascuaDomingo(year){
+  const a=year%19, b=Math.floor(year/100), c=year%100;
+  const d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25), g=Math.floor((b-f+1)/3);
+  const h=(19*a+b-d-g+15)%30, i=Math.floor(c/4), k=c%4;
+  const l=(32+2*e+2*i-h-k)%7, m=Math.floor((a+11*h+22*l)/451);
+  const mes=Math.floor((h+l-7*m+114)/31);
+  const dia=((h+l-7*m+114)%31)+1;
+  return new Date(year, mes-1, dia);
+}
+// traslada una fecha al lunes siguiente si no cae en lunes (Ley Emiliani)
+function siguienteLunes(d){
+  const dd=new Date(d);
+  const dow=dd.getDay();
+  const add=(8-dow)%7;
+  dd.setDate(dd.getDate()+add);
+  return dd;
+}
+// calcula todos los festivos colombianos de un año → {fechaISO: nombre}
+function festivosColombia(year){
+  const fests={};
+  const add=(d,nombre)=>{ fests[fechaISO(d)]=nombre; };
+  // fijos (no se trasladan)
+  add(new Date(year,0,1),'Año Nuevo');
+  add(new Date(year,4,1),'Día del Trabajo');
+  add(new Date(year,6,20),'Independencia de Colombia');
+  add(new Date(year,7,7),'Batalla de Boyacá');
+  add(new Date(year,11,8),'Inmaculada Concepción');
+  add(new Date(year,11,25),'Navidad');
+  // Ley Emiliani: se trasladan al lunes siguiente si no caen en lunes
+  [[new Date(year,0,6),'Reyes Magos'],
+   [new Date(year,2,19),'San José'],
+   [new Date(year,5,29),'San Pedro y San Pablo'],
+   [new Date(year,7,15),'Asunción de la Virgen'],
+   [new Date(year,9,12),'Día de la Raza'],
+   [new Date(year,10,1),'Todos los Santos'],
+   [new Date(year,10,11),'Independencia de Cartagena']
+  ].forEach(([d,n])=>add(siguienteLunes(d),n));
+  // móviles, relativos al Domingo de Pascua
+  const pascua = pascuaDomingo(year);
+  const mover=(dias)=>{ const d=new Date(pascua); d.setDate(d.getDate()+dias); return d; };
+  add(mover(-3),'Jueves Santo');
+  add(mover(-2),'Viernes Santo');
+  add(siguienteLunes(mover(39)),'Ascensión del Señor');
+  add(siguienteLunes(mover(60)),'Corpus Christi');
+  add(siguienteLunes(mover(68)),'Sagrado Corazón');
+  return fests;
+}
+function festivoEnFecha(fISO){
+  const year = parseInt(fISO.slice(0,4));
+  if(!window._festivosCache) window._festivosCache={};
+  if(!window._festivosCache[year]) window._festivosCache[year]=festivosColombia(year);
+  return window._festivosCache[year][fISO] || null;
+}
+// etiqueta corta de fecha para tags de tareas programadas, ej: "mañana", "jue 23"
+function etiquetaDiaCorta(fISO){
+  if(fISO===HOY) return 'hoy';
+  if(fISO===MANANA) return 'mañana';
+  const d=new Date(fISO+'T00:00');
+  return DOW_CORTO[d.getDay()]+' '+d.getDate();
+}
+
+let S = cargar();
+
+function cargar(){
+  try{
+    const raw = localStorage.getItem('refugio-ale');
+    if(raw){
+      const s = JSON.parse(raw);
+      // migración: asegurar que exista el objeto ciclo
+      if(!s.ciclo){
+        s.ciclo = {inicios:['2026-08-28'], duracionCiclo:28, duracionSangrado:7};
+      }
+      if(s.faseManual===undefined) s.faseManual=null;
+      if(!s.eventos) s.eventos=[];
+      if(!s.habitos) s.habitos=[
+        {id:'h1', txt:'Meditar', hechoDia:null},
+        {id:'h2', txt:'Tomar agua', hechoDia:null},
+        {id:'h3', txt:'Moverme / ejercicio', hechoDia:null},
+      ];
+      if(!s.rapidas) s.rapidas=[];
+      if(!s.historialEnergia) s.historialEnergia={};
+      if(!s.historialHabitos) s.historialHabitos=[];
+      if(!s.layout) s.layout=null;
+      if(!s.pausas) s.pausas={activas:false, cadaMin:50, dias:{}, sonido:true};
+      if(s.pausas.sonido===undefined) s.pausas.sonido=true;
+      return s;
+    }
+  }catch(e){}
+  return {
+    tareas: [],           // {id, txt, eje, dif, hecho, enHoy, notionId:null, fechaObjetivo:null, eventoId:null}
+    parqueadero: [],      // {id, txt}
+    bienestar: {trabajo:60, proyectos:70, educacion:55, cuidado:35},
+    nivel: {trabajo:2, proyectos:2, educacion:2, cuidado:1},
+    fase: 'folicular',
+    faseManual: null,     // si Ale corrige la fase a mano ese día: {dia:'YYYY-MM-DD', fase:'...'}
+    energia: 'media',
+    historialEnergia: {},  // {'YYYY-MM-DD': 'baja'|'media'|'alta'} — snapshot diario para el informe semanal
+    racha: 0,
+    ultimoDia: null,
+    modoBajo: false,
+    // ---- ciclo menstrual ----
+    ciclo: {
+      inicios: ['2026-08-28'],   // fechas de inicio de periodo (la más reciente al final)
+      duracionCiclo: 28,          // días entre periodos (se ajusta con el tiempo)
+      duracionSangrado: 7,        // días de sangrado aprox
+    },
+    // ---- eventos del calendario (gancho para Google Calendar en la versión completa) ----
+    eventos: [],   // {id, fecha:'YYYY-MM-DD', hora:'HH:MM'|null, txt, origen:'local'}
+    // ---- hábitos diarios (checklist que se reinicia cada día; alimentan a Nubi) ----
+    habitos: [
+      {id:'h1', txt:'Meditar', hechoDia:null},
+      {id:'h2', txt:'Tomar agua', hechoDia:null},
+      {id:'h3', txt:'Moverme / ejercicio', hechoDia:null},
+    ],
+    historialHabitos: [], // {fecha, id, txt} — log de cada marca, para el informe semanal
+    // ---- tareas rápidas (recados <5 min; persisten hasta marcarse; no dan bienestar) ----
+    rapidas: [],   // {id, txt, eje:null, hecho:false, fechaHecho:null}
+    layout: null,  // {orden:[...], columnas:{card:'main'|'side'}, alturas:{card:'123px'}} — acomodo manual de las secciones de Hoy
+    pausas: {activas:false, cadaMin:50, dias:{}, sonido:true},  // pausas activas: dias = {'YYYY-MM-DD': cuántas hechas}; sonido = tono en los avisos
+  };
+}
+function guardar(){ localStorage.setItem('refugio-ale', JSON.stringify(S)); }
+
+// ============ CÁLCULO DEL CICLO ============
+function diasEntre(a, b){
+  return Math.round((new Date(b+'T00:00') - new Date(a+'T00:00')) / 86400000);
+}
+// devuelve {diaCiclo, fase, sangrando, diasParaProximo}
+function calcularCiclo(){
+  const c = S.ciclo;
+  if(!c || !c.inicios || c.inicios.length===0) return null;
+  const validas = c.inicios.filter(f=>f<=HOY).sort();
+  if(validas.length===0) return null;
+  const ultimoInicio = validas[validas.length-1];
+  let dia = diasEntre(ultimoInicio, HOY) + 1; // día 1 = primer día del periodo
+  if(dia < 1) dia = 1;
+  const dur = c.duracionCiclo || 28;
+  // Si ya pasó la duración del ciclo, seguimos contando (periodo atrasado)
+  const ovu = dur - 14; // ovulación ~14 días antes del próximo periodo
+  let fase;
+  if(dia <= 5) fase='menstrual';
+  else if(dia <= ovu-1) fase='folicular';
+  else if(dia <= ovu+1) fase='ovulatoria';
+  else fase='lutea';
+  const sangrando = dia <= (c.duracionSangrado||6);
+  const diasParaProximo = dur - dia + 1;
+  return {dia, fase, sangrando, diasParaProximo, dur};
+}
+// aplica el cálculo a S.fase (respetando corrección manual del día)
+function actualizarFaseAuto(){
+  const calc = calcularCiclo();
+  if(!calc) return;
+  if(S.faseManual && S.faseManual.dia === HOY){
+    S.fase = S.faseManual.fase;   // Ale corrigió hoy, respetamos
+  } else {
+    S.fase = calc.fase;
+    S.faseManual = null;
+  }
+}
+
+function nid(){ return Date.now()+''+Math.floor(Math.random()*999); }
+
+// ---- racha: cuenta cualquier día que abres la app ----
+function chequearRacha(){
+  if(S.ultimoDia === HOY) return;
+  const _ayerD = new Date(); _ayerD.setDate(_ayerD.getDate()-1);
+  const ayer = fechaISO(_ayerD);
+  if(S.ultimoDia === ayer) S.racha++;
+  else if(S.ultimoDia === null) S.racha = 1;
+  else S.racha = 1; // se rompió, reinicia amable a 1 (hoy ya cuenta)
+  S.ultimoDia = HOY;
+  // decaimiento suave de bienestar por día nuevo (nunca a cero)
+  for(let k in S.bienestar){ S.bienestar[k] = Math.max(15, S.bienestar[k]-4); }
+  guardar();
+}
+
+// ============ RENDER ============
+function estadoTexto(v, k){
+  const nm = EJES[k].nombre;
+  if(v>=80) return {t:'Radiante y feliz', c:EJES[k].d};
+  if(v>=60) return {t:'Contenta y activa', c:EJES[k].d};
+  if(v>=40) return {t:'Tranquila, al día', c:EJES[k].d};
+  if(v>=25) return {t:'Te extraña un poco', c:EJES[k].d};
+  return {t:nm+' te extraña', c:EJES[k].d};
+}
+
+function fechaBonita(){
+  const d = new Date();
+  return d.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+}
+
+function render(){
+  document.getElementById('fecha').textContent = fechaBonita();
+  document.getElementById('racha-n').textContent = S.racha;
+  if(!S.historialEnergia[HOY]) S.historialEnergia[HOY]=S.energia; // asegura registro de hoy
+  renderCiclo();
+  renderCalendario();
+  renderMiSemana();
+  renderPausas();
+  renderHabitos();
+  renderRapidas();
+  activarProgramadasDeHoy();
+  renderHoy();
+  renderParqueadero();
+  renderEjes();
+  renderRefugio();
+  renderInformeSemanal();
+  // preservar estado del detalle de ciclo entre renders
+  const det=document.getElementById('ciclo-detalle');
+  const ban=document.getElementById('energia-banner');
+  if(det){ det.style.display=window._cicloAbierto?'block':'none'; ban.classList.toggle('abierto',!!window._cicloAbierto); }
+  guardar();
+}
+
+// activa automáticamente en "hoy" las tareas programadas (por evento) cuya fecha es HOY,
+// respetando el máximo de retos según la energía del día
+function activarProgramadasDeHoy(){
+  const max = maxRetosHoy();
+  let enHoy = S.tareas.filter(t=>t.enHoy && !t.hecho).length;
+  const candidatas = S.tareas.filter(t=>t.fechaObjetivo===HOY && !t.enHoy && !t.hecho);
+  candidatas.forEach(t=>{
+    if(max===Infinity || enHoy<max){ t.enHoy=true; enHoy++; }
+  });
+}
+
+// ============ CALENDARIO ============
+let _calMes = null; // {y, m} mes visible; null = mes actual
+function calRef(){
+  if(_calMes) return new Date(_calMes.y, _calMes.m, 1);
+  const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1);
+}
+function mesCal(delta){
+  const r = calRef();
+  r.setMonth(r.getMonth()+delta);
+  _calMes = {y:r.getFullYear(), m:r.getMonth()};
+  renderCalendario();
+}
+// referencia (lunes) de la semana visible, según el offset de semanas navegado
+function calRefSemanaInicio(){
+  const base = new Date(inicioSemana(HOY)+'T00:00');
+  base.setDate(base.getDate() + (window._semanaOffset||0)*7);
+  return base;
+}
+function calNav(delta){
+  if(window._calModo==='semana'){
+    window._semanaOffset = (window._semanaOffset||0)+delta;
+    renderCalendario();
+  } else {
+    mesCal(delta);
+  }
+}
+function setCalModo(modo){
+  window._calModo = modo;
+  renderCalendario();
+}
+// ¿está sangrando en la fecha f? (según ciclos registrados)
+function sangradoEnFecha(fISO){
+  const c = S.ciclo;
+  for(const ini of c.inicios){
+    const diff = diasEntre(ini, fISO);
+    if(diff>=0 && diff < (c.duracionSangrado||6)) return true;
+  }
+  return false;
+}
+function renderSemana(){
+  const cont = document.getElementById('cal-semana');
+  if(!cont) return;
+  const inicio = calRefSemanaInicio();
+  const nombresCortos=['L','M','X','J','V','S','D'];
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(inicio); d.setDate(d.getDate()+i);
+    const fISO=fechaISO(d);
+    const evDia=S.eventos.filter(ev=>ev.fecha===fISO).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
+    const esHoy = fISO===HOY;
+    const sangra = sangradoEnFecha(fISO);
+    const fest = festivoEnFecha(fISO);
+    const maxEv = fest ? 2 : 3;
+    let chips = fest ? `<div class="sem-ev" style="border-left:3px solid var(--educacion);font-weight:700;" title="${escapeHtml(fest)}">🎉 ${escapeHtml(fest)}</div>` : '';
+    chips += evDia.slice(0,maxEv).map(ev=>{
+      const e = ev.eje?EJES[ev.eje]:null;
+      return `<div class="sem-ev" style="${e?'border-left:3px solid '+e.color+';':''}" title="${escapeHtml((ev.hora?ev.hora+' · ':'')+ev.txt)}">${ev.hora?ev.hora+' ':''}${escapeHtml(ev.txt)}</div>`;
+    }).join('');
+    if(evDia.length>maxEv) chips += `<div class="sem-ev-mas">+${evDia.length-maxEv} más</div>`;
+    html += `<div class="sem-dia${esHoy?' hoy':''}" onclick="abrirFormEvento('${fISO}')">
+      <div class="sem-dia-head"><span>${nombresCortos[i]}</span><span class="sem-dia-num">${d.getDate()}</span>${sangra?'<span class="sem-sangrado-dot"></span>':''}</div>
+      <div class="sem-eventos">${chips || '<div class="sem-vacio">—</div>'}</div>
+    </div>`;
+  }
+  cont.innerHTML = html;
+}
+function renderCalendario(){
+  if(!window._calModo) window._calModo='mes';
+  const modo = window._calModo;
+  const ref = calRef();
+  const y = ref.getFullYear(), m = ref.getMonth();
+  const tEl = document.getElementById('cal-titulo');
+  if(!tEl) return;
+  const gridEl = document.getElementById('cal-grid');
+  const semEl = document.getElementById('cal-semana');
+  // botones de modo
+  document.querySelectorAll('.cal-modo-btn').forEach(b=>{
+    b.classList.toggle('on', b.dataset.modo===modo);
+    b.onclick=()=>setCalModo(b.dataset.modo);
+  });
+  if(modo==='semana'){
+    gridEl.style.display='none';
+    semEl.style.display='grid';
+    const inicioSem = calRefSemanaInicio();
+    const finSem = new Date(inicioSem); finSem.setDate(finSem.getDate()+6);
+    const opts={day:'numeric',month:'short'};
+    tEl.textContent = inicioSem.toLocaleDateString('es',opts)+' – '+finSem.toLocaleDateString('es',opts);
+    renderSemana();
+  } else {
+    gridEl.style.display='grid';
+    semEl.style.display='none';
+    tEl.textContent = ref.toLocaleDateString('es',{month:'long',year:'numeric'});
+  }
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML='';
+  ['L','M','X','J','V','S','D'].forEach(d=>{
+    const e=document.createElement('div'); e.className='cal-dow'; e.textContent=d; grid.appendChild(e);
+  });
+  const primero = new Date(y,m,1);
+  let offset = (primero.getDay()+6)%7; // lunes=0
+  const diasMes = new Date(y,m+1,0).getDate();
+  const diasPrev = new Date(y,m,0).getDate();
+  for(let i=offset;i>0;i--){
+    const e=document.createElement('div'); e.className='cal-dia otro'; e.textContent=diasPrev-i+1; grid.appendChild(e);
+  }
+  for(let d=1;d<=diasMes;d++){
+    const cell=document.createElement('div');
+    cell.className='cal-dia';
+    const fISO = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    if(fISO===HOY) cell.classList.add('hoy');
+    if(sangradoEnFecha(fISO)) cell.classList.add('sangrado');
+    const fest = festivoEnFecha(fISO);
+    if(fest) cell.classList.add('festivo');
+    const evDia = S.eventos.filter(ev=>ev.fecha===fISO);
+    if(evDia.length) cell.classList.add('con-evento');
+    cell.textContent=d;
+    cell.onclick=()=>abrirFormEvento(fISO);
+    const titlePartes=[];
+    if(fest) titlePartes.push('🎉 '+fest);
+    if(evDia.length){
+      const evOrdenados=[...evDia].sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
+      evOrdenados.forEach(ev=> titlePartes.push((ev.hora?ev.hora+' · ':'')+ev.txt) );
+    }
+    if(titlePartes.length) cell.title = titlePartes.join('\n');
+    grid.appendChild(cell);
+  }
+  // eventos del rango visible (mes o semana, según el modo) — solo hoy y futuros
+  const evCont=document.getElementById('cal-eventos');
+  let evMes;
+  if(modo==='semana'){
+    const inicioSem = calRefSemanaInicio();
+    const finSem = new Date(inicioSem); finSem.setDate(finSem.getDate()+6);
+    const iniISO = fechaISO(inicioSem), finISO = fechaISO(finSem);
+    evMes = S.eventos.filter(ev=>ev.fecha>=iniISO && ev.fecha<=finISO && ev.fecha>=HOY);
+  } else {
+    evMes = S.eventos.filter(ev=>ev.fecha.slice(0,7)===`${y}-${String(m+1).padStart(2,'0')}` && ev.fecha>=HOY);
+  }
+  evMes.sort((a,b)=> (a.fecha+ (a.hora||'99:99')).localeCompare(b.fecha+(b.hora||'99:99')) );
+  evCont.innerHTML='';
+  if(evMes.length===0){
+    evCont.innerHTML='<div style="font-size:.76rem;color:var(--gris-cl);padding:6px 2px;">Sin eventos próximos '+(modo==='semana'?'esta semana':'este mes')+' ✨</div>';
+  }
+  evMes.forEach(ev=>{
+    const d=new Date(ev.fecha+'T00:00').toLocaleDateString('es',{day:'numeric',month:'short'});
+    const hora = ev.hora ? ' · '+ev.hora : '';
+    const e = ev.eje ? EJES[ev.eje] : null;
+    const row=document.createElement('div');
+    row.className='cal-ev';
+    row.innerHTML=`<span class="ev-fecha">${d}${hora}</span>${e?`<span class="eje-dot" style="background:${e.color}"></span>`:''}<span>${escapeHtml(ev.txt)}</span><button class="ev-del" onclick="borrarEvento('${ev.id}')">✕</button>`;
+    evCont.appendChild(row);
+  });
+  // llenar select de ejes del formulario (una sola vez)
+  const ejeSel = document.getElementById('evento-eje');
+  if(ejeSel && ejeSel.options.length<=1){
+    for(let k in EJES){
+      const o=document.createElement('option');
+      o.value=k; o.textContent=EJES[k].nombre+' · '+EJES[k].eje;
+      ejeSel.appendChild(o);
+    }
+  }
+  // llenar selects de hora (24h) y minutos, una sola vez
+  const hSel = document.getElementById('evento-hora-h');
+  if(hSel && hSel.options.length<=1){
+    for(let h=0; h<24; h++){
+      const o=document.createElement('option');
+      o.value=String(h).padStart(2,'0'); o.textContent=String(h).padStart(2,'0');
+      hSel.appendChild(o);
+    }
+  }
+  const mSel = document.getElementById('evento-hora-m');
+  if(mSel && mSel.options.length<=1){
+    ['00','15','30','45'].forEach(m=>{
+      const o=document.createElement('option');
+      o.value=m; o.textContent=m;
+      mSel.appendChild(o);
+    });
+  }
+  const addBtn=document.getElementById('cal-add');
+  if(addBtn) addBtn.onclick=()=>abrirFormEvento(HOY);
+  // toggle del panel
+  const tog=document.getElementById('toggle-cal');
+  const panel=document.getElementById('cal-panel');
+  if(tog && panel){
+    panel.style.display = window._calAbierto ? 'block':'none';
+    tog.onclick=()=>{ window._calAbierto=!window._calAbierto; panel.style.display=window._calAbierto?'block':'none'; };
+    const badge=document.getElementById('cal-badge');
+    if(badge){
+      const n=S.eventos.filter(ev=>ev.fecha>=HOY).length;
+      badge.textContent = n>0 ? '· '+n+' próximo'+(n>1?'s':'') : '';
+    }
+  }
+}
+function abrirFormEvento(fISO){
+  window._calAbierto=true;
+  window._eventoFecha=fISO;
+  const form=document.getElementById('evento-form');
+  const fechaEl=document.getElementById('evento-form-fecha');
+  fechaEl.textContent='📅 '+new Date(fISO+'T00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('evento-txt').value='';
+  document.getElementById('evento-hora-h').value='';
+  document.getElementById('evento-hora-m').value='';
+  document.getElementById('evento-eje').value='';
+  document.getElementById('evento-dif').value='1';
+  form.style.display='block';
+  document.getElementById('evento-txt').focus();
+}
+function cerrarFormEvento(){
+  document.getElementById('evento-form').style.display='none';
+}
+function guardarEvento(){
+  const fISO = window._eventoFecha || HOY;
+  const txt = document.getElementById('evento-txt').value.trim();
+  if(!txt){ toast('Escribe qué es el evento'); return; }
+  const hh = document.getElementById('evento-hora-h').value;
+  const mm = document.getElementById('evento-hora-m').value;
+  const hora = hh ? (hh+':'+(mm||'00')) : null;
+  const eje = document.getElementById('evento-eje').value || null;
+  const dif = parseInt(document.getElementById('evento-dif').value);
+  const evId = nid();
+  S.eventos.push({id:evId, fecha:fISO, hora:hora, txt:txt, origen:'local', eje:eje, dif:eje?dif:null});
+  if(eje){
+    S.tareas.push({id:nid(), txt:txt, eje:eje, dif:dif, hecho:false, enHoy:false, notionId:null, fechaObjetivo:fISO, eventoId:evId, hora:hora, durMin:null});
+  }
+  cerrarFormEvento();
+  toast(eje ? 'Evento y reto programados 📅' : 'Evento añadido 📅');
+  render();
+}
+function borrarEvento(id){
+  S.eventos=S.eventos.filter(e=>e.id!==id);
+  S.tareas=S.tareas.filter(t=>t.eventoId!==id);
+  window._calAbierto=true;
+  render();
+}
+
+function renderCiclo(){
+  actualizarFaseAuto();
+  const calc = calcularCiclo();
+  const nombreEl = document.getElementById('fase-nombre');
+  const sugEl = document.getElementById('fase-sug');
+
+  if(calc){
+    const corregida = (S.faseManual && S.faseManual.dia===HOY);
+    let etiqueta = FASES[S.fase].n + ' · día ' + calc.dia;
+    if(calc.sangrando) etiqueta += ' 🩸';
+    if(corregida) etiqueta += ' ✎';
+    nombreEl.textContent = etiqueta;
+    let sug = FASES[S.fase].sug;
+    const proximoEl = document.getElementById('fase-proximo');
+    // aviso suave próximo periodo
+    if(calc.diasParaProximo <= 2 && calc.diasParaProximo >= 0){
+      sug += ' · 🌙 Tu próximo periodo se acerca (~'+calc.diasParaProximo+(calc.diasParaProximo===1?' día':' días')+').';
+    } else if(calc.dia > calc.dur){
+      sug += ' · 🌙 Tu periodo podría estar por llegar. ¿Ya empezó? Regístralo abajo.';
+    }
+    sugEl.textContent = sug;
+    if(proximoEl){
+      if(calc.dia <= calc.dur){
+        const fProx = new Date(); fProx.setDate(fProx.getDate()+calc.diasParaProximo);
+        const fBonita = fProx.toLocaleDateString('es',{day:'numeric',month:'long'});
+        proximoEl.textContent = '📅 Próximo periodo estimado: '+fBonita;
+      } else {
+        proximoEl.textContent = '';
+      }
+    }
+  } else {
+    nombreEl.textContent = FASES[S.fase].n;
+    sugEl.textContent = FASES[S.fase].sug;
+  }
+
+  // ---- mensaje discreto de energía (fase + circadiano) ----
+  renderEnergiaBanner(calc);
+
+  const pills = document.getElementById('fase-pills');
+  pills.innerHTML = '<span class="lbl" style="font-size:.72rem;color:var(--gris-cl);align-self:center;margin-right:2px;">Corregir fase:</span>';
+  for(let k in FASES){
+    const b = document.createElement('button');
+    b.className = 'fase-pill'+(S.fase===k?' on':'');
+    b.textContent = FASES[k].n.replace('Fase ','');
+    b.onclick = ()=>{ S.faseManual={dia:HOY, fase:k}; S.fase=k; render(); };
+    pills.appendChild(b);
+  }
+  const er = document.getElementById('energia-row');
+  er.innerHTML = '';
+  ['baja','media','alta'].forEach(e=>{
+    const b = document.createElement('button');
+    b.className='en-pill'+(S.energia===e?' on':'');
+    b.textContent=e;
+    b.onclick=()=>{S.energia=e; S.historialEnergia[HOY]=e; render();};
+    er.appendChild(b);
+  });
+  // registro de periodo por fecha
+  const fechaInp = document.getElementById('fecha-periodo');
+  const guardarBtn = document.getElementById('guardar-periodo');
+  const toggleReg = document.getElementById('toggle-registro');
+  if(fechaInp && !fechaInp.value){ fechaInp.value = HOY; fechaInp.max = HOY; }
+  if(guardarBtn){ guardarBtn.onclick = guardarPeriodo; }
+  if(toggleReg){
+    const panel = document.getElementById('registro-panel');
+    panel.style.display = window._regAbierto ? 'block' : 'none';
+    toggleReg.onclick = ()=>{
+      window._regAbierto = !window._regAbierto;
+      panel.style.display = window._regAbierto ? 'block' : 'none';
+    };
+  }
+  renderListaPeriodos();
+  document.getElementById('modo-bajo').style.display = S.modoBajo?'flex':'none';
+  document.getElementById('btn-modo-bajo').style.display = S.modoBajo?'none':'block';
+}
+
+function franjaCircadiana(){
+  const h = new Date().getHours();
+  if(h < 13) return {tramo:'mañana', reco:'trabajo profundo', tip:'Aprovecha la mañana para lo difícil (TFM, diseño, lo que requiere foco).'};
+  if(h < 19) return {tramo:'tarde', reco:'admin y social', tip:'La tarde es tu momento para correos, llamadas, aplicar a empleos y networking.'};
+  return {tramo:'noche', reco:'cerrar y descansar', tip:'De noche, cierra el día suave: revisa lo hecho y prepara mañana.'};
+}
+function renderEnergiaBanner(calc){
+  const msgEl = document.getElementById('energia-msg');
+  const notaEl = document.getElementById('side-circadiano');
+  if(!msgEl) return;
+  const cir = franjaCircadiana();
+  const faseCorta = FASES[S.fase].n.replace('Fase ','');
+  // emoji según fase
+  const emo = {menstrual:'🌙',folicular:'🌱',ovulatoria:'☀️',lutea:'🍂'}[S.fase] || '✨';
+  msgEl.textContent = `${emo} ${faseCorta} + ${cir.tramo} → tu mejor momento para ${cir.reco}`;
+  if(notaEl){
+    let extra = '';
+    if(calc){
+      extra = `Estás en el día ${calc.dia} de tu ciclo. `;
+      if(calc.diasParaProximo<=5 && calc.diasParaProximo>=0) extra += `Tu próximo periodo llega en ~${calc.diasParaProximo} ${calc.diasParaProximo===1?'día':'días'}. `;
+    }
+    notaEl.innerHTML = `<b>${cir.tramo.charAt(0).toUpperCase()+cir.tramo.slice(1)}:</b> ${cir.tip}<br><span style="color:var(--gris-cl)">${extra}Toca el mensaje de arriba para ver tu ciclo.</span>`;
+  }
+}
+function toggleCiclo(){
+  window._cicloAbierto = !window._cicloAbierto;
+  const det = document.getElementById('ciclo-detalle');
+  const ban = document.getElementById('energia-banner');
+  det.style.display = window._cicloAbierto ? 'block' : 'none';
+  ban.classList.toggle('abierto', window._cicloAbierto);
+}
+
+// ============ HÁBITOS DIARIOS ============
+function renderHabitos(){
+  const cont = document.getElementById('habitos-lista');
+  if(!cont) return;
+  cont.innerHTML='';
+  let hechos=0;
+  S.habitos.forEach(h=>{
+    const done = h.hechoDia===HOY;
+    if(done) hechos++;
+    const row=document.createElement('div');
+    row.className='habito'+(done?' hecho':'');
+    row.innerHTML=`
+      <button class="check" onclick="toggleHabito('${h.id}')">${done?'✓':''}</button>
+      <span class="habito-txt">${escapeHtml(h.txt)}</span>
+      <button class="habito-del" onclick="borrarHabito('${h.id}')" title="Quitar hábito">×</button>`;
+    cont.appendChild(row);
+  });
+  const prog=document.getElementById('habitos-prog');
+  if(prog) prog.textContent = S.habitos.length ? hechos+'/'+S.habitos.length : '';
+}
+function toggleHabito(id){
+  const h=S.habitos.find(x=>x.id===id);
+  if(!h) return;
+  if(h.hechoDia===HOY){
+    h.hechoDia=null;
+    S.historialHabitos = S.historialHabitos.filter(r=>!(r.fecha===HOY && r.id===id));
+  } else {
+    h.hechoDia=HOY;
+    S.historialHabitos.push({fecha:HOY, id:id, txt:h.txt});
+    // los hábitos alimentan a Nubi (cuidado), poquito
+    S.bienestar.cuidado=Math.min(100,S.bienestar.cuidado+4);
+    toast('Nubi lo agradece 💗 +4');
+  }
+  render();
+}
+function addHabito(){
+  const inp=document.getElementById('add-habito-inp');
+  const t=inp.value.trim();
+  if(!t) return;
+  S.habitos.push({id:nid(),txt:t,hechoDia:null});
+  inp.value='';
+  render();
+}
+function borrarHabito(id){
+  S.habitos=S.habitos.filter(x=>x.id!==id);
+  render();
+}
+
+// ============ TAREAS RÁPIDAS ============
+function renderRapidas(){
+  const cont=document.getElementById('rapidas-lista');
+  if(!cont) return;
+  const pend=S.rapidas.filter(r=>!r.hecho);
+  cont.innerHTML='';
+  if(pend.length===0){
+    cont.innerHTML='<div style="font-size:.76rem;color:var(--gris-cl);padding:4px 0;">Sin recados pendientes ✨</div>';
+  }
+  pend.forEach(r=>{
+    const e = r.eje ? EJES[r.eje] : null;
+    const row=document.createElement('div');
+    row.className='habito';
+    row.innerHTML=`
+      <button class="check" onclick="toggleRapida('${r.id}')"></button>
+      ${e?`<span class="rapida-dot" style="background:${e.color}"></span>`:''}
+      <span class="habito-txt">${escapeHtml(r.txt)}</span>
+      <button class="habito-del" onclick="borrarRapida('${r.id}')" title="Quitar">×</button>`;
+    cont.appendChild(row);
+  });
+  const prog=document.getElementById('rapidas-prog');
+  if(prog) prog.textContent = pend.length ? pend.length+' pend.' : '';
+}
+function toggleRapida(id){
+  const r=S.rapidas.find(x=>x.id===id);
+  if(!r) return;
+  r.hecho=true;               // al marcarla, sale de la lista (no da bienestar)
+  r.fechaHecho=HOY;
+  toast('Hecho, fuera del radar ✓');
+  render();
+}
+function addRapida(){
+  const inp=document.getElementById('add-rapida-inp');
+  const t=inp.value.trim();
+  if(!t) return;
+  S.rapidas.push({id:nid(),txt:t,eje:null,hecho:false,fechaHecho:null});
+  inp.value='';
+  render();
+}
+function borrarRapida(id){
+  S.rapidas=S.rapidas.filter(x=>x.id!==id);
+  render();
+}
+
+function renderListaPeriodos(){
+  const cont = document.getElementById('lista-periodos');
+  if(!cont) return;
+  const ins = [...S.ciclo.inicios].sort().reverse();
+  if(ins.length===0){ cont.innerHTML=''; return; }
+  cont.innerHTML = ins.map(f=>{
+    const d = new Date(f+'T00:00').toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'});
+    return `<div style="display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--gris);padding:3px 0;">
+      <span>🩸 ${d}</span>
+      <button onclick="borrarPeriodo('${f}')" style="margin-left:auto;color:var(--gris-cl);font-size:.74rem;">borrar</button>
+    </div>`;
+  }).join('');
+}
+
+function guardarPeriodo(){
+  const inp = document.getElementById('fecha-periodo');
+  const fecha = inp.value;
+  if(!fecha){ toast('Elige una fecha primero'); return; }
+  if(fecha > HOY){ toast('Esa fecha es futura 🌙'); return; }
+  if(S.ciclo.inicios.includes(fecha)){ toast('Esa fecha ya está registrada 🩸'); return; }
+  S.ciclo.inicios.push(fecha);
+  S.ciclo.inicios.sort();
+  aprenderDuracion();
+  S.faseManual=null;
+  window._regAbierto = true;
+  toast('Periodo registrado 🌙');
+  render();
+}
+function borrarPeriodo(fecha){
+  S.ciclo.inicios = S.ciclo.inicios.filter(f=>f!==fecha);
+  aprenderDuracion();
+  S.faseManual=null;
+  window._regAbierto = true;
+  toast('Fecha eliminada');
+  render();
+}
+// aprende duración promediando los últimos ciclos reales
+function aprenderDuracion(){
+  const ins = S.ciclo.inicios;
+  if(ins.length < 2) return;
+  const difs = [];
+  for(let i=1;i<ins.length;i++){
+    const d = diasEntre(ins[i-1], ins[i]);
+    if(d>=18 && d<=40) difs.push(d); // filtrar valores raros
+  }
+  if(difs.length){
+    const prom = Math.round(difs.reduce((a,b)=>a+b,0)/difs.length);
+    S.ciclo.duracionCiclo = prom;
+  }
+}
+
+// ============ MI SEMANA (resumen visible desde Hoy) ============
+function renderMiSemana(){
+  const cont = document.getElementById('mi-semana');
+  if(!cont) return;
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()+i);
+    const fISO=fechaISO(d);
+    const tareasDia = S.tareas.filter(t=>!t.hecho && (t.fechaObjetivo===fISO || (fISO===HOY && t.enHoy)));
+    const fest = festivoEnFecha(fISO);
+    const dots = tareasDia.slice(0,4).map(t=>`<span class="ms-dot" style="background:${EJES[t.eje].color}" title="${escapeHtml(t.txt)}"></span>`).join('');
+    const extra = tareasDia.length>4 ? `<span class="ms-mas">+${tareasDia.length-4}</span>` : '';
+    html += `<div class="ms-dia${fISO===HOY?' hoy':''}" title="${fest?escapeHtml(fest):''}" onclick="abrirDiaModal('${fISO}')">
+      <div class="ms-dow">${i===0?'hoy':DOW_CORTO[d.getDay()]}</div>
+      <div class="ms-num">${d.getDate()}${fest?' 🎉':''}</div>
+      <div class="ms-dots">${dots || '<span class="ms-vacio">–</span>'}${extra}</div>
+    </div>`;
+  }
+  cont.innerHTML = html;
+}
+// ---- modal: ver/gestionar las tareas de un día concreto, tocando "Mi semana" ----
+function abrirDiaModal(fISO){
+  const tareasDia = S.tareas.filter(t=>!t.hecho && (t.fechaObjetivo===fISO || (fISO===HOY && t.enHoy)));
+  const eventosDia = S.eventos.filter(ev=>ev.fecha===fISO).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
+  const fest = festivoEnFecha(fISO);
+  const d = new Date(fISO+'T00:00');
+  const titulo = d.toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+
+  let body = fest ? `<div class="modal-fest">🎉 ${escapeHtml(fest)}</div>` : '';
+
+  if(eventosDia.length){
+    body += eventosDia.map(ev=>{
+      const e = ev.eje ? EJES[ev.eje] : null;
+      return `<div class="modal-item">
+        ${e?`<span class="eje-dot" style="background:${e.color}"></span>`:'<span style="font-size:.9rem;">📌</span>'}
+        <span class="modal-item-txt">${ev.hora?'<b>'+ev.hora+'</b> · ':''}${escapeHtml(ev.txt)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  const tareasSinEvento = tareasDia.filter(t=>!t.eventoId);
+  if(tareasSinEvento.length){
+    body += tareasSinEvento.map(t=>{
+      const e = EJES[t.eje];
+      return `<div class="modal-item">
+        <button class="check" style="width:22px;height:22px;font-size:12px;" onclick="toggleHecho('${t.id}');abrirDiaModal('${fISO}')"></button>
+        <span class="eje-dot" style="background:${e.color}"></span>
+        <span class="modal-item-txt">${t.hora?'<b>'+t.hora+'</b> · ':''}${escapeHtml(t.txt)} <span class="estrellas">${ESTRELLAS[t.dif]}</span></span>
+        <button class="tag-x" style="color:var(--gris-cl);font-size:1rem;" onclick="quitarPrograma('${t.id}');abrirDiaModal('${fISO}')" title="Quitar de este día">×</button>
+      </div>`;
+    }).join('');
+  }
+
+  if(!eventosDia.length && !tareasSinEvento.length && !fest){
+    body += '<div class="vacio" style="padding:18px 4px;"><span class="em">🌱</span><p>Nada programado este día todavía.</p></div>';
+  }
+
+  document.getElementById('dia-modal-box').innerHTML = `
+    <div class="modal-head"><h3>${titulo}</h3><button class="modal-close" onclick="cerrarDiaModal()">×</button></div>
+    ${body}
+    ${fISO>=HOY ? `<button class="btn-primary" style="background:#fff;color:var(--tinta);border:1px solid var(--linea);margin-top:4px;" onclick="irAEventoDesdeModal('${fISO}')">+ Añadir evento este día</button>` : ''}`;
+  document.getElementById('dia-modal-overlay').classList.add('show');
+}
+function cerrarDiaModal(){
+  document.getElementById('dia-modal-overlay').classList.remove('show');
+}
+function irAEventoDesdeModal(fISO){
+  cerrarDiaModal();
+  window._calAbierto = true;
+  render();
+  abrirFormEvento(fISO);
+}
+
+function renderHoy(){
+  const cont = document.getElementById('retos-hoy');
+  const hoy = S.tareas.filter(t=>t.enHoy && !t.hecho);
+  const max = maxRetosHoy();
+  const hintEl = document.getElementById('retos-hint');
+  if(hintEl) hintEl.textContent = (max===Infinity ? 'energía alta · sin límite' : 'máx '+max) + ' · la #1 es sagrada';
+  cont.innerHTML='';
+  if(hoy.length===0){
+    const maxTxt = max===Infinity ? 'los que quieras, tienes energía alta 🔥' : 'máximo '+max;
+    cont.innerHTML='<div class="vacio"><span class="em">🌱</span><p>Aún no has elegido tus retos de hoy.<br>Ve a tus ejes y toma '+maxTxt+'.</p></div>';
+    return;
+  }
+  // los retos con hora van primero, ordenados por hora; los demás conservan su orden
+  const conHora = hoy.filter(t=>t.hora).sort((a,b)=>a.hora.localeCompare(b.hora));
+  const sinHora = hoy.filter(t=>!t.hora);
+  [...conHora, ...sinHora].forEach(t=>{
+    const e = EJES[t.eje];
+    const enCurso = tareaEnCurso(t);
+    const editando = window._horaEditando===t.id;
+    const chipTxt = t.hora ? '🕐 '+t.hora+(t.durMin?' · '+t.durMin+' min':'') : '🕐 + hora';
+    const d = document.createElement('div');
+    d.className='reto'+(t.hecho?' hecho':'')+(enCurso?' en-curso':'');
+    let editorHtml = '';
+    if(editando){
+      const durOpts = [['','Sin duración'],[15,'15 min'],[30,'30 min'],[45,'45 min'],[60,'1 h'],[90,'1 h 30'],[120,'2 h']]
+        .map(([v,l])=>`<option value="${v}"${(t.durMin||'')===v?' selected':''}>${l}</option>`).join('');
+      editorHtml = `<div class="hora-editor">
+        <input type="time" id="hora-inp" value="${t.hora||''}">
+        <select id="dur-sel">${durOpts}</select>
+        <button class="hora-ok" onclick="guardarHora('${t.id}')">Guardar</button>
+        ${t.hora?`<button class="hora-quitar" onclick="quitarHora('${t.id}')">Quitar</button>`:''}
+        <button class="hora-quitar" onclick="editarHora('${t.id}')">Cancelar</button>
+      </div>`;
+    }
+    d.innerHTML = `
+      <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
+      <div class="reto-body">
+        <div class="reto-txt">${escapeHtml(t.txt)}</div>
+        <div class="reto-meta">
+          <span class="eje-dot" style="background:${e.color}"></span>
+          <span class="reto-eje">${e.nombre} · ${e.eje}</span>
+          <span class="estrellas">${ESTRELLAS[t.dif]}</span>
+          <button class="hora-chip${t.hora?' con-hora':''}" onclick="editarHora('${t.id}')">${chipTxt}</button>
+          ${enCurso?'<span class="tag-curso">en curso</span>':''}
+        </div>
+        ${editorHtml}
+      </div>
+      <button class="reto-del" onclick="quitarDeHoy('${t.id}')">×</button>`;
+    cont.appendChild(d);
+  });
+}
+
+// ============ HORAS DE LOS RETOS + AVISOS + PAUSAS ACTIVAS ============
+function minDe(hhmm){ const [h,m]=hhmm.split(':').map(Number); return h*60+m; }
+function hhmm(ts){ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function tareaEnCurso(t){
+  if(!t.hora || t.hecho) return false;
+  const n = new Date(); const ahoraMin = n.getHours()*60+n.getMinutes();
+  const ini = minDe(t.hora);
+  return ahoraMin>=ini && ahoraMin < ini+(t.durMin||30);
+}
+function editarHora(id){
+  window._horaEditando = (window._horaEditando===id) ? null : id;
+  renderHoy();
+}
+function guardarHora(id){
+  const t=S.tareas.find(x=>x.id===id); if(!t) return;
+  const h=document.getElementById('hora-inp').value;
+  const dur=parseInt(document.getElementById('dur-sel').value)||null;
+  t.hora = h||null; t.durMin = h?dur:null;
+  t.avisadoDia=null; t.snooze=0;
+  window._horaEditando=null;
+  if(h){ pedirPermisoNotif(); toast('Hora guardada 🕐'); }
+  render();
+}
+function quitarHora(id){
+  const t=S.tareas.find(x=>x.id===id); if(!t) return;
+  t.hora=null; t.durMin=null; t.avisadoDia=null;
+  window._horaEditando=null;
+  render();
+}
+
+// ---- notificación del navegador (solo funciona con la app abierta en una pestaña) ----
+function pedirPermisoNotif(){
+  try{ if('Notification' in window && Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+}
+function notificarSistema(titulo, cuerpo){
+  try{
+    if(!('Notification' in window) || Notification.permission!=='granted') return;
+    // solo si no la estás viendo: pestaña oculta, o ventana sin foco
+    if(!(document.hidden || !document.hasFocus())) return;
+    if(window._notif){ try{ window._notif.close(); }catch(e){} }
+    const n = new Notification(titulo,{body:cuerpo, tag:'refugio-aviso', requireInteraction:true});
+    n.onclick = ()=>{ window.focus(); n.close(); };
+    window._notif = n;
+  }catch(e){}
+}
+function estadoNotif(){
+  if(!('Notification' in window)) return 'no-soportada';
+  return Notification.permission; // 'default' | 'granted' | 'denied'
+}
+function activarNotif(){
+  try{
+    Promise.resolve(Notification.requestPermission()).then(()=>{ renderPausas(); });
+  }catch(e){ renderPausas(); }
+}
+
+// ---- sonido (Web Audio, sin archivos): dos tonos distintos para reto y pausa ----
+function audioCtx(){
+  try{
+    if(!window._ac) window._ac = new (window.AudioContext||window.webkitAudioContext)();
+    if(window._ac.state==='suspended') window._ac.resume();
+    return window._ac;
+  }catch(e){ return null; }
+}
+function tono(ac, freq, t0, dur, vol){
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type='sine'; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(vol,t0+0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g); g.connect(ac.destination);
+  o.start(t0); o.stop(t0+dur+0.05);
+}
+function sonarAviso(tipo, forzar){
+  if(!forzar && S.pausas.sonido===false) return;
+  const ac = audioCtx(); if(!ac) return;
+  const t = ac.currentTime+0.03;
+  if(tipo==='pausa'){ tono(ac,659.25,t,0.7,0.3); tono(ac,523.25,t+0.3,1.0,0.26); }               // descendente, suave
+  else { tono(ac,523.25,t,0.5,0.3); tono(ac,659.25,t+0.22,0.5,0.3); tono(ac,783.99,t+0.44,1.0,0.3); } // ascendente, "empieza"
+}
+function toggleSonido(){
+  S.pausas.sonido = (S.pausas.sonido===false);
+  if(S.pausas.sonido) sonarAviso('pausa', true);
+  render();
+}
+function probarSonido(){ sonarAviso('pausa', true); setTimeout(()=>sonarAviso('reto', true), 1600); }
+// los navegadores solo dejan sonar audio después de un clic: lo "desbloqueamos" en el primer clic o tecla
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev, ()=>{ if(!window._ac || window._ac.state!=='running') audioCtx(); }));
+
+// ---- título de la pestaña parpadeando mientras haya un aviso y no estés mirando ----
+function iniciarParpadeoTitulo(texto){
+  if(window._tituloOriginal===undefined) window._tituloOriginal = document.title;
+  clearInterval(window._parpadeo);
+  let alt = false;
+  window._parpadeo = setInterval(()=>{
+    if(!document.hidden){ document.title = window._tituloOriginal; return; }
+    alt = !alt;
+    document.title = alt ? texto : window._tituloOriginal;
+  }, 1000);
+}
+function detenerParpadeoTitulo(){
+  clearInterval(window._parpadeo);
+  if(window._tituloOriginal!==undefined) document.title = window._tituloOriginal;
+}
+
+// ---- aviso flotante (un solo aviso a la vez) ----
+function mostrarAviso(icono, titulo, texto, botones){
+  window._avisoActivo = true;
+  const el = document.getElementById('aviso');
+  el.innerHTML = `<div class="aviso-ic">${icono}</div><div class="aviso-body"><div class="aviso-tit">${titulo}</div><div class="aviso-txt">${texto}</div><div class="aviso-acc">${botones.map((b,i)=>`<button class="aviso-btn${b.primario?' pri':''}" data-i="${i}">${b.txt}</button>`).join('')}</div></div>`;
+  el.querySelectorAll('.aviso-btn').forEach(btn=>{ btn.onclick=()=>{ cerrarAviso(); botones[btn.dataset.i].fn(); }; });
+  el.style.display='flex';
+  const tipo = (icono==='🧘') ? 'pausa' : 'reto';
+  const textoPlano = texto.replace(/<[^>]+>/g,'');
+  notificarSistema(titulo, textoPlano);
+  sonarAviso(tipo);
+  iniciarParpadeoTitulo(icono+' '+titulo);
+  // si no respondes, repite el sonido cada 45 s (máximo 3 veces más)
+  clearInterval(window._avisoTimer);
+  window._avisoRepeticiones = 0;
+  window._avisoTimer = setInterval(()=>{
+    if(!window._avisoActivo || ++window._avisoRepeticiones>3){ clearInterval(window._avisoTimer); return; }
+    sonarAviso(tipo);
+  }, 45000);
+}
+function cerrarAviso(){
+  window._avisoActivo = false;
+  clearInterval(window._avisoTimer);
+  detenerParpadeoTitulo();
+  if(window._notif){ try{ window._notif.close(); }catch(e){} window._notif=null; }
+  document.getElementById('aviso').style.display='none';
+}
+
+// ---- pausas activas ----
+const SUGERENCIAS_PAUSA = [
+  'Párate y estira cuello y hombros durante 1 minuto.',
+  'Mira algo lejano por 20 segundos (regla 20-20-20 para los ojos).',
+  'Camina 2 minutos y toma un vaso de agua.',
+  'Estira muñecas y antebrazos: 10 giros por lado.',
+  'De pie: 10 sentadillas suaves o inclina el torso hacia adelante.',
+  'Respira profundo 5 veces, con los hombros abajo y la mandíbula suelta.'
+];
+function togglePausas(){
+  S.pausas.activas = !S.pausas.activas;
+  if(S.pausas.activas){
+    window._proximaPausa = Date.now() + S.pausas.cadaMin*60000;
+    pedirPermisoNotif();
+    toast('Pausas activas encendidas 🧘');
+  } else {
+    toast('Pausas activas apagadas');
+  }
+  render();
+}
+function setCadaPausa(v){
+  S.pausas.cadaMin = parseInt(v)||50;
+  if(S.pausas.activas) window._proximaPausa = Date.now() + S.pausas.cadaMin*60000;
+  render();
+}
+function mostrarAvisoPausa(){
+  window._idxPausa = ((window._idxPausa||0)+1) % SUGERENCIAS_PAUSA.length;
+  mostrarAviso('🧘','Pausa activa',SUGERENCIAS_PAUSA[window._idxPausa],[
+    {txt:'Hecha ✓', primario:true, fn:pausaHecha},
+    {txt:'En 10 min', fn:()=>{ window._proximaPausa = Date.now()+10*60000; renderPausas(); }}
+  ]);
+}
+function pausaAhora(){
+  if(window._avisoActivo){ toast('Primero atiende el aviso abierto'); return; }
+  mostrarAvisoPausa();
+}
+function pausaHecha(){
+  const P=S.pausas;
+  P.dias[HOY] = (P.dias[HOY]||0)+1;
+  if(P.dias[HOY] <= 6){
+    S.bienestar.cuidado = Math.min(100, S.bienestar.cuidado+2);
+    toast('Nubi lo agradece 💗 +2');
+  } else {
+    toast('Pausa hecha ✓');
+  }
+  window._proximaPausa = Date.now() + P.cadaMin*60000;
+  render();
+}
+function renderPausas(){
+  const c = document.getElementById('pausas-cont');
+  if(!c) return;
+  const P = S.pausas;
+  const hechas = P.dias[HOY]||0;
+  const opts = [30,45,50,60,90].map(m=>`<option value="${m}"${P.cadaMin===m?' selected':''}>cada ${m} min</option>`).join('');
+  const estado = P.activas
+    ? 'Próximo aviso: <b>'+(window._proximaPausa?hhmm(window._proximaPausa):'--:--')+'</b> (solo entre 7:00 y 21:00).'
+    : 'Te aviso cada cierto tiempo para levantarte y mover el cuerpo.';
+  const en = estadoNotif();
+  const notifTxt = en==='granted' ? '🔔 Notificación emergente: activada (sale cuando no estás viendo la app).'
+    : en==='denied' ? '⚠️ Notificaciones bloqueadas por el navegador: actívalas en el candado de la barra de direcciones.'
+    : en==='default' ? '🔔 Notificación emergente: <button class="mini" style="display:inline-flex;padding:2px 9px;" onclick="activarNotif()">Activar</button>'
+    : 'Este navegador no permite notificaciones emergentes.';
+  c.innerHTML = `
+    <div class="side-tit">Pausas activas <span>${hechas} hoy</span></div>
+    <div class="pausa-row">
+      <button class="pausa-switch${P.activas?' on':''}" onclick="togglePausas()">${P.activas?'● Encendidas':'○ Apagadas'}</button>
+      <select class="pausa-sel" onchange="setCadaPausa(this.value)">${opts}</select>
+    </div>
+    <div class="side-nota">${estado}</div>
+    <button class="mini" style="margin-top:10px;" onclick="pausaAhora()">🧘 Hacer una pausa ahora</button>
+    <div class="pausa-row" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--linea);">
+      <button class="pausa-switch${P.sonido!==false?' on':''}" onclick="toggleSonido()">${P.sonido!==false?'🔔 Sonido: sí':'🔕 Sonido: no'}</button>
+      <button class="mini" onclick="probarSonido()">▶ Probar</button>
+    </div>
+    <div class="side-nota">${notifTxt}</div>
+    <div class="side-sub" style="margin-top:8px;margin-bottom:0;">Los avisos funcionan mientras la app esté abierta en una pestaña (puede estar en segundo plano).</div>`;
+}
+
+// ---- reloj: cada 20 s revisa si llegó la hora de un reto o toca una pausa ----
+function tickAvisos(){
+  const n = new Date(); const nowMs = n.getTime(); const nowMin = n.getHours()*60+n.getMinutes();
+  if(!window._avisoActivo && !S.modoBajo){
+    const t = S.tareas.find(x=>x.enHoy && !x.hecho && x.hora && x.avisadoDia!==HOY && (x.snooze||0)<=nowMs && nowMin>=minDe(x.hora) && nowMin<minDe(x.hora)+45);
+    if(t){
+      t.avisadoDia = HOY; guardar();
+      const dur = t.durMin ? ' ('+t.durMin+' min)' : '';
+      mostrarAviso('⏰','Es hora de tu reto', escapeHtml(t.txt)+dur, [
+        {txt:'Empiezo ✓', primario:true, fn:()=>{ renderHoy(); }},
+        {txt:'En 10 min', fn:()=>{ t.avisadoDia=null; t.snooze=Date.now()+10*60000; guardar(); }}
+      ]);
+    }
+  }
+  if(!window._avisoActivo && S.pausas.activas && n.getHours()>=7 && n.getHours()<21 && window._proximaPausa && nowMs>=window._proximaPausa){
+    mostrarAvisoPausa();
+  }
+  // refresca la marca "en curso" solo cuando cambia
+  const firma = S.tareas.filter(tareaEnCurso).map(t=>t.id).join(',');
+  if(firma!==window._firmaEnCurso){
+    window._firmaEnCurso = firma;
+    if(!window._horaEditando) renderHoy();
+  }
+}
+
+function renderParqueadero(){
+  const cont = document.getElementById('parqueadero');
+  document.getElementById('parq-count').textContent = S.parqueadero.length?S.parqueadero.length+' pendientes':'';
+  cont.innerHTML='';
+  if(S.parqueadero.length===0){
+    cont.innerHTML='<div class="vacio"><span class="em">✨</span><p>Parqueadero vacío. Todo repartido.</p></div>';
+    return;
+  }
+  S.parqueadero.forEach(p=>{
+    const d = document.createElement('div');
+    d.className='parq-item';
+    let botones='';
+    for(let k in EJES){
+      botones+=`<button class="mini" style="color:${EJES[k].d};border-color:${EJES[k].color}44" onclick="repartir('${p.id}','${k}')"><span class="eje-dot" style="background:${EJES[k].color}"></span>${EJES[k].nombre}</button>`;
+    }
+    d.innerHTML=`<div class="parq-txt">${escapeHtml(p.txt)}</div><div class="parq-acc">${botones}<button class="parq-del" onclick="borrarParq('${p.id}')">descartar</button></div>`;
+    cont.appendChild(d);
+  });
+}
+
+function svgMascota(k, size){
+  // Versiones simples dibujadas en código, con el color de cada eje
+  const e = EJES[k];
+  const c = e.color, d = e.d;
+  if(k==='trabajo') // dino redondo
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><ellipse cx="50" cy="58" rx="34" ry="32" fill="${c}"/><circle cx="50" cy="34" r="6" fill="none" stroke="${d}" stroke-width="3"/><circle cx="40" cy="52" r="4.5" fill="#2B2438"/><circle cx="60" cy="52" r="4.5" fill="#2B2438"/><circle cx="41.5" cy="50.5" r="1.5" fill="#fff"/><circle cx="61.5" cy="50.5" r="1.5" fill="#fff"/><path d="M43 62 Q50 67 57 62" stroke="#2B2438" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M45 62 l0 5 3 0 z" fill="#fff"/><path d="M55 62 l0 5 -3 0 z" fill="#fff"/><circle cx="30" cy="38" r="5" fill="${c}"/><circle cx="70" cy="38" r="5" fill="${c}"/><circle cx="24" cy="50" r="4.5" fill="${c}"/></svg>`;
+  if(k==='proyectos') // zorro con chispa
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><path d="M30 42 L24 26 L38 36 Z" fill="${c}"/><path d="M70 42 L76 26 L62 36 Z" fill="${c}"/><ellipse cx="50" cy="56" rx="30" ry="28" fill="${c}"/><circle cx="41" cy="54" r="5" fill="#2B2438"/><circle cx="59" cy="54" r="5" fill="#2B2438"/><circle cx="42.5" cy="52" r="1.6" fill="#fff"/><circle cx="60.5" cy="52" r="1.6" fill="#fff"/><path d="M44 64 Q50 69 56 64" stroke="#2B2438" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M46 42 l4 5 4 -5 z" fill="#F0A81E"/><path d="M78 60 Q92 54 88 40" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="88" cy="36" r="5" fill="#F0A81E"/><circle cx="80" cy="30" r="2.5" fill="#F0A81E"/></svg>`;
+  if(k==='educacion') // caracol con gafas
+    return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><path d="M20 72 Q18 58 32 58 L60 58 Q70 58 70 68 Z" fill="${c}"/><circle cx="64" cy="56" r="22" fill="${c}"/><circle cx="64" cy="56" r="15" fill="none" stroke="${d}" stroke-width="3"/><circle cx="64" cy="56" r="7" fill="none" stroke="${d}" stroke-width="2.5"/><ellipse cx="34" cy="52" rx="18" ry="17" fill="${c}"/><path d="M26 34 l-3 -9" stroke="${c}" stroke-width="3" stroke-linecap="round"/><path d="M40 34 l3 -9" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="23" cy="24" r="3.5" fill="#F0A81E"/><circle cx="45" cy="24" r="3.5" fill="#F0A81E"/><circle cx="28" cy="52" r="8" fill="none" stroke="#2B2438" stroke-width="2"/><circle cx="42" cy="52" r="8" fill="none" stroke="#2B2438" stroke-width="2"/><line x1="36" y1="52" x2="34" y2="52" stroke="#2B2438" stroke-width="2"/><circle cx="28" cy="52" r="3.5" fill="#2B2438"/><circle cx="42" cy="52" r="3.5" fill="#2B2438"/><path d="M31 60 Q35 63 39 60" stroke="#2B2438" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+  // cuidado: gata nube
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><path d="M28 38 l6 -12 6 12 z" fill="${c}"/><path d="M72 38 l-6 -12 -6 12 z" fill="${c}"/><ellipse cx="50" cy="56" rx="36" ry="26" fill="${c}"/><ellipse cx="26" cy="60" rx="12" ry="10" fill="${c}"/><ellipse cx="74" cy="60" rx="12" ry="10" fill="${c}"/><ellipse cx="50" cy="70" rx="20" ry="12" fill="${c}"/><path d="M50 44 a5 5 0 1 0 0.1 0 z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M40 56 Q43 60 46 56" stroke="${d}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M54 56 Q57 60 60 56" stroke="${d}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M47 62 Q50 65 53 62" stroke="${d}" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+}
+
+function renderEjes(){
+  const cont = document.getElementById('ejes-lista');
+  cont.innerHTML='';
+  if(!window._ejesAbiertos) window._ejesAbiertos={};
+  for(let k in EJES){
+    const e = EJES[k];
+    const v = Math.round(S.bienestar[k]);
+    const est = estadoTexto(v,k);
+    const tareas = S.tareas.filter(t=>t.eje===k && !t.hecho);
+    const abierto = !!window._ejesAbiertos[k];
+    const card = document.createElement('div');
+    card.className='eje-card';
+    let tareasHtml='';
+    tareas.forEach(t=>{
+      let acciones, pickerHtml='';
+      if(t.enHoy){
+        acciones = `<span class="tag-prog" style="color:${e.d};background:${e.bg};">en hoy</span>`;
+      } else if(t.fechaObjetivo && t.fechaObjetivo>HOY){
+        acciones = `<span class="tag-prog" style="color:${e.d};background:${e.bg};">${etiquetaDiaCorta(t.fechaObjetivo)} <button class="tag-x" onclick="quitarPrograma('${t.id}')" title="Cancelar">×</button></span>`;
+      } else {
+        acciones = `<button class="mini" style="padding:3px 8px;color:${e.d}" onclick="togglePicker('${t.id}')">📅 programar</button>`;
+        if(window._pickerAbierto===t.id) pickerHtml = renderPickerDias(t.id);
+      }
+      tareasHtml+=`<div class="et" id="et-${t.id}">
+        <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
+        <span class="et-txt">${escapeHtml(t.txt)}</span>
+        <span class="et-star">${ESTRELLAS[t.dif]}</span>
+        ${acciones}
+        <button class="et-del" onclick="borrarTarea('${t.id}')" title="Eliminar">×</button>
+      </div>${pickerHtml}`;
+    });
+    if(tareas.length===0) tareasHtml='<p style="font-size:.82rem;color:var(--gris-cl);padding:6px 0;">Sin tareas pendientes aquí.</p>';
+    card.innerHTML=`
+      <button class="eje-head" onclick="toggleEje('${k}')" style="width:100%;text-align:left;cursor:pointer;">
+        <div class="mascota-mini">${svgMascota(k,48)}</div>
+        <div class="eje-info">
+          <div class="eje-nombre">${e.nombre} <span style="font-weight:400;color:var(--gris);font-size:.82rem;">· ${e.eje}</span>${tareas.length?' <span style="font-weight:400;color:var(--gris-cl);font-size:.76rem;">· '+tareas.length+' pend.</span>':''}</div>
+          <div class="barra" style="background:${e.bg}"><div class="barra-fill" style="width:${v}%;background:${e.color}"></div></div>
+          <div class="eje-estado" style="color:${est.c}">${est.t}</div>
+        </div>
+        <div class="eje-nivel" style="background:${e.bg};color:${e.d}">Nv ${S.nivel[k]}</div>
+        <span class="eje-chevron" style="color:var(--gris-cl);font-size:1.1rem;transform:rotate(${abierto?180:0}deg);transition:transform .2s;flex-shrink:0;">⌄</span>
+      </button>
+      <div class="eje-tareas" style="display:${abierto?'block':'none'};">
+        ${tareasHtml}
+        <div class="add-tarea">
+          <input id="add-${k}" placeholder="Nueva tarea para ${e.nombre}..." onkeydown="if(event.key==='Enter')addTarea('${k}')">
+          <select id="dif-${k}"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3">⭐⭐⭐</option></select>
+          <button onclick="addTarea('${k}')">+</button>
+        </div>
+      </div>`;
+    cont.appendChild(card);
+  }
+}
+function toggleEje(k){
+  if(!window._ejesAbiertos) window._ejesAbiertos={};
+  window._ejesAbiertos[k] = !window._ejesAbiertos[k];
+  renderEjes();
+}
+
+// ---- detalle de mascota en el Refugio (tareas de la semana + gráfico) ----
+function inicioSemana(fISO){
+  const d = new Date(fISO+'T00:00');
+  const dow = (d.getDay()+6)%7; // lunes=0
+  d.setDate(d.getDate()-dow);
+  return fechaISO(d);
+}
+function toggleMascotaDetalle(k){
+  window._mascotaAbierta = (window._mascotaAbierta===k) ? null : k;
+  renderMascotaDetalle();
+}
+function renderMascotaDetalle(){
+  const cont = document.getElementById('mascota-detalle');
+  if(!cont) return;
+  const k = window._mascotaAbierta;
+  if(!k){ cont.style.display='none'; cont.innerHTML=''; return; }
+  const e = EJES[k];
+  const inicioSem = inicioSemana(HOY);
+  const hechasSemana = S.tareas.filter(t=>t.eje===k && t.hecho && t.fechaHecho && t.fechaHecho>=inicioSem)
+    .sort((a,b)=>b.fechaHecho.localeCompare(a.fechaHecho));
+
+  // gráfico: barras por día de la semana (L a D)
+  const dias=['L','M','X','J','V','S','D'];
+  const inicio=new Date(inicioSem+'T00:00');
+  const conteos=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(inicio); d.setDate(d.getDate()+i);
+    const fISO=fechaISO(d);
+    conteos.push(S.tareas.filter(t=>t.eje===k && t.hecho && t.fechaHecho===fISO).length);
+  }
+  const maxC = Math.max(1, ...conteos);
+  let barrasHtml = '<div class="semana-graf">';
+  dias.forEach((d,i)=>{
+    const h = Math.round((conteos[i]/maxC)*44)+4;
+    const esHoy = fechaISO(new Date(inicio.getTime()+i*86400000))===HOY;
+    barrasHtml += `<div class="semana-col">
+      <div class="semana-num">${conteos[i]||''}</div>
+      <div class="semana-bar" style="height:${h}px;background:${conteos[i]>0?e.color:'var(--linea)'}"></div>
+      <div class="semana-dia" style="${esHoy?'font-weight:700;color:'+e.d+';':''}">${d}</div>
+    </div>`;
+  });
+  barrasHtml += '</div>';
+
+  let listaHtml = '';
+  if(hechasSemana.length===0){
+    listaHtml = '<p style="font-size:.82rem;color:var(--gris-cl);padding:6px 0;">Sin retos completados esta semana todavía.</p>';
+  } else {
+    listaHtml = hechasSemana.map(t=>{
+      const d = new Date(t.fechaHecho+'T00:00').toLocaleDateString('es',{weekday:'short',day:'numeric'});
+      return `<div class="et" style="opacity:.85;">
+        <span style="color:${e.d};font-size:.72rem;flex-shrink:0;width:52px;">${d}</span>
+        <span class="et-txt" style="text-decoration:line-through;opacity:.7;">${escapeHtml(t.txt)}</span>
+        <span class="et-star">${ESTRELLAS[t.dif]}</span>
+      </div>`;
+    }).join('');
+  }
+
+  cont.style.display='block';
+  cont.innerHTML = `
+    <div class="mascota-panel" style="border-color:${e.color}55;">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <div class="mascota-mini" style="width:56px;height:56px;flex-shrink:0;">${svgMascota(k,56)}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:1rem;">${e.nombre} <span style="font-weight:400;color:var(--gris);font-size:.82rem;">· ${e.eje}</span></div>
+          <p style="font-size:.82rem;color:var(--gris);margin-top:4px;line-height:1.5;">${e.desc}</p>
+        </div>
+        <button onclick="toggleMascotaDetalle('${k}')" style="color:var(--gris-cl);font-size:1.2rem;flex-shrink:0;">×</button>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--linea);">
+        <div style="font-size:.8rem;font-weight:700;margin-bottom:8px;">Esta semana</div>
+        ${barrasHtml}
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--linea);">
+        <div style="font-size:.8rem;font-weight:700;margin-bottom:8px;">Retos completados esta semana (${hechasSemana.length})</div>
+        ${listaHtml}
+      </div>
+    </div>`;
+}
+
+// ---- informe semanal (Refugio) ----
+function toggleInforme(){
+  window._informeAbierto = !window._informeAbierto;
+  render();
+}
+function renderInformeSemanal(){
+  const cont = document.getElementById('informe-semanal');
+  const btn = document.getElementById('toggle-informe');
+  if(!cont || !btn) return;
+  btn.onclick = toggleInforme;
+  cont.style.display = window._informeAbierto ? 'block' : 'none';
+
+  const inicioSem = inicioSemana(HOY);
+  const nombresDias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const inicio = new Date(inicioSem+'T00:00');
+  const energColors = {
+    baja:  {bg:'var(--cuidado-bg)',   c:'var(--cuidado-d)'},
+    media: {bg:'var(--linea)',        c:'var(--gris)'},
+    alta:  {bg:'var(--proyectos-bg)', c:'var(--proyectos-d)'},
+  };
+  let totalTareas=0, totalHabitos=0, totalRapidas=0, diasHtml='';
+
+  for(let i=0;i<7;i++){
+    const d = new Date(inicio); d.setDate(d.getDate()+i);
+    const fISO = fechaISO(d);
+    const cabecera = `<div class="informe-dia-head"><span class="informe-dia-nombre">${nombresDias[i]} · ${d.getDate()}</span>`;
+
+    if(fISO>HOY){
+      diasHtml += `<div class="informe-dia" style="opacity:.4;">${cabecera}</div><div class="informe-vacio">Aún no llega</div></div>`;
+      continue;
+    }
+
+    const tareasDia = S.tareas.filter(t=>t.hecho && t.fechaHecho===fISO);
+    const habitosDia = S.historialHabitos.filter(r=>r.fecha===fISO);
+    const rapidasDia = S.rapidas.filter(r=>r.hecho && r.fechaHecho===fISO);
+    const energ = S.historialEnergia[fISO];
+    totalTareas+=tareasDia.length; totalHabitos+=habitosDia.length; totalRapidas+=rapidasDia.length;
+
+    const tareasHtml = tareasDia.length ? tareasDia.map(t=>{
+      const e=EJES[t.eje];
+      return `<div class="informe-item"><span class="eje-dot" style="background:${e.color}"></span>${escapeHtml(t.txt)} <span class="estrellas">${ESTRELLAS[t.dif]}</span></div>`;
+    }).join('') : '<div class="informe-vacio">Sin retos completados</div>';
+    const habitosHtml = habitosDia.length ? `<div class="informe-item">🌸 ${habitosDia.map(h=>escapeHtml(h.txt)).join(' · ')}</div>` : '';
+    const rapidasHtml = rapidasDia.length ? `<div class="informe-item">⚡ ${rapidasDia.map(r=>escapeHtml(r.txt)).join(' · ')}</div>` : '';
+    const ep = energ ? energColors[energ] : null;
+    const energPill = ep ? `<span class="informe-energia-pill" style="background:${ep.bg};color:${ep.c}">${energ}</span>` : '';
+
+    diasHtml += `<div class="informe-dia">${cabecera}${energPill}</div>${tareasHtml}${habitosHtml}${rapidasHtml}</div>`;
+  }
+
+  cont.innerHTML = `<div class="informe-panel">
+    <div class="informe-resumen">
+      <div class="informe-stat"><b>${totalTareas}</b>retos completados</div>
+      <div class="informe-stat"><b>${totalHabitos}</b>hábitos marcados</div>
+      <div class="informe-stat"><b>${totalRapidas}</b>rápidas resueltas</div>
+    </div>
+    ${diasHtml}
+  </div>`;
+}
+
+function renderRefugio(){
+  const hab = document.getElementById('casa-hab');
+  if(!hab) return;
+  hab.innerHTML='';
+  let min=100, minK='';
+  const orden=['trabajo','proyectos','educacion','cuidado'];
+  for(const k of orden){
+    const e=EJES[k]; const v=Math.round(S.bienestar[k]);
+    if(v<min){min=v;minK=k;}
+    const est=estadoTexto(v,k);
+    // opacidad de la mascota según bienestar (nunca invisible)
+    const op = (0.55 + v/100*0.45).toFixed(2);
+    const div=document.createElement('button');
+    div.className='hab';
+    div.onclick=()=>toggleMascotaDetalle(k);
+    div.innerHTML=`
+      <div class="mascota-casa" style="opacity:${op}">${svgMascota(k,88)}</div>
+      <div class="hab-nombre">${e.nombre}</div>
+      <div class="hab-eje">${e.eje} · Nv ${S.nivel[k]}</div>
+      <div class="hab-barra" style="background:${e.bg}"><div class="barra-fill" style="width:${v}%;background:${e.color}"></div></div>
+      <div class="hab-estado" style="color:${e.d}">${est.t}</div>`;
+    hab.appendChild(div);
+  }
+  renderMascotaDetalle();
+  const foot=document.getElementById('ref-foot');
+  const prom=Math.round(Object.values(S.bienestar).reduce((a,b)=>a+b,0)/4);
+  let msg;
+  if(prom>=70) msg=`🌟 Tu refugio florece. Las cuatro mascotas están felices en casa.`;
+  else if(min<30) msg=`💗 ${EJES[minK].nombre} (${EJES[minK].eje}) te extraña en su rincón. El refugio florece cuando las cuatro están en equilibrio.`;
+  else msg=`🔥 Racha de ${S.racha} ${S.racha===1?'día':'días'}. El refugio florece cuando las cuatro están en equilibrio.`;
+  foot.innerHTML=`<span>${msg}</span>`;
+}
+
+// ============ ACCIONES ============
+function capturar(){
+  const inp=document.getElementById('cap-input');
+  const t=inp.value.trim();
+  if(!t) return;
+  S.parqueadero.unshift({id:nid(),txt:t});
+  inp.value='';
+  toast('Soltado en el parqueadero 💭');
+  render();
+}
+function repartir(pid, eje){
+  const p=S.parqueadero.find(x=>x.id===pid);
+  if(!p) return;
+  S.tareas.push({id:nid(),txt:p.txt,eje:eje,dif:1,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null});
+  S.parqueadero=S.parqueadero.filter(x=>x.id!==pid);
+  toast(`Para ${EJES[eje].nombre} ✦`);
+  render();
+}
+function borrarParq(pid){ S.parqueadero=S.parqueadero.filter(x=>x.id!==pid); render(); }
+
+function addTarea(k){
+  const inp=document.getElementById('add-'+k);
+  const dif=parseInt(document.getElementById('dif-'+k).value);
+  const t=inp.value.trim();
+  if(!t) return;
+  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null});
+  inp.value='';
+  render();
+}
+function maxRetosHoy(){
+  return {baja:2, media:3, alta:Infinity}[S.energia] ?? 3;
+}
+function aHoy(id){
+  const max = maxRetosHoy();
+  const enHoy=S.tareas.filter(t=>t.enHoy && !t.hecho).length;
+  if(enHoy>=max){
+    toast(max===2 ? 'Hoy con energía baja, máximo 2. Cuídate 🌸' : 'Máximo '+max+' retos hoy. La #1 es sagrada 🌱');
+    return;
+  }
+  const t=S.tareas.find(x=>x.id===id);
+  if(t){t.enHoy=true; toast('Añadido a hoy ☀️');}
+  render();
+}
+function aManana(id){
+  aFecha(id, MANANA);
+}
+// ---- selector de 7 días (reemplaza los antiguos botones +hoy/+mañana) ----
+function togglePicker(id){
+  window._pickerAbierto = (window._pickerAbierto===id) ? null : id;
+  renderEjes();
+}
+function renderPickerDias(taskId){
+  let html = '<div class="dia-picker">';
+  for(let i=0;i<7;i++){
+    const d=new Date(); d.setDate(d.getDate()+i);
+    const fISO=fechaISO(d);
+    const fest=festivoEnFecha(fISO);
+    const label = i===0?'hoy':(i===1?'mañ.':DOW_CORTO[d.getDay()]);
+    html+=`<button class="dia-pill${fest?' festivo':''}" onclick="aFecha('${taskId}','${fISO}')" title="${fest?escapeHtml(fest):''}">
+      <span class="dp-dow">${label}</span><span class="dp-num">${d.getDate()}</span>${fest?'<span class="dp-fest">🎉</span>':''}
+    </button>`;
+  }
+  html += '</div>';
+  return html;
+}
+function aFecha(id, fISO){
+  window._pickerAbierto = null;
+  if(fISO===HOY){ aHoy(id); return; }
+  const t=S.tareas.find(x=>x.id===id);
+  if(t){ t.fechaObjetivo=fISO; toast('Programado para '+etiquetaDiaCorta(fISO)+' 📅'); }
+  render();
+}
+function quitarPrograma(id){
+  const t=S.tareas.find(x=>x.id===id);
+  if(t){ t.fechaObjetivo=null; toast('Programación cancelada'); }
+  render();
+}
+function quitarDeHoy(id){
+  const t=S.tareas.find(x=>x.id===id);
+  if(t){
+    t.enHoy=false;
+    if(t.fechaObjetivo===HOY) t.fechaObjetivo=null; // evita que se vuelva a activar sola
+  }
+  render();
+}
+function borrarTarea(id){
+  const t=S.tareas.find(x=>x.id===id);
+  if(!t) return;
+  if(confirm('¿Eliminar "'+t.txt+'"? Esta acción no se puede deshacer.')){
+    S.tareas=S.tareas.filter(x=>x.id!==id);
+    toast('Reto eliminado');
+    render();
+  }
+}
+
+function toggleHecho(id){
+  const t=S.tareas.find(x=>x.id===id);
+  if(!t) return;
+  t.hecho=!t.hecho;
+  if(t.hecho){
+    t.fechaHecho = HOY;
+    const suben = {1:6,2:11,3:18}[t.dif];
+    S.bienestar[t.eje]=Math.min(100,S.bienestar[t.eje]+suben);
+    // subir nivel cada vez que cruza umbral de 100 acumulado simbólico
+    const bonus = (t.eje===sugeridoPorFase() ? ' +bonus sintonía' : '');
+    S.nivel[t.eje] += 0; // nivel sube por hitos; simple por ahora
+    if(S.bienestar[t.eje]>=100 && Math.random()>.5){ S.nivel[t.eje]++; }
+    toast(`+${suben} bienestar para ${EJES[t.eje].nombre}${bonus} ✨`);
+  } else {
+    t.fechaHecho = null;
+  }
+  render();
+}
+
+function sugeridoPorFase(){
+  return {menstrual:'cuidado',folicular:'educacion',ovulatoria:'trabajo',lutea:'proyectos'}[S.fase];
+}
+
+function activarModoBajo(){
+  S.modoBajo=true;
+  toast('Modo descanso. Tu racha está a salvo 🌸');
+  render();
+}
+function salirModoBajo(){ S.modoBajo=false; render(); }
+
+// ============ NAV ============
+function irA(v){
+  document.querySelectorAll('.vista').forEach(s=>s.classList.remove('activa'));
+  document.getElementById('v-'+v).classList.add('activa');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  window.scrollTo(0,0);
+}
+
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),1900);
+}
+
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+
+// ============ ACOMODAR SECCIONES (Hoy: arrastrar para reordenar/mover de columna, estirar para cambiar alto) ============
+function restablecerLayout(){
+  if(!confirm('¿Volver las secciones de Hoy a su orden y tamaño original?')) return;
+  S.layout = null;
+  guardar();
+  toast('Diseño restablecido ✓');
+  setTimeout(()=>location.reload(), 400);
+}
+function toggleEditarLayout(){
+  window._editandoLayout = !window._editandoLayout;
+  document.body.classList.toggle('editando-layout', window._editandoLayout);
+  const btn = document.getElementById('toggle-editar-layout');
+  btn.classList.toggle('on', window._editandoLayout);
+  btn.textContent = window._editandoLayout ? '✓ Listo, guardar acomodo' : '✥ Acomodar secciones';
+  document.querySelectorAll('.panel-drag').forEach(el=>{ el.draggable = !!window._editandoLayout; });
+  if(!window._editandoLayout){ guardarOrdenLayout(); toast('Diseño guardado ✥'); }
+}
+function elementoDespuesDe(zona, y){
+  const els = [...zona.querySelectorAll('.panel-drag:not(.dragging)')];
+  return els.reduce((closest, child)=>{
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset < 0 && offset > closest.offset) return {offset:offset, element:child};
+    return closest;
+  }, {offset:-Infinity, element:null}).element;
+}
+function guardarOrdenLayout(){
+  const layout = {orden:[], columnas:{}, alturas:(S.layout&&S.layout.alturas)||{}, colWidths:(S.layout&&S.layout.colWidths)||null};
+  document.querySelectorAll('.zona-drag').forEach(zona=>{
+    const zkey = zona.dataset.zona;
+    zona.querySelectorAll(':scope > .panel-drag').forEach(el=>{
+      layout.orden.push(el.dataset.card);
+      layout.columnas[el.dataset.card] = zkey;
+      if(el.style.height) layout.alturas[el.dataset.card] = el.style.height;
+    });
+  });
+  S.layout = layout;
+  guardar();
+}
+function aplicarLayoutGuardado(){
+  if(!S.layout || !S.layout.orden) return;
+  S.layout.orden.forEach(card=>{
+    const el = document.querySelector(`.panel-drag[data-card="${card}"]`);
+    const zonaKey = S.layout.columnas[card];
+    const zona = document.querySelector(`.zona-drag[data-zona="${zonaKey}"]`);
+    if(el && zona) zona.appendChild(el);
+    // alto guardado = MÍNIMO, nunca un tope: si el contenido necesita más (ej. el calendario abierto), la tarjeta crece en vez de desbordarse encima de la de abajo
+    if(el && S.layout.alturas && S.layout.alturas[card]){ el.style.height=''; el.style.minHeight = S.layout.alturas[card]; }
+    el && (el.style.width = ''); // el ancho ya no se ajusta por tarjeta, sino por columna completa
+  });
+  if(S.layout.colWidths) aplicarAnchoColumnas(S.layout.colWidths);
+}
+
+// ---- divisor entre columnas: ajusta el ancho de la columna entera (así las tarjetas quedan siempre alineadas) ----
+function colWidthsValidos(w){
+  return Array.isArray(w) && w.length===3 && w.every(n=>Number.isFinite(n) && n>=10);
+}
+function aplicarAnchoColumnas(porcentajes){
+  if(!colWidthsValidos(porcentajes)) return; // estado dañado: no lo aplica, se queda con el 1fr/1fr/1fr por defecto del CSS
+  window._colWidths = porcentajes;
+  const layoutEl = document.querySelector('.hoy-layout');
+  // fr (no %): reparte el espacio DESPUÉS de descontar los 32px fijos de los dos divisores, evita que las columnas se encimen
+  if(layoutEl) layoutEl.style.gridTemplateColumns = `minmax(240px,${porcentajes[0]}fr) 16px minmax(240px,${porcentajes[1]}fr) 16px minmax(240px,${porcentajes[2]}fr)`;
+}
+function guardarAnchoColumnas(){
+  if(!S.layout) S.layout = {orden:[], columnas:{}, alturas:{}, colWidths:null};
+  S.layout.colWidths = window._colWidths;
+  guardar();
+}
+function initColResize(){
+  document.querySelectorAll('.col-resizer').forEach(res=>{
+    res.addEventListener('mousedown', e=>{
+      if(!window._editandoLayout) return;
+      e.preventDefault();
+      res.classList.add('activo');
+      const idx = parseInt(res.dataset.idx); // 0 = entre col1/col2, 1 = entre col2/col3
+      const layoutEl = document.querySelector('.hoy-layout');
+      const totalWidth = layoutEl.getBoundingClientRect().width;
+      const startX = e.clientX;
+      const base = window._colWidths || [33.3,33.3,33.4];
+      function onMove(ev){
+        const deltaPct = ((ev.clientX - startX) / totalWidth) * 100;
+        const nuevo = base.slice();
+        nuevo[idx] = base[idx] + deltaPct;
+        nuevo[idx+1] = base[idx+1] - deltaPct;
+        if(nuevo[idx] < 15 || nuevo[idx+1] < 15) return;
+        aplicarAnchoColumnas(nuevo);
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        res.classList.remove('activo');
+        guardarAnchoColumnas();
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  });
+}
+function initDragLayout(){
+  document.querySelectorAll('.panel-drag').forEach(el=>{
+    el.addEventListener('dragstart', e=>{
+      if(!window._editandoLayout){ e.preventDefault(); return; }
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain', el.dataset.card);
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', ()=>{
+      el.classList.remove('dragging');
+      guardarOrdenLayout();
+    });
+    // guarda el alto cuando Ale termina de estirar la esquina (resize nativo del navegador)
+    new ResizeObserver(()=>{ if(window._editandoLayout) guardarOrdenLayout(); }).observe(el);
+  });
+  document.querySelectorAll('.zona-drag').forEach(zona=>{
+    zona.addEventListener('dragover', e=>{
+      if(!window._editandoLayout) return;
+      e.preventDefault();
+      zona.classList.add('sobre');
+      const dragging = document.querySelector('.panel-drag.dragging');
+      if(!dragging) return;
+      const after = elementoDespuesDe(zona, e.clientY);
+      if(after==null) zona.appendChild(dragging);
+      else zona.insertBefore(dragging, after);
+    });
+    zona.addEventListener('dragleave', ()=> zona.classList.remove('sobre'));
+    zona.addEventListener('drop', e=>{
+      if(!window._editandoLayout) return;
+      e.preventDefault();
+      zona.classList.remove('sobre');
+      guardarOrdenLayout();
+    });
+  });
+}
+
+// ============ INICIO ============
+chequearRacha();
+render();
+aplicarLayoutGuardado();
+initColResize();
+if(S.pausas.activas) window._proximaPausa = Date.now() + S.pausas.cadaMin*60000;
+renderPausas();
+setInterval(tickAvisos, 20000);
+tickAvisos();
+initDragLayout();
+</script>
+</body>
+</html>
