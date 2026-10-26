@@ -633,6 +633,7 @@
       <div class="cal" id="cal-panel" style="display:none;">
         <div class="gcal-bar" id="gcal-bar">
           <button class="gcal-btn" id="gcal-btn" onclick="gcalToggle()"><span class="gdot"></span><span id="gcal-label">Conectar Google Calendar</span></button>
+          <button class="gcal-btn" id="gcal-refresh" onclick="gcalSync(true)" style="display:none;" aria-label="Sincronizar ahora">↻ Actualizar</button>
           <span class="gcal-sync" id="gcal-sync"></span>
         </div>
         <div class="cal-modo-toggle" id="cal-modo-toggle">
@@ -2530,6 +2531,8 @@ function gcalToggle(){
 function gcalUpdateUI(connected){
   const btn = document.getElementById('gcal-btn');
   const label = document.getElementById('gcal-label');
+  const rf = document.getElementById('gcal-refresh');
+  if(rf) rf.style.display = connected ? '' : 'none';
   if(connected){
     btn.classList.add('on');
     label.textContent = 'Calendar conectado';
@@ -2540,8 +2543,9 @@ function gcalUpdateUI(connected){
   }
 }
 
-async function gcalSync(){
-  if(!_gcalToken) return;
+async function gcalSync(manual){
+  if(!_gcalToken){ if(manual===true) toast('Conecta Google Calendar primero'); return; }
+  if(manual===true) toast('Actualizando…');
   try {
     // traer eventos de hoy hasta 30 días adelante
     const hoy = new Date();
@@ -2572,8 +2576,10 @@ async function gcalSync(){
     S.eventos = S.eventos.filter(e => e.origen !== 'google');
 
     // agregar los nuevos
+    const propios = new Set(S.eventos.filter(e=>e.googleId).map(e=>e.googleId));
     items.forEach(ev => {
       if(ev.status === 'cancelled') return;
+      if(propios.has(ev.id)) return; // ya existe como evento creado desde Refugio
       const start = ev.start.dateTime || ev.start.date;
       const fecha = start.slice(0,10);
       let hora = null;
@@ -2597,8 +2603,10 @@ async function gcalSync(){
     const ahora = new Date();
     document.getElementById('gcal-sync').textContent = 'Sync ' + ahora.getHours()+':'+String(ahora.getMinutes()).padStart(2,'0');
     render();
+    if(manual===true) toast('Calendar actualizado ✓');
   } catch(e){
     console.error('gcalSync error', e);
+    if(manual===true) toast('No se pudo actualizar, intenta de nuevo');
   }
 }
 
@@ -2646,6 +2654,8 @@ async function gcalBorrarEvento(googleId){
 gcalInit();
 // auto-sync cada 5 minutos
 setInterval(()=>{ if(_gcalToken) gcalSync(); }, 300000);
+// al volver a la app (cambiar de pestaña o abrirla desde el celular) sincroniza
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && _gcalToken) gcalSync(); });
 
 // ============ PWA ============
 if('serviceWorker' in navigator){
