@@ -1190,15 +1190,8 @@ function renderEjes(){
         </div>
       </div>`;
     cont.appendChild(card);
-    // El picker empieza oculto — mostrarlo solo al hacer clic en "programar"
+    // El picker siempre empieza oculto — se abre solo al clicar "programar"
     card.querySelectorAll('.et-sched').forEach(el=>el.style.display='none');
-    // Si la tarea ya tiene fecha, mostrar el picker abierto para que se vea
-    tareas.forEach(t=>{
-      if(t.enHoy || t.fechaProg){
-        const sched = card.querySelector(`#sched-${t.id}`);
-        if(sched) sched.style.display='block';
-      }
-    });
   }
 }
 
