@@ -185,11 +185,24 @@
   .et.hecho .et-txt{text-decoration:line-through;opacity:.5;}
   .et-txt{flex:1;font-size:.88rem;}
   .et-star{font-size:.7rem;}
-  .add-tarea{display:flex;gap:6px;margin-top:10px;}
+  .add-tarea{display:flex;gap:6px;margin-top:10px;align-items:center;}
   .add-tarea input{flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:.85rem;background:var(--panel);color:var(--tinta);}
   .add-tarea input:focus{outline:none;border-color:var(--proyectos);}
-  .add-tarea select{border:1px solid var(--linea);border-radius:10px;padding:0 6px;font-family:inherit;font-size:.8rem;background:var(--panel);color:var(--tinta);}
-  .add-tarea button{background:var(--tinta);color:#fff;border-radius:10px;width:38px;font-size:1.1rem;flex-shrink:0;}
+  .add-tarea select{border:1px solid var(--linea);border-radius:10px;padding:5px 6px;height:34px;font-family:inherit;font-size:.8rem;background:var(--panel);color:var(--tinta);flex-shrink:0;}
+  .add-tarea button{background:var(--tinta);color:#fff;border-radius:10px;width:34px;height:34px;font-size:1.1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+  /* ---- programar tarea (picker de días) ---- */
+  .et-sched{margin-top:6px;padding:8px 10px;background:var(--fondo);border-radius:10px;border:1px solid var(--linea);}
+  body.noche .et-sched{background:var(--noche-fondo,#0F0D1A);}
+  .dias-picker{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+  .dia-pill{border:1.5px solid var(--linea);border-radius:10px;padding:4px 7px;font-size:.72rem;text-align:center;cursor:pointer;transition:.15s;min-width:36px;background:var(--panel);}
+  .dia-pill:hover{border-color:var(--proyectos);color:var(--proyectos);}
+  .dia-pill.on{background:var(--tinta);border-color:var(--tinta);color:#fff;font-weight:700;}
+  .dia-pill .dia-nombre{font-size:.65rem;color:inherit;opacity:.75;}
+  .dia-pill .dia-num{font-weight:700;font-size:.82rem;}
+  .sched-btn{display:inline-flex;align-items:center;gap:4px;border:none;background:transparent;font-size:.72rem;color:var(--gris);cursor:pointer;padding:2px 4px;border-radius:6px;}
+  .sched-btn:hover{color:var(--proyectos);background:var(--proyectos-bg);}
+  .sched-btn svg{width:12px;height:12px;}
 
   /* ---- refugio ---- */
   .ref-intro{font-size:.86rem;color:var(--gris);margin-bottom:16px;}
@@ -1094,6 +1107,35 @@ function svgMascota(k, size){
   return `<svg viewBox="0 0 100 100" width="${size}" height="${size}"><path d="M28 38 l6 -12 6 12 z" fill="${c}"/><path d="M72 38 l-6 -12 -6 12 z" fill="${c}"/><ellipse cx="50" cy="56" rx="36" ry="26" fill="${c}"/><ellipse cx="26" cy="60" rx="12" ry="10" fill="${c}"/><ellipse cx="74" cy="60" rx="12" ry="10" fill="${c}"/><ellipse cx="50" cy="70" rx="20" ry="12" fill="${c}"/><path d="M50 44 a5 5 0 1 0 0.1 0 z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M40 56 Q43 60 46 56" stroke="${d}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M54 56 Q57 60 60 56" stroke="${d}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M47 62 Q50 65 53 62" stroke="${d}" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
 }
 
+function diasPickerHTML(id, cols){
+  const DIAS_NOM = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const t = S.tareas.find(x=>x.id===id);
+  let pills = '';
+  for(let i=0; i<7; i++){
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    const iso = d.toISOString().slice(0,10);
+    const nomDia = i===0 ? 'Hoy' : DIAS_NOM[d.getDay()];
+    const num = d.getDate();
+    const activo = t && t.fechaProg===iso;
+    const enHoyFlag = t && t.enHoy && iso===HOY;
+    pills += `<button class="dia-pill${activo||enHoyFlag?' on':''}" onclick="programarTarea('${id}','${iso}')">
+      <div class="dia-nombre">${nomDia}</div>
+      <div class="dia-num">${num}</div>
+    </button>`;
+  }
+  // Botón quitar programación si tiene fecha asignada
+  const quitarBtn = (t && (t.enHoy || t.fechaProg))
+    ? `<button class="sched-btn" onclick="quitarProg('${id}')" style="margin-left:auto;color:var(--gris);">✕ quitar</button>`
+    : '';
+  return `<div class="et-sched" id="sched-${id}">
+    <div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--gris);">
+      <span>📅 ¿Cuándo?</span>${quitarBtn}
+    </div>
+    <div class="dias-picker">${pills}</div>
+  </div>`;
+}
+
 function renderEjes(){
   const cont = document.getElementById('ejes-lista');
   cont.innerHTML='';
@@ -1107,12 +1149,26 @@ function renderEjes(){
     card.className='eje-card';
     let tareasHtml='';
     tareas.forEach(t=>{
+      const programadoLabel = t.enHoy
+        ? `<span style="font-size:.68rem;color:${cols.d}">☀️ hoy</span>`
+        : t.fechaProg && t.fechaProg!==HOY
+          ? `<span style="font-size:.68rem;color:var(--gris)">📅 ${t.fechaProg.slice(5).replace('-','/')}</span>`
+          : '';
       tareasHtml+=`<div class="et" id="et-${t.id}">
-        <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
-        <span class="et-txt">${escapeHtml(t.txt)}</span>
-        <span class="et-star">${ESTRELLAS[t.dif]}</span>
-        ${t.enHoy?'<span style="font-size:.68rem;color:'+cols.d+'">en hoy</span>':'<button class="mini" style="padding:3px 8px;color:'+cols.d+'" onclick="aHoy(\''+t.id+'\')">+ hoy</button>'}
-      </div>`;
+        <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;">
+          <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
+          <span class="et-txt">${escapeHtml(t.txt)}</span>
+          <span class="et-star">${ESTRELLAS[t.dif]}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+          ${programadoLabel}
+          <button class="sched-btn" onclick="toggleSchedPicker('${t.id}')" title="Programar tarea">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M5 1v4M11 1v4M2 7h12"/></svg>
+            programar
+          </button>
+        </div>
+      </div>
+      ${diasPickerHTML(t.id, cols)}`;
     });
     if(tareas.length===0) tareasHtml='<p style="font-size:.82rem;color:var(--gris-cl);padding:6px 0;">Sin tareas pendientes aquí.</p>';
     card.innerHTML=`
@@ -1134,7 +1190,23 @@ function renderEjes(){
         </div>
       </div>`;
     cont.appendChild(card);
+    // El picker empieza oculto — mostrarlo solo al hacer clic en "programar"
+    card.querySelectorAll('.et-sched').forEach(el=>el.style.display='none');
+    // Si la tarea ya tiene fecha, mostrar el picker abierto para que se vea
+    tareas.forEach(t=>{
+      if(t.enHoy || t.fechaProg){
+        const sched = card.querySelector(`#sched-${t.id}`);
+        if(sched) sched.style.display='block';
+      }
+    });
   }
+}
+
+function quitarProg(id){
+  const t = S.tareas.find(x=>x.id===id);
+  if(t){ t.enHoy=false; t.fechaProg=null; }
+  guardar(); render();
+  toast('Programación eliminada');
 }
 
 function renderRefugio(){
@@ -1200,10 +1272,34 @@ function aHoy(id){
   const enHoy=S.tareas.filter(t=>t.enHoy && !t.hecho).length;
   if(enHoy>=3){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
   const t=S.tareas.find(x=>x.id===id);
-  if(t){t.enHoy=true; toast('Añadido a hoy ☀️');}
-  render();
+  if(t){t.enHoy=true; t.fechaProg=HOY; toast('Añadido a hoy ☀️');}
+  guardar(); render();
 }
-function quitarDeHoy(id){ const t=S.tareas.find(x=>x.id===id); if(t)t.enHoy=false; render(); }
+function quitarDeHoy(id){ const t=S.tareas.find(x=>x.id===id); if(t){t.enHoy=false; t.fechaProg=null;} guardar(); render(); }
+
+function programarTarea(id, fecha){
+  const t=S.tareas.find(x=>x.id===id);
+  if(!t) return;
+  if(fecha===HOY){
+    const enHoy=S.tareas.filter(t=>t.enHoy && !t.hecho).length;
+    if(enHoy>=3 && !t.enHoy){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
+    t.enHoy=true;
+    t.fechaProg=HOY;
+    toast('Añadido a hoy ☀️');
+  } else {
+    t.enHoy=false;
+    t.fechaProg=fecha;
+    const diaNom = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][new Date(fecha+'T12:00').getDay()];
+    toast(`Programado para ${diaNom} 📅`);
+  }
+  guardar(); render();
+}
+
+function toggleSchedPicker(id){
+  const el=document.getElementById('sched-'+id);
+  if(!el) return;
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
 
 function toggleHecho(id){
   const t=S.tareas.find(x=>x.id===id);
