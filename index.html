@@ -194,7 +194,9 @@
   .cal-dia.hoy.sangrado::after{background:#fff;}
   .cal-dia.con-evento{box-shadow:inset 0 0 0 1.5px var(--proyectos);}
   .cal-eventos{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
-  .cal-ev{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:8px 10px;background:var(--hueso);border-radius:10px;}
+  .cal-ev{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:8px 10px;background:var(--hueso);border-radius:10px;flex-wrap:wrap;}
+  .ev-eje-sel{margin-left:auto;border:1px solid var(--linea);border-radius:8px;padding:3px 4px;font-family:inherit;font-size:.72rem;background:#fff;color:var(--gris);max-width:128px;}
+  .ev-eje-sel.con-eje{color:var(--tinta);font-weight:600;}
   .cal-ev .ev-fecha{font-size:.7rem;color:var(--gris);flex-shrink:0;}
   .cal-ev .ev-del{margin-left:auto;color:var(--gris-cl);font-size:.74rem;}
 
@@ -1209,7 +1211,12 @@ function renderCalendario(){
     const e = ev.eje ? EJES[ev.eje] : null;
     const row=document.createElement('div');
     row.className='cal-ev' + (ev.origen==='google' ? ' google' : '');
-    const delBtn = ev.origen==='google' ? '' : `<button class="ev-del" onclick="borrarEvento('${ev.id}')">✕</button>`;
+    let delBtn = ev.origen==='google' ? '' : `<button class="ev-del" onclick="borrarEvento('${ev.id}')">✕</button>`;
+    if(ev.origen==='google'){
+      const opts = '<option value="">+ Vincular a un eje</option>' + Object.keys(EJES).map(k=>`<option value="${k}"${ev.eje===k?' selected':''}>${EJES[k].nombre} · ${EJES[k].eje}</option>`).join('');
+      const difSel = ev.eje ? `<select class="ev-eje-sel" style="margin-left:0;max-width:60px;" onchange="vincularEventoEje('${ev.id}',null,this.value)">${[1,2,3].map(n=>`<option value="${n}"${(ev.dif||1)===n?' selected':''}>${ESTRELLAS[n]}</option>`).join('')}</select>` : '';
+      delBtn = `<select class="ev-eje-sel${ev.eje?' con-eje':''}" onchange="vincularEventoEje('${ev.id}',this.value,null)">${opts}</select>${difSel}`;
+    }
     row.innerHTML=`<span class="ev-fecha">${d}${hora}</span>${ev.origen==='google'?'<span style="color:#4285F4;font-size:.65rem;font-weight:600;">G</span>':''}${e?`<span class="eje-dot" style="background:${e.color}"></span>`:''}<span>${escapeHtml(ev.txt)}</span>${delBtn}`;
     evCont.appendChild(row);
   });
@@ -2543,6 +2550,33 @@ function gcalUpdateUI(connected){
   }
 }
 
+// vincular un evento de Google a un eje: el vínculo vive en S.gcalEjes (sobrevive a cada sync)
+// y se crea un reto para ese día, igual que con los eventos creados en Refugio
+function vincularEventoEje(evId, eje, dif){
+  const ev = S.eventos.find(e=>e.id===evId);
+  if(!ev || !ev.googleId) return;
+  if(!S.gcalEjes) S.gcalEjes = {};
+  const prev = S.gcalEjes[ev.googleId] || {};
+  const nuevoEje = eje===null ? prev.eje : (eje||null);
+  const nuevoDif = dif===null ? (prev.dif||1) : parseInt(dif);
+  if(!nuevoEje){
+    delete S.gcalEjes[ev.googleId];
+    ev.eje = null; ev.dif = null;
+    S.tareas = S.tareas.filter(t=>!(t.eventoId===evId && !t.hecho));
+    toast('Evento desvinculado');
+  } else {
+    S.gcalEjes[ev.googleId] = {eje:nuevoEje, dif:nuevoDif};
+    ev.eje = nuevoEje; ev.dif = nuevoDif;
+    const t = S.tareas.find(t=>t.eventoId===evId);
+    if(t){ t.eje = nuevoEje; t.dif = nuevoDif; t.txt = ev.txt; t.fechaObjetivo = ev.fecha; t.hora = ev.hora; }
+    else S.tareas.push({id:nid(), txt:ev.txt, eje:nuevoEje, dif:nuevoDif, hecho:false, enHoy:false, notionId:null, fechaObjetivo:ev.fecha, eventoId:evId, hora:ev.hora, durMin:null});
+    if(eje!==null) toast('Vinculado a '+EJES[nuevoEje].nombre+' 🔗');
+  }
+  window._calAbierto = true;
+  guardar();
+  render();
+}
+
 async function gcalSync(manual){
   if(!_gcalToken){ if(manual===true) toast('Conecta Google Calendar primero'); return; }
   if(manual===true) toast('Actualizando…');
@@ -2576,6 +2610,7 @@ async function gcalSync(manual){
     S.eventos = S.eventos.filter(e => e.origen !== 'google');
 
     // agregar los nuevos
+    const vistos = new Set();
     const propios = new Set(S.eventos.filter(e=>e.googleId).map(e=>e.googleId));
     items.forEach(ev => {
       if(ev.status === 'cancelled') return;
@@ -2587,6 +2622,7 @@ async function gcalSync(manual){
         const d = new Date(ev.start.dateTime);
         hora = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
       }
+      const vin = (S.gcalEjes && S.gcalEjes[ev.id]) || null;
       S.eventos.push({
         id: 'g_' + ev.id,
         googleId: ev.id,
@@ -2594,10 +2630,18 @@ async function gcalSync(manual){
         hora: hora,
         txt: ev.summary || '(sin título)',
         origen: 'google',
-        eje: null,
-        dif: null
+        eje: vin ? vin.eje : null,
+        dif: vin ? vin.dif : null
       });
+      vistos.add('g_' + ev.id);
+      // si el evento cambió de día/hora/título en Google, el reto lo sigue
+      if(vin){
+        const t = S.tareas.find(t=>t.eventoId==='g_'+ev.id);
+        if(t && !t.hecho){ t.fechaObjetivo = fecha; t.hora = hora; t.txt = ev.summary || '(sin título)'; }
+      }
     });
+    // evento borrado o cancelado en Google → se quita su reto pendiente (los de hoy o ya hechos se conservan)
+    S.tareas = S.tareas.filter(t=>!(t.eventoId && t.eventoId.startsWith('g_') && !vistos.has(t.eventoId) && !t.hecho && t.fechaObjetivo>HOY));
 
     guardar();
     const ahora = new Date();
