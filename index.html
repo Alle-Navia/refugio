@@ -220,11 +220,6 @@
   .sem-dia.hoy .sem-ev-mas{color:rgba(255,255,255,.7);}
   .sem-vacio{font-size:.66rem;color:var(--gris-cl);text-align:center;padding-top:6px;}
   .sem-dia.hoy .sem-vacio{color:rgba(255,255,255,.5);}
-  @media (max-width:640px){
-    .sem-dia{min-height:70px;padding:5px 3px;}
-    .sem-ev{font-size:.58rem;}
-  }
-
   /* ---- festivos colombianos ---- */
   .cal-dia.festivo::before{content:'';position:absolute;top:4px;right:4px;width:5px;height:5px;border-radius:50%;background:var(--educacion);}
   .sem-fest-dot{width:5px;height:5px;border-radius:50%;background:var(--educacion);margin-top:1px;}
@@ -301,12 +296,227 @@
   .hora-select{border:none;background:transparent;font-family:inherit;font-size:.82rem;color:var(--tinta);padding:8px 2px;font-weight:600;}
   .hora-select:focus{outline:none;}
   .hora-select:focus, #evento-hora-wrap:focus-within{border-color:var(--proyectos);}
+  /* ======== RESPONSIVE ======== */
+
+  /* — tablet / 2 columnas — */
   @media (max-width:960px){
-    .hoy-layout{grid-template-columns:1fr 1fr;}
+    .hoy-layout{grid-template-columns:1fr 1fr!important;gap:0 12px;}
+    .hoy-layout > [data-zona="col1"]{grid-column:1!important;}
+    .hoy-layout > [data-idx="0"]{display:none;}
+    .hoy-layout > [data-zona="col2"]{grid-column:2!important;}
+    .hoy-layout > [data-idx="1"]{display:none;}
+    .hoy-layout > [data-zona="col3"]{grid-column:1/-1!important;}
+    .editar-layout-btn{font-size:.74rem;padding:6px 10px;}
+    #restablecer-layout{font-size:.74rem;padding:6px 10px;}
   }
+
+  /* — móvil / 1 columna — */
   @media (max-width:640px){
-    .hoy-layout{grid-template-columns:1fr;}
-    .hoy-col{position:static;}
+    body{padding-bottom:72px;}
+    .hoy-layout{grid-template-columns:1fr!important;gap:0;}
+    .hoy-layout > [data-zona="col1"],
+    .hoy-layout > [data-zona="col2"],
+    .hoy-layout > [data-zona="col3"]{grid-column:1!important;}
+    .hoy-layout > [data-idx="0"],
+    .hoy-layout > [data-idx="1"]{display:none!important;}
+    .hoy-col,.hoy-side{position:static;}
+
+    /* top bar */
+    .top{padding:14px 12px 6px;}
+    .top h1{font-size:1.1rem;}
+    .fecha{font-size:.72rem;}
+    .racha{font-size:.78rem;padding:4px 9px;}
+
+    /* energía banner */
+    .energia-banner{padding:10px 12px;font-size:.82rem;border-radius:12px;margin-bottom:12px;}
+
+    /* ciclo menstrual */
+    .ciclo{padding:12px 13px;}
+    .ciclo-fase{font-size:.92rem;}
+    .ciclo-sug{font-size:.8rem;}
+    .fase-pill{font-size:.72rem;padding:4px 9px;}
+
+    /* secciones */
+    .sec-tit{margin:14px 2px 8px;}
+    .sec-tit h2{font-size:.95rem;}
+    .sec-tit .hint{font-size:.7rem;}
+    .vista{padding:6px 10px 16px;}
+
+    /* reto cards */
+    .reto{padding:10px 11px;gap:10px;border-radius:12px;}
+    .reto-meta{gap:4px;}
+    .reto-txt{font-size:.84rem;}
+    .hora-chip{font-size:.66rem;padding:1px 6px;}
+    .tag-curso{font-size:.62rem;padding:1px 6px;}
+    .hora-editor{gap:4px;}
+    .hora-editor input,.hora-editor select{padding:5px 6px;font-size:.78rem;}
+
+    /* botones primarios */
+    .btn-primary{padding:10px 14px;font-size:.84rem;border-radius:10px;}
+
+    /* side cards */
+    .side-card{padding:11px 12px;border-radius:14px;}
+    .side-tit{font-size:.82rem;}
+    .side-sub{font-size:.72rem;}
+    .side-nota{font-size:.72rem;}
+
+    /* mi semana (week dots) */
+    .ms-row{gap:2px;}
+
+    /* hábitos y rápidas */
+    .habito{padding:6px 0;gap:7px;}
+    .habito-txt{font-size:.82rem;}
+    .habito .check{width:20px;height:20px;font-size:11px;}
+    .habito-del{opacity:1;} /* siempre visible en touch */
+    .add-habito input{font-size:.82rem;padding:7px 9px;}
+    .add-habito button{width:30px;font-size:.9rem;}
+
+    /* calendario mes */
+    .cal{padding:11px 12px;border-radius:14px;}
+    .cal-head span{font-size:.86rem;}
+    .cal-head button{width:28px;height:28px;font-size:1rem;}
+    .cal-grid{gap:2px;}
+    .cal-dia{font-size:.72rem;border-radius:6px;}
+    .cal-dow{font-size:.6rem;}
+    .cal-dia .cal-dots{gap:1px;}
+    .cal-dia .cal-dot{width:4px;height:4px;}
+    .dia-num{font-size:.72rem;}
+
+    /* calendario semana */
+    .cal-semana{gap:3px;}
+    .sem-dia{min-height:64px;padding:5px 3px;border-radius:8px;}
+    .sem-dia-head{font-size:.6rem;gap:0;}
+    .sem-dia-num{font-size:.78rem;}
+    .sem-ev{font-size:.56rem;padding:2px 3px;border-radius:4px;}
+    .sem-ev-mas{font-size:.56rem;}
+
+    /* eventos */
+    .cal-ev{padding:7px 0;font-size:.82rem;}
+    .cal-ev .ev-fecha{font-size:.66rem;}
+
+    /* modo toggle mes/semana */
+    .cal-modo-toggle{margin-bottom:10px;}
+    .cal-modo-btn{font-size:.74rem;padding:5px 12px;}
+
+    /* google calendar bar */
+    .gcal-bar{gap:6px;margin-bottom:8px;}
+    .gcal-btn{padding:6px 10px;font-size:.72rem;}
+    .gcal-sync{font-size:.62rem;}
+
+    /* evento form */
+    #evento-form{margin-top:8px;}
+    #evento-form input[type="text"]{font-size:.82rem;padding:8px 9px;}
+    #evento-form select{font-size:.78rem;}
+
+    /* parqueadero */
+    .parq-item{padding:10px 12px;border-radius:10px;}
+    .parq-txt{font-size:.86rem;margin-bottom:7px;}
+    .parq-acc{gap:5px;}
+    .parq-acc button{font-size:.72rem;padding:4px 8px;}
+
+    /* ejes cards */
+    .eje-card{padding:13px 12px;border-radius:14px;}
+    .add-tarea{gap:5px;}
+    .add-tarea input{font-size:.8rem;padding:7px 8px;}
+    .add-tarea button{width:34px;font-size:1rem;}
+    .et{gap:6px;padding:6px 0;}
+    .et-txt{font-size:.82rem;}
+    .et-del{opacity:1;} /* siempre visible en touch */
+    .et-star{font-size:.64rem;}
+    .tag-prog{font-size:.64rem;padding:2px 6px;}
+
+    /* refugio */
+    .ref-intro{font-size:.8rem;}
+    .ref-grid{gap:8px;}
+    .ref-card{padding:11px;border-radius:14px;}
+    .ref-card .mascota-mini{width:52px;height:52px;}
+    .ref-nombre{font-size:.86rem;}
+    .ref-eje{font-size:.66rem;}
+    .ref-estado{font-size:.68rem;}
+    .ref-nivel{font-size:.64rem;}
+    .ref-foot{padding:11px 13px;font-size:.78rem;border-radius:14px;}
+
+    /* casita */
+    .casa{border-radius:16px;}
+    .hab{padding:14px 10px 12px;}
+    .hab .mascota-casa{width:64px;height:64px;}
+    .hab-nombre{font-size:.82rem;}
+    .hab-eje{font-size:.62rem;}
+    .hab-barra{max-width:90px;}
+    .hab-estado{font-size:.64rem;}
+    .casa-techo{height:36px;width:65%;}
+    .casa-suelo{height:10px;}
+
+    /* mascota panel detalle */
+    .mascota-panel{padding:13px 12px;border-radius:14px;}
+    .semana-graf{height:52px;gap:4px;}
+    .semana-bar{max-width:18px;}
+    .semana-num{font-size:.62rem;}
+    .semana-dia{font-size:.62rem;}
+
+    /* informe semanal */
+    .informe-panel{padding:13px 12px;border-radius:14px;}
+    .informe-resumen{gap:6px;margin-bottom:10px;padding-bottom:10px;}
+    .informe-stat{padding:6px 10px;font-size:.7rem;}
+    .informe-stat b{font-size:.9rem;}
+    .informe-dia-nombre{font-size:.8rem;}
+
+    /* modal */
+    .modal-box{padding:16px 14px calc(16px + env(safe-area-inset-bottom));max-height:85vh;}
+
+    /* nav bar */
+    .nav{max-width:100%;border-radius:0;padding:6px 0 max(6px,env(safe-area-inset-bottom));}
+    .nav button{gap:1px;padding:5px 10px;font-size:.62rem;}
+    .nav .ic{font-size:1.15rem;}
+
+    /* toast */
+    .toast{bottom:78px;font-size:.8rem;padding:9px 16px;border-radius:20px;}
+
+    /* aviso flotante */
+    .aviso{bottom:82px;width:calc(100% - 20px);padding:12px 13px;border-radius:14px;}
+    .aviso-tit{font-size:.88rem;}
+    .aviso-txt{font-size:.8rem;}
+    .aviso-btn{padding:6px 10px;font-size:.74rem;}
+
+    /* pausas */
+    .pausa-row{gap:5px;}
+    .pausa-switch{font-size:.72rem;padding:4px 10px;}
+    .pausa-sel{font-size:.72rem;padding:4px 6px;}
+
+    /* modo bajo energía */
+    .modo-bajo{padding:10px 12px;font-size:.78rem;border-radius:12px;gap:8px;}
+    .modo-bajo button{padding:5px 10px;font-size:.72rem;}
+
+    /* editar layout: ocultar en mobile */
+    .editar-layout-btn{display:none!important;}
+    #restablecer-layout{display:none!important;}
+    .col-resizer{display:none!important;}
+
+    /* energía row */
+    .energia-row{gap:4px;}
+    .energia-row .lbl{font-size:.72rem;}
+  }
+
+  /* — pantallas muy pequeñas (iPhone SE, etc.) — */
+  @media (max-width:380px){
+    body{padding-bottom:66px;}
+    .top{padding:10px 8px 4px;}
+    .top h1{font-size:1rem;}
+    .vista{padding:4px 8px 12px;}
+    .cal-semana{gap:2px;}
+    .sem-dia{min-height:56px;padding:4px 2px;}
+    .sem-dia-num{font-size:.7rem;}
+    .sem-ev{font-size:.52rem;}
+    .ref-grid{grid-template-columns:1fr 1fr;gap:6px;}
+    .ref-card .mascota-mini{width:44px;height:44px;}
+    .hab .mascota-casa{width:52px;height:52px;}
+    .hab{padding:10px 8px 10px;}
+    .nav button{padding:4px 8px;font-size:.58rem;}
+    .nav .ic{font-size:1.05rem;}
+    .reto{padding:9px 9px;gap:8px;}
+    .side-card{padding:10px;}
+    .cal{padding:10px;}
+    .gcal-btn{padding:5px 8px;font-size:.68rem;}
   }
 
   /* ---- acomodar secciones (editar layout) ---- */
