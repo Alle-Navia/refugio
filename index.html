@@ -130,6 +130,26 @@
   .estrellas{font-size:.74rem;letter-spacing:1px;}
   .reto-del{color:var(--gris-cl);font-size:1.1rem;padding:2px 4px;line-height:1;}
 
+  /* ---- badge hora/duración ---- */
+  .hora-badge{display:inline-flex;align-items:center;gap:5px;background:var(--proyectos-bg);border:1.5px solid var(--proyectos);color:var(--proyectos-d);border-radius:20px;padding:3px 10px;font-size:.74rem;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap;}
+  body.noche .hora-badge{background:var(--proyectos-bgN,#1E1630);border-color:var(--proyectos);color:var(--proyectos-dN,#C4A3FF);}
+  .hora-badge:hover{filter:brightness(.93);}
+  .hora-badge .hora-icn{font-size:.82rem;}
+  .btn-add-hora{display:inline-flex;align-items:center;gap:4px;border:1.5px dashed var(--gris-cl);border-radius:20px;padding:3px 10px;font-size:.74rem;color:var(--gris);background:transparent;cursor:pointer;transition:.15s;}
+  .btn-add-hora:hover{border-color:var(--proyectos);color:var(--proyectos);}
+  /* popover de edición */
+  .hora-pop{position:absolute;z-index:200;background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:14px 16px;box-shadow:0 8px 28px rgba(0,0,0,.13);min-width:260px;top:calc(100% + 6px);left:0;}
+  body.noche .hora-pop{box-shadow:0 8px 28px rgba(0,0,0,.4);}
+  .hora-pop-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;}
+  .hora-pop label{font-size:.74rem;color:var(--gris);white-space:nowrap;}
+  .hora-pop select{border:1px solid var(--linea);border-radius:8px;padding:5px 7px;font-family:inherit;font-size:.84rem;background:var(--panel);color:var(--tinta);flex:1;}
+  .hora-pop .hora-sep{font-weight:700;font-size:1rem;color:var(--tinta);}
+  .hora-pop-btns{display:flex;gap:8px;margin-top:4px;}
+  .hora-pop-btns button{flex:1;border-radius:10px;padding:7px;font-size:.82rem;font-weight:600;}
+  .btn-pop-ok{background:var(--tinta);color:#fff;}
+  .btn-pop-del{background:transparent;border:1px solid var(--linea);color:var(--gris);}
+  .reto-wrap{position:relative;}
+
   .vacio{text-align:center;padding:32px 16px;color:var(--gris);}
   .vacio .em{font-size:2rem;display:block;margin-bottom:8px;}
   .vacio p{font-size:.9rem;}
@@ -923,6 +943,91 @@ function aprenderDuracion(){
   }
 }
 
+function calcHoraFin(hora, durMin){
+  if(!hora || !durMin) return null;
+  const [h,m] = hora.split(':').map(Number);
+  const total = h*60 + m + durMin;
+  const fh = Math.floor(total/60) % 24;
+  const fm = total % 60;
+  return String(fh).padStart(2,'0')+':'+String(fm).padStart(2,'0');
+}
+
+function horaBadgeHTML(t){
+  if(!t.hora){
+    return `<button class="btn-add-hora" onclick="abrirPopHora('${t.id}',event)">🕐 + hora</button>`;
+  }
+  const fin = t.durMin ? calcHoraFin(t.hora, t.durMin) : null;
+  const durLabel = t.durMin ? labelDur(t.durMin) : '';
+  const finLabel = fin ? ` → ${fin}` : '';
+  return `<button class="hora-badge" onclick="abrirPopHora('${t.id}',event)"><span class="hora-icn">🕐</span>${t.hora}${durLabel ? ' · '+durLabel : ''}${finLabel}</button>`;
+}
+
+function labelDur(min){
+  if(min < 60) return min+' min';
+  const h = Math.floor(min/60), m = min%60;
+  return m ? h+'h '+m+'min' : h+'h';
+}
+
+function abrirPopHora(id, ev){
+  ev.stopPropagation();
+  // cerrar cualquier popover abierto
+  document.querySelectorAll('.hora-pop').forEach(p=>p.remove());
+  const t = S.tareas.find(x=>x.id===id);
+  if(!t) return;
+  const wrap = document.getElementById('reto-wrap-'+id);
+  if(!wrap) return;
+
+  // Opciones de hora HH
+  let horasOpts='';
+  for(let h=0;h<24;h++) horasOpts+=`<option value="${String(h).padStart(2,'0')}" ${t.hora && parseInt(t.hora.split(':')[0])===h?'selected':''}>${String(h).padStart(2,'0')}</option>`;
+  // Opciones de minuto
+  const minOpts=['00','15','30','45'].map(m=>`<option value="${m}" ${t.hora && t.hora.split(':')[1]===m?'selected':''}>${m}</option>`).join('');
+  // Opciones de duración
+  const durs=[15,30,45,60,90,120,150,180,240,300,360,420,480];
+  let durOpts=`<option value="">--</option>`+durs.map(d=>`<option value="${d}" ${t.durMin===d?'selected':''}>${labelDur(d)}</option>`).join('');
+
+  const pop = document.createElement('div');
+  pop.className='hora-pop';
+  pop.id='hora-pop-'+id;
+  pop.innerHTML=`
+    <div class="hora-pop-row">
+      <label>Hora</label>
+      <select id="pop-hh-${id}">${horasOpts}</select>
+      <span class="hora-sep">:</span>
+      <select id="pop-mm-${id}">${minOpts}</select>
+    </div>
+    <div class="hora-pop-row">
+      <label>Duración</label>
+      <select id="pop-dur-${id}">${durOpts}</select>
+    </div>
+    <div class="hora-pop-btns">
+      <button class="btn-pop-del" onclick="quitarHora('${id}')">Quitar hora</button>
+      <button class="btn-pop-ok" onclick="guardarHora('${id}')">Guardar</button>
+    </div>`;
+  wrap.appendChild(pop);
+  // cerrar al hacer clic fuera
+  setTimeout(()=>{ document.addEventListener('click', function handler(e){ if(!pop.contains(e.target)){pop.remove(); document.removeEventListener('click',handler);} }); },0);
+}
+
+function guardarHora(id){
+  const t = S.tareas.find(x=>x.id===id);
+  if(!t) return;
+  const hh = document.getElementById('pop-hh-'+id)?.value || '09';
+  const mm = document.getElementById('pop-mm-'+id)?.value || '00';
+  const dur = document.getElementById('pop-dur-'+id)?.value;
+  t.hora = hh+':'+mm;
+  t.durMin = dur ? parseInt(dur) : null;
+  document.querySelectorAll('.hora-pop').forEach(p=>p.remove());
+  guardar(); render();
+}
+
+function quitarHora(id){
+  const t = S.tareas.find(x=>x.id===id);
+  if(t){ t.hora=null; t.durMin=null; }
+  document.querySelectorAll('.hora-pop').forEach(p=>p.remove());
+  guardar(); render();
+}
+
 function renderHoy(){
   const cont = document.getElementById('retos-hoy');
   const hoy = S.tareas.filter(t=>t.enHoy);
@@ -933,6 +1038,9 @@ function renderHoy(){
   }
   hoy.forEach(t=>{
     const e = EJES[t.eje];
+    const wrap = document.createElement('div');
+    wrap.className='reto-wrap';
+    wrap.id='reto-wrap-'+t.id;
     const d = document.createElement('div');
     d.className='reto'+(t.hecho?' hecho':'');
     d.innerHTML = `
@@ -943,10 +1051,12 @@ function renderHoy(){
           <span class="eje-dot" style="background:${e.color}"></span>
           <span class="reto-eje">${e.nombre} · ${e.eje}</span>
           <span class="estrellas">${ESTRELLAS[t.dif]}</span>
+          ${horaBadgeHTML(t)}
         </div>
       </div>
       <button class="reto-del" onclick="quitarDeHoy('${t.id}')">×</button>`;
-    cont.appendChild(d);
+    wrap.appendChild(d);
+    cont.appendChild(wrap);
   });
 }
 
