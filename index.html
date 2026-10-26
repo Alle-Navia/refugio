@@ -197,6 +197,50 @@
   .cal-ev{display:flex;align-items:center;gap:8px;font-size:.82rem;padding:8px 10px;background:var(--hueso);border-radius:10px;flex-wrap:wrap;}
   .ev-eje-sel{margin-left:auto;border:1px solid var(--linea);border-radius:8px;padding:3px 4px;font-family:inherit;font-size:.72rem;background:#fff;color:var(--gris);max-width:128px;}
   .ev-eje-sel.con-eje{color:var(--tinta);font-weight:600;}
+
+  /* ---- semana completa (tipo Google Calendar) ---- */
+  .sw-open-btn{width:100%;margin-top:10px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:8px;font-size:.8rem;font-weight:600;color:var(--tinta);}
+  .sw-open-btn:hover{border-color:var(--proyectos);}
+  body.sw-open{overflow:hidden;}
+  .semana-full{display:none;position:fixed;inset:0;z-index:90;background:var(--panel);flex-direction:column;}
+  .semana-full.show{display:flex;}
+  .sw-bar{display:flex;align-items:center;gap:8px;padding:max(10px,env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--linea);flex-shrink:0;}
+  .sw-bar h3{font-size:1rem;flex:1;text-transform:capitalize;min-width:0;}
+  .sw-btn{background:#fff;border:1px solid var(--linea);border-radius:10px;padding:6px 11px;font-size:.8rem;font-weight:600;color:var(--tinta);min-width:34px;}
+  .sw-btn:hover{border-color:var(--proyectos);}
+  .sw-x{font-size:1.3rem;line-height:1;padding:4px 10px;}
+  #sw-scroll{flex:1;overflow:auto;position:relative;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  .sw-grid{display:grid;grid-template-columns:52px repeat(7,minmax(92px,1fr));min-width:max-content;width:100%;}
+  .sw-corner{position:sticky;top:0;left:0;z-index:6;background:var(--panel);border-bottom:1px solid var(--linea);}
+  .sw-hd{position:sticky;top:0;z-index:4;background:var(--panel);border-bottom:1px solid var(--linea);border-left:1px solid var(--linea);padding:6px 4px 6px;text-align:center;cursor:pointer;min-width:0;}
+  .sw-hd:hover{background:var(--hueso);}
+  .sw-dow{font-size:.68rem;color:var(--gris);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+  .sw-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-size:1rem;font-weight:700;margin-top:2px;}
+  .sw-hd.hoy .sw-num{background:var(--tinta);color:#fff;}
+  .sw-hd.hoy .sw-dow{color:var(--tinta);}
+  .sw-allday{display:flex;flex-direction:column;gap:2px;margin-top:4px;}
+  .sw-chip{font-size:.64rem;border-radius:5px;padding:2px 5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--bg,#EEEAFB);color:var(--t,#4E2A9E);border-left:3px solid var(--c,#8B5CF6);}
+  .sw-chip.fest{background:var(--educacion-bg);color:var(--educacion-d);border-left-color:var(--educacion);}
+  .sw-gut{position:sticky;left:0;z-index:3;background:var(--panel);height:1152px;position:sticky;}
+  .sw-gut span{position:absolute;right:6px;font-size:.66rem;color:var(--gris-cl);transform:translateY(-50%);}
+  .sw-col{position:relative;height:1152px;border-left:1px solid var(--linea);cursor:pointer;min-width:0;
+    background:repeating-linear-gradient(to bottom,transparent 0,transparent 47px,var(--linea) 47px,var(--linea) 48px);}
+  .sw-col.hoy{background-color:rgba(150,87,254,.04);}
+  .sw-col.pasado{background-color:rgba(43,36,56,.025);}
+  .sw-ev{position:absolute;box-sizing:border-box;border-radius:7px;padding:2px 5px;font-size:.68rem;line-height:1.25;overflow:hidden;cursor:pointer;
+    background:var(--bg);color:var(--t);border-left:3px solid var(--c);box-shadow:0 0 0 1px #fff;}
+  .sw-ev b{display:block;font-size:.62rem;font-weight:600;opacity:.8;}
+  .sw-ev.tarea{border-left-style:dashed;background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.55) 0 4px,transparent 4px 8px);}
+  .sw-ev:hover{z-index:2;box-shadow:0 2px 8px rgba(43,36,56,.18);}
+  .sw-now{position:absolute;left:0;right:0;height:0;border-top:2px solid #E5484D;z-index:2;pointer-events:none;}
+  .sw-now::before{content:'';position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:#E5484D;}
+  @media (max-width:640px){
+    .sw-grid{grid-template-columns:40px repeat(7,minmax(84px,1fr));}
+    .sw-gut span{font-size:.6rem;right:4px;}
+    .sw-bar{padding:max(8px,env(safe-area-inset-top)) 10px 8px;gap:6px;}
+    .sw-bar h3{font-size:.88rem;}
+    .sw-btn{padding:6px 9px;}
+  }
   .cal-ev .ev-fecha{font-size:.7rem;color:var(--gris);flex-shrink:0;}
   .cal-ev .ev-del{margin-left:auto;color:var(--gris-cl);font-size:.74rem;}
 
@@ -638,6 +682,7 @@
           <button class="gcal-btn" id="gcal-refresh" onclick="gcalSync(true)" style="display:none;" aria-label="Sincronizar ahora">↻ Actualizar</button>
           <span class="gcal-sync" id="gcal-sync"></span>
         </div>
+        <button class="sw-open-btn" style="margin:0 0 10px;" onclick="swAbrir()">🗓 Ver semana completa</button>
         <div class="cal-modo-toggle" id="cal-modo-toggle">
           <button data-modo="mes" class="cal-modo-btn">Mes</button>
           <button data-modo="semana" class="cal-modo-btn">Semana</button>
@@ -711,6 +756,7 @@
         <div class="side-card">
           <div class="side-tit">Mi semana <span id="ms-hint" style="font-size:.68rem;color:var(--gris-cl);font-weight:500;">toca ✦ Ejes para programar</span></div>
           <div class="ms-row" id="mi-semana"></div>
+          <button class="sw-open-btn" onclick="swAbrir()">🗓 Ver semana completa</button>
         </div>
       </div>
       <div class="panel-drag" data-card="energia">
@@ -800,6 +846,18 @@
   <button data-v="ejes" onclick="irA('ejes')"><span class="ic">✦</span>Ejes</button>
   <button data-v="refugio" onclick="irA('refugio')"><span class="ic">🏡</span>Refugio</button>
 </nav>
+
+<div class="semana-full" id="semana-full" role="dialog" aria-label="Semana completa">
+  <div class="sw-bar">
+    <button class="sw-btn" onclick="swNav(-1)" aria-label="Semana anterior">‹</button>
+    <button class="sw-btn" onclick="swNav(0)">Hoy</button>
+    <button class="sw-btn" onclick="swNav(1)" aria-label="Semana siguiente">›</button>
+    <h3 id="sw-titulo"></h3>
+    <button class="sw-btn" id="sw-sync" onclick="gcalSync(true)" style="display:none;" aria-label="Sincronizar Google Calendar">↻</button>
+    <button class="sw-btn sw-x" onclick="swCerrar()" aria-label="Cerrar">×</button>
+  </div>
+  <div id="sw-scroll"><div class="sw-grid" id="sw-grid"></div></div>
+</div>
 
 <div class="toast" id="toast"></div>
 <div class="aviso" id="aviso" style="display:none;" role="alert"></div>
@@ -1044,6 +1102,7 @@ function render(){
   renderEjes();
   renderRefugio();
   renderInformeSemanal();
+  if(window._swAbierto) renderSemanaFull(false);
   // preservar estado del detalle de ciclo entre renders
   const det=document.getElementById('ciclo-detalle');
   const ban=document.getElementById('energia-banner');
@@ -2540,6 +2599,8 @@ function gcalUpdateUI(connected){
   const label = document.getElementById('gcal-label');
   const rf = document.getElementById('gcal-refresh');
   if(rf) rf.style.display = connected ? '' : 'none';
+  const sws = document.getElementById('sw-sync');
+  if(sws) sws.style.display = connected ? '' : 'none';
   if(connected){
     btn.classList.add('on');
     label.textContent = 'Calendar conectado';
@@ -2549,6 +2610,138 @@ function gcalUpdateUI(connected){
     document.getElementById('gcal-sync').textContent = '';
   }
 }
+
+// ============ SEMANA COMPLETA (cuadrícula por horas, como Google Calendar) ============
+const SW_H = 48; // px por hora
+function swMin(h){ const p=h.split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
+function swAbrir(){
+  window._swAbierto = true;
+  window._swOffset = 0;
+  document.getElementById('semana-full').classList.add('show');
+  document.body.classList.add('sw-open');
+  renderSemanaFull(true);
+}
+function swCerrar(){
+  window._swAbierto = false;
+  document.getElementById('semana-full').classList.remove('show');
+  document.body.classList.remove('sw-open');
+}
+function swNav(d){
+  window._swOffset = d===0 ? 0 : (window._swOffset||0)+d;
+  renderSemanaFull(true);
+}
+// reparte en columnas los bloques que se solapan en un mismo día
+function swEmpaquetar(its){
+  its.sort((a,b)=>a.ini-b.ini || b.fin-a.fin);
+  const grupos=[]; let g=null, finG=-1;
+  its.forEach(it=>{
+    if(!g || it.ini>=finG){ g=[]; grupos.push(g); finG=it.fin; } else finG=Math.max(finG,it.fin);
+    g.push(it);
+  });
+  grupos.forEach(gr=>{
+    const cols=[];
+    gr.forEach(it=>{
+      let c=cols.findIndex(f=>f<=it.ini);
+      if(c<0){ c=cols.length; cols.push(0); }
+      cols[c]=it.fin; it.col=c;
+    });
+    gr.forEach(it=>it.ncols=cols.length);
+  });
+}
+function swEstilo(ev){
+  const e = ev.eje ? EJES[ev.eje] : null;
+  if(e) return {c:e.color, bg:e.bg, t:e.d};
+  if(ev.origen==='google') return {c:'#4285F4', bg:'#E8F0FE', t:'#1a4fa0'};
+  return {c:'#8B5CF6', bg:'#EEEAFB', t:'#4E2A9E'};
+}
+function renderSemanaFull(scroll){
+  const grid = document.getElementById('sw-grid');
+  if(!grid) return;
+  const off = window._swOffset||0;
+  const ini = new Date(inicioSemana(HOY)+'T00:00'); ini.setDate(ini.getDate()+off*7);
+  const dias = [];
+  for(let i=0;i<7;i++){ const d=new Date(ini); d.setDate(d.getDate()+i); dias.push(d); }
+  const f0=dias[0], f6=dias[6];
+  const mismoMes = f0.getMonth()===f6.getMonth();
+  document.getElementById('sw-titulo').textContent = mismoMes
+    ? f0.getDate()+' – '+f6.getDate()+' '+f6.toLocaleDateString('es',{month:'long',year:'numeric'})
+    : f0.toLocaleDateString('es',{day:'numeric',month:'short'})+' – '+f6.toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'});
+  const sy = document.getElementById('sw-sync');
+  if(sy) sy.style.display = (typeof _gcalToken!=='undefined' && _gcalToken) ? '' : 'none';
+
+  const ahora = new Date();
+  const minAhora = ahora.getHours()*60+ahora.getMinutes();
+  let head='', cols='', primero=1440;
+  dias.forEach(d=>{
+    const f = fechaISO(d);
+    const esHoy = f===HOY;
+    const fest = festivoEnFecha(f);
+    const timed = [], allday = [];
+    S.eventos.filter(ev=>ev.fecha===f).forEach(ev=>{
+      const st = swEstilo(ev);
+      if(!ev.hora){ allday.push({txt:ev.txt, st, tarea:false}); return; }
+      const ini = swMin(ev.hora);
+      let fin = ev.fin ? swMin(ev.fin) : ini+60;
+      if(fin<=ini) fin = ini+30;
+      timed.push({txt:ev.txt, hora:ev.hora, finTxt:ev.fin||null, ini:ini, fin:Math.min(fin,1440), st, tarea:false});
+    });
+    S.tareas.filter(t=>!t.hecho && !t.eventoId && (t.fechaObjetivo===f || (esHoy && t.enHoy))).forEach(t=>{
+      const e = EJES[t.eje];
+      const st = {c:e.color, bg:e.bg, t:e.d};
+      if(!t.hora){ allday.push({txt:t.txt, st, tarea:true}); return; }
+      const ini = swMin(t.hora);
+      timed.push({txt:t.txt, hora:t.hora, ini:ini, fin:Math.min(ini+(t.durMin||30),1440), st, tarea:true});
+    });
+    swEmpaquetar(timed);
+    timed.forEach(it=>{ if(it.ini<primero) primero=it.ini; });
+    const chips = (fest?`<div class="sw-chip fest" title="${escapeHtml(fest)}">🎉 ${escapeHtml(fest)}</div>`:'')
+      + allday.map(a=>`<div class="sw-chip" style="--c:${a.st.c};--bg:${a.st.bg};--t:${a.st.t}" title="${escapeHtml(a.txt)}">${a.tarea?'✦ ':''}${escapeHtml(a.txt)}</div>`).join('');
+    head += `<div class="sw-hd${esHoy?' hoy':''}" onclick="abrirDiaModal('${f}')">
+      <div class="sw-dow">${DOW_CORTO[d.getDay()]}</div><div class="sw-num">${d.getDate()}</div>
+      <div class="sw-allday">${chips}</div></div>`;
+    const bloques = timed.map(it=>{
+      const top = it.ini/60*SW_H;
+      const alto = Math.max((it.fin-it.ini)/60*SW_H, 20);
+      const w = 100/it.ncols;
+      const rango = it.hora + (it.finTxt ? '–'+it.finTxt : '');
+      return `<div class="sw-ev${it.tarea?' tarea':''}" style="top:${top}px;height:${alto-1}px;left:calc(${it.col*w}% + 1px);width:calc(${w}% - 3px);--c:${it.st.c};--bg:${it.st.bg};--t:${it.st.t}" title="${escapeHtml(rango+' · '+it.txt)}" onclick="event.stopPropagation();abrirDiaModal('${f}')"><b>${rango}</b>${it.tarea?'✦ ':''}${escapeHtml(it.txt)}</div>`;
+    }).join('');
+    const linea = esHoy ? `<div class="sw-now" style="top:${minAhora/60*SW_H}px"></div>` : '';
+    cols += `<div class="sw-col${esHoy?' hoy':''}${f<HOY?' pasado':''}" onclick="swClickCol(event,'${f}')">${bloques}${linea}</div>`;
+  });
+  let horas='';
+  for(let h=1;h<24;h++) horas += `<span style="top:${h*SW_H}px">${String(h).padStart(2,'0')}:00</span>`;
+  // las cabeceras van en una fila y las columnas en otra, para que el scroll vertical las mantenga pegadas arriba
+  grid.innerHTML = `<div class="sw-corner"></div>${head}<div class="sw-gut">${horas}</div>${cols}`;
+
+  if(scroll){
+    const sc = document.getElementById('sw-scroll');
+    // arranca cerca de "ahora" (semana actual) o a las 7:00, pero sin esconder el primer evento de la semana
+    const base = off===0 ? Math.max(6*60, minAhora-90) : 7*60;
+    const minIni = Math.max(0, Math.min(base, primero-30));
+    sc.scrollTop = minIni/60*SW_H;
+    sc.scrollLeft = 0;
+    if(off===0 && sc.scrollWidth>sc.clientWidth){
+      const idx = (ahora.getDay()+6)%7;
+      sc.scrollLeft = idx*((sc.scrollWidth-52)/7);
+    }
+  }
+}
+// clic en un hueco libre: abre el formulario de evento con la hora más cercana (de a 30 min)
+function swClickCol(ev, f){
+  if(f<HOY){ abrirDiaModal(f); return; }
+  const r = ev.currentTarget.getBoundingClientRect();
+  const min = Math.max(0, Math.min(1410, Math.floor((ev.clientY-r.top)/SW_H*2)*30));
+  swCerrar();
+  window._calAbierto = true;
+  render();
+  abrirFormEvento(f);
+  document.getElementById('evento-hora-h').value = String(Math.floor(min/60)).padStart(2,'0');
+  document.getElementById('evento-hora-m').value = String(min%60).padStart(2,'0');
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && window._swAbierto) swCerrar(); });
+// mantiene viva la línea de "ahora"
+setInterval(()=>{ if(window._swAbierto) renderSemanaFull(false); }, 60000);
 
 // vincular un evento de Google a un eje: el vínculo vive en S.gcalEjes (sobrevive a cada sync)
 // y se crea un reto para ese día, igual que con los eventos creados en Refugio
@@ -2623,11 +2816,17 @@ async function gcalSync(manual){
         hora = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
       }
       const vin = (S.gcalEjes && S.gcalEjes[ev.id]) || null;
+      let fin = null;
+      if(ev.start.dateTime && ev.end && ev.end.dateTime){
+        const d1 = new Date(ev.start.dateTime), d2 = new Date(ev.end.dateTime);
+        fin = (fechaISO(d1)===fechaISO(d2)) ? String(d2.getHours()).padStart(2,'0')+':'+String(d2.getMinutes()).padStart(2,'0') : '23:59';
+      }
       S.eventos.push({
         id: 'g_' + ev.id,
         googleId: ev.id,
         fecha: fecha,
         hora: hora,
+        fin: fin,
         txt: ev.summary || '(sin título)',
         origen: 'google',
         eje: vin ? vin.eje : null,
