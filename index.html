@@ -369,6 +369,10 @@
         <span class="hint">máx 3 · la #1 es sagrada</span>
       </div>
       <div id="retos-hoy"></div>
+      <div id="aviso-ayer" style="display:none;margin-top:6px;padding:8px 12px;background:var(--panel);border:1px solid var(--linea);border-radius:10px;font-size:.75rem;color:var(--gris);align-items:center;gap:8px;">
+        <span>Hay retos con datos de días anteriores.</span>
+        <button onclick="limpiarCompletadasAyer()" style="font-size:.72rem;font-weight:600;color:var(--proyectos);border:1.5px solid var(--proyectos);border-radius:8px;padding:2px 8px;background:transparent;cursor:pointer;flex-shrink:0;">Reiniciar retos</button>
+      </div>
       <button class="btn-primary" style="background:var(--panel);color:var(--tinta);border:1px solid var(--linea);" onclick="irA('ejes')">+ Tomar un reto de mis ejes</button>
       <div style="margin-top:8px;">
         <button class="btn-primary" style="background:var(--cuidado-bg);color:var(--cuidado-d);" onclick="activarModoBajo()" id="btn-modo-bajo">🌸 Hoy es día de descanso</button>
@@ -494,16 +498,17 @@ function cargar(){
         {id:'h3', txt:'Moverme / ejercicio', hechoDia:null},
       ];
       if(!s.rapidas) s.rapidas=[];
-      // Migración: convertir t.hecho (boolean) → t.hechoFecha (string ISO|null)
+      // Migración v1: boolean hecho → hechoFecha
       if(s.tareas) s.tareas.forEach(t=>{
         if(t.hechoFecha===undefined){
-          // Si estaba hecha y tiene fechaProg de un día pasado, usar esa fecha
-          // para no contaminar el filtro de "completada hoy"
           t.hechoFecha = t.hecho ? (t.fechaProg && t.fechaProg < HOY ? t.fechaProg : HOY) : null;
           delete t.hecho;
         }
-        // Corrección de migración defectuosa anterior:
-        // Si hechoFecha===HOY pero fechaProg es de un día anterior, la fecha es incorrecta
+      });
+      // Corrección definitiva (incondicional):
+      // hechoFecha nunca puede ser HOY si fechaProg < HOY.
+      // Esto cubre tanto la migración defectuosa como datos corruptos anteriores.
+      if(s.tareas) s.tareas.forEach(t=>{
         if(t.hechoFecha === HOY && t.fechaProg && t.fechaProg < HOY){
           t.hechoFecha = t.fechaProg;
         }
@@ -600,7 +605,8 @@ function nid(){ return Date.now()+''+Math.floor(Math.random()*999); }
 
 function chequearRacha(){
   if(S.ultimoDia === HOY) return;
-  const ayer = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const _ay = new Date(); _ay.setDate(_ay.getDate()-1);
+  const ayer = _ay.getFullYear()+'-'+String(_ay.getMonth()+1).padStart(2,'0')+'-'+String(_ay.getDate()).padStart(2,'0');
   if(S.ultimoDia === ayer) S.racha++;
   else if(S.ultimoDia === null) S.racha = 1;
   else S.racha = 1;
@@ -1084,6 +1090,14 @@ function renderHoy(){
     return (estaHoy || completadaHoy || postergada) && !completadaAntes;
   });
 
+  // Mostrar aviso si hay tareas con hechoFecha=HOY pero sin hechoSesion=HOY
+  // (se marcaron en una sesión anterior con el bug, antes del fix)
+  const tieneCorruptas = S.tareas.some(t =>
+    t.enHoy && t.hechoFecha === HOY && t.hechoSesion !== HOY
+  );
+  const avisoEl = document.getElementById('aviso-ayer');
+  if(avisoEl) avisoEl.style.display = tieneCorruptas ? 'flex' : 'none';
+
   if(tareasHoy.length===0){
     cont.innerHTML='<div class="vacio"><span class="em">🌱</span><p>Aún no has elegido tus retos de hoy.<br>Ve a tus ejes y toma máximo 3.</p></div>';
     return;
@@ -1320,6 +1334,21 @@ function aHoy(id){
 function quitarDeHoy(id){ const t=S.tareas.find(x=>x.id===id); if(t){t.enHoy=false; t.fechaProg=null; t.hechoFecha=null;} guardar(); render(); }
 
 // Reprogramar para hoy una tarea que quedó pendiente de un día anterior
+function limpiarCompletadasAyer(){
+  // Resetea hechoFecha SOLO para tareas corruptas:
+  // marcadas con hechoFecha=HOY en una sesión anterior al fix (sin hechoSesion=HOY)
+  // No toca tareas marcadas legítimamente en esta sesión.
+  S.tareas.forEach(t=>{
+    if(t.enHoy && t.hechoFecha === HOY && t.hechoSesion !== HOY){
+      t.hechoFecha = null;
+      t.hechoSesion = null;
+    }
+  });
+  guardar();
+  render();
+  toast('Retos listos para hoy ☀️');
+}
+
 function reprogramarHoy(id){
   const enHoy=S.tareas.filter(t=>t.enHoy && t.fechaProg===HOY && !t.hechoFecha).length;
   if(enHoy>=3){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
@@ -1359,10 +1388,11 @@ function toggleHecho(id){
   if(yaHecha){
     // Desmarcar
     t.hechoFecha = null;
+    t.hechoSesion = null;
   } else {
-    // Marcar como hecha hoy
+    // Marcar como hecha hoy (no tocar fechaProg para preservar la fecha original)
     t.hechoFecha = HOY;
-    t.fechaProg = HOY; // Asegurar que quede asociada a hoy
+    t.hechoSesion = HOY; // sesión del día en que se marcó, para detectar migraciones corruptas
     const suben = {1:6,2:11,3:18}[t.dif];
     S.bienestar[t.eje]=Math.min(100,S.bienestar[t.eje]+suben);
     if(S.bienestar[t.eje]>=100 && Math.random()>.5){ S.nivel[t.eje]++; }
