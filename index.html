@@ -281,6 +281,7 @@
   .add-habito input{flex:1;border:1px solid var(--linea);border-radius:9px;padding:7px 9px;font-family:inherit;font-size:.8rem;background:var(--panel);color:var(--tinta);}
   .add-habito input:focus{outline:none;border-color:var(--cuidado);}
   .add-habito button{background:var(--cuidado);color:#fff;border-radius:9px;width:32px;font-size:1rem;flex-shrink:0;}
+  .btn-add-rapida{background:var(--proyectos);color:#fff;border-radius:9px;width:32px;font-size:1rem;flex-shrink:0;font-weight:700;}
   @media (max-width:760px){
     .hoy-layout{grid-template-columns:1fr;}
     .hoy-side{position:static;}
@@ -399,7 +400,7 @@
         <div id="rapidas-lista"></div>
         <div class="add-habito">
           <input id="add-rapida-inp" placeholder="Ej: responder a Frank..." onkeydown="if(event.key==='Enter')addRapida()">
-          <button onclick="addRapida()" style="background:var(--tinta)">+</button>
+          <button onclick="addRapida()" class="btn-add-rapida">+</button>
         </div>
       </div>
     </aside>
@@ -470,7 +471,12 @@ const FASES = {
 };
 const ESTRELLAS = {1:'⭐',2:'⭐⭐',3:'⭐⭐⭐'};
 
-const HOY = new Date().toISOString().slice(0,10);
+// Usar fecha local (no UTC) para evitar desfase en zonas UTC-
+function fechaLocalISO(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+const HOY = fechaLocalISO();
 
 let S = cargar();
 
@@ -491,8 +497,15 @@ function cargar(){
       // Migración: convertir t.hecho (boolean) → t.hechoFecha (string ISO|null)
       if(s.tareas) s.tareas.forEach(t=>{
         if(t.hechoFecha===undefined){
-          t.hechoFecha = t.hecho ? (t.fechaProg || HOY) : null;
+          // Si estaba hecha y tiene fechaProg de un día pasado, usar esa fecha
+          // para no contaminar el filtro de "completada hoy"
+          t.hechoFecha = t.hecho ? (t.fechaProg && t.fechaProg < HOY ? t.fechaProg : HOY) : null;
           delete t.hecho;
+        }
+        // Corrección de migración defectuosa anterior:
+        // Si hechoFecha===HOY pero fechaProg es de un día anterior, la fecha es incorrecta
+        if(t.hechoFecha === HOY && t.fechaProg && t.fechaProg < HOY){
+          t.hechoFecha = t.fechaProg;
         }
       });
       return s;
