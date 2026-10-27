@@ -120,6 +120,11 @@
   .reto{background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:13px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:.15s;}
   .reto.hecho{opacity:.55;}
   .reto.hecho .reto-txt{text-decoration:line-through;}
+  .reto.postergada{border-color:var(--gris-cl);border-style:dashed;opacity:.85;}
+  .reto.postergada .reto-txt{color:var(--gris);}
+  .badge-postergada{font-size:.68rem;color:var(--gris);background:var(--bg);border:1px solid var(--linea);border-radius:10px;padding:2px 7px;white-space:nowrap;}
+  .btn-reprog{font-size:.72rem;font-weight:600;color:var(--proyectos);border:1.5px solid var(--proyectos);border-radius:10px;padding:3px 9px;background:transparent;cursor:pointer;white-space:nowrap;transition:.15s;}
+  .btn-reprog:hover{background:var(--proyectos);color:#fff;}
   .check{width:26px;height:26px;border-radius:50%;border:2px solid var(--gris-cl);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;font-size:14px;color:#fff;}
   .reto.hecho .check{background:var(--trabajo);border-color:var(--trabajo);}
   .reto-body{flex:1;min-width:0;}
@@ -483,6 +488,13 @@ function cargar(){
         {id:'h3', txt:'Moverme / ejercicio', hechoDia:null},
       ];
       if(!s.rapidas) s.rapidas=[];
+      // Migración: convertir t.hecho (boolean) → t.hechoFecha (string ISO|null)
+      if(s.tareas) s.tareas.forEach(t=>{
+        if(t.hechoFecha===undefined){
+          t.hechoFecha = t.hecho ? (t.fechaProg || HOY) : null;
+          delete t.hecho;
+        }
+      });
       return s;
     }
   }catch(e){}
@@ -1043,28 +1055,52 @@ function quitarHora(id){
 
 function renderHoy(){
   const cont = document.getElementById('retos-hoy');
-  const hoy = S.tareas.filter(t=>t.enHoy);
   cont.innerHTML='';
-  if(hoy.length===0){
+
+  // Tareas que van en la vista de hoy:
+  // 1. Programadas para HOY (fechaProg === HOY) y no completadas aún
+  // 2. Completadas HOY (hechoFecha === HOY) — se muestran tachadas
+  // 3. Postergadas: enHoy=true, fechaProg < HOY (de días anteriores), no completadas
+  const tareasHoy = S.tareas.filter(t => {
+    if(!t.enHoy) return false;
+    const estaHoy = t.fechaProg === HOY;
+    const completadaHoy = t.hechoFecha === HOY;
+    const completadaAntes = t.hechoFecha && t.hechoFecha < HOY;
+    const postergada = t.fechaProg && t.fechaProg < HOY && !t.hechoFecha;
+    // Mostrar: programadas hoy (completas o no), y postergadas. Ocultar completadas de días anteriores.
+    return (estaHoy || completadaHoy || postergada) && !completadaAntes;
+  });
+
+  if(tareasHoy.length===0){
     cont.innerHTML='<div class="vacio"><span class="em">🌱</span><p>Aún no has elegido tus retos de hoy.<br>Ve a tus ejes y toma máximo 3.</p></div>';
     return;
   }
-  hoy.forEach(t=>{
+
+  tareasHoy.forEach(t=>{
     const e = EJES[t.eje];
+    const hecha = t.hechoFecha === HOY;
+    const postergada = t.fechaProg && t.fechaProg < HOY && !t.hechoFecha;
     const wrap = document.createElement('div');
     wrap.className='reto-wrap';
     wrap.id='reto-wrap-'+t.id;
     const d = document.createElement('div');
-    d.className='reto'+(t.hecho?' hecho':'');
+    d.className='reto'+(hecha?' hecho':'')+(postergada?' postergada':'');
+
+    const badgePostergada = postergada
+      ? `<span class="badge-postergada">⏭ Pendiente del ${t.fechaProg.slice(5).replace('-','/')}</span>
+         <button class="btn-reprog" onclick="reprogramarHoy('${t.id}')">Reprogramar</button>`
+      : '';
+
     d.innerHTML = `
-      <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
+      <button class="check" onclick="toggleHecho('${t.id}')">${hecha?'✓':''}</button>
       <div class="reto-body">
         <div class="reto-txt">${escapeHtml(t.txt)}</div>
         <div class="reto-meta">
           <span class="eje-dot" style="background:${e.color}"></span>
           <span class="reto-eje">${e.nombre} · ${e.eje}</span>
           <span class="estrellas">${ESTRELLAS[t.dif]}</span>
-          ${horaBadgeHTML(t)}
+          ${postergada ? '' : horaBadgeHTML(t)}
+          ${badgePostergada}
         </div>
       </div>
       <button class="reto-del" onclick="quitarDeHoy('${t.id}')">×</button>`;
@@ -1144,7 +1180,7 @@ function renderEjes(){
     const cols = getColors(k);
     const v = Math.round(S.bienestar[k]);
     const est = estadoTexto(v,k);
-    const tareas = S.tareas.filter(t=>t.eje===k && !t.hecho);
+    const tareas = S.tareas.filter(t=>t.eje===k && !t.hechoFecha);
     const card = document.createElement('div');
     card.className='eje-card';
     let tareasHtml='';
@@ -1156,7 +1192,7 @@ function renderEjes(){
           : '';
       tareasHtml+=`<div class="et" id="et-${t.id}">
         <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;">
-          <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
+          <button class="check" onclick="toggleHecho('${t.id}')"></button>
           <span class="et-txt">${escapeHtml(t.txt)}</span>
           <span class="et-star">${ESTRELLAS[t.dif]}</span>
         </div>
@@ -1245,7 +1281,7 @@ function capturar(){
 function repartir(pid, eje){
   const p=S.parqueadero.find(x=>x.id===pid);
   if(!p) return;
-  S.tareas.push({id:nid(),txt:p.txt,eje:eje,dif:1,hecho:false,enHoy:false,notionId:null});
+  S.tareas.push({id:nid(),txt:p.txt,eje:eje,dif:1,hechoFecha:null,enHoy:false,notionId:null});
   S.parqueadero=S.parqueadero.filter(x=>x.id!==pid);
   toast(`Para ${EJES[eje].nombre} ✦`);
   render();
@@ -1257,24 +1293,33 @@ function addTarea(k){
   const dif=parseInt(document.getElementById('dif-'+k).value);
   const t=inp.value.trim();
   if(!t) return;
-  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null});
+  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hechoFecha:null,enHoy:false,notionId:null});
   inp.value='';
   render();
 }
 function aHoy(id){
-  const enHoy=S.tareas.filter(t=>t.enHoy && !t.hecho).length;
+  const enHoy=S.tareas.filter(t=>t.enHoy && !t.hechoFecha).length;
   if(enHoy>=3){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
   const t=S.tareas.find(x=>x.id===id);
   if(t){t.enHoy=true; t.fechaProg=HOY; toast('Añadido a hoy ☀️');}
   guardar(); render();
 }
-function quitarDeHoy(id){ const t=S.tareas.find(x=>x.id===id); if(t){t.enHoy=false; t.fechaProg=null;} guardar(); render(); }
+function quitarDeHoy(id){ const t=S.tareas.find(x=>x.id===id); if(t){t.enHoy=false; t.fechaProg=null; t.hechoFecha=null;} guardar(); render(); }
+
+// Reprogramar para hoy una tarea que quedó pendiente de un día anterior
+function reprogramarHoy(id){
+  const enHoy=S.tareas.filter(t=>t.enHoy && t.fechaProg===HOY && !t.hechoFecha).length;
+  if(enHoy>=3){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
+  const t=S.tareas.find(x=>x.id===id);
+  if(t){ t.fechaProg=HOY; toast('Reprogramada para hoy ☀️'); }
+  guardar(); render();
+}
 
 function programarTarea(id, fecha){
   const t=S.tareas.find(x=>x.id===id);
   if(!t) return;
   if(fecha===HOY){
-    const enHoy=S.tareas.filter(t=>t.enHoy && !t.hecho).length;
+    const enHoy=S.tareas.filter(t=>t.enHoy && !t.hechoFecha).length;
     if(enHoy>=3 && !t.enHoy){ toast('Máximo 3 retos hoy. La #1 es sagrada 🌱'); return; }
     t.enHoy=true;
     t.fechaProg=HOY;
@@ -1297,11 +1342,16 @@ function toggleSchedPicker(id){
 function toggleHecho(id){
   const t=S.tareas.find(x=>x.id===id);
   if(!t) return;
-  t.hecho=!t.hecho;
-  if(t.hecho){
+  const yaHecha = t.hechoFecha !== null && t.hechoFecha !== undefined;
+  if(yaHecha){
+    // Desmarcar
+    t.hechoFecha = null;
+  } else {
+    // Marcar como hecha hoy
+    t.hechoFecha = HOY;
+    t.fechaProg = HOY; // Asegurar que quede asociada a hoy
     const suben = {1:6,2:11,3:18}[t.dif];
     S.bienestar[t.eje]=Math.min(100,S.bienestar[t.eje]+suben);
-    S.nivel[t.eje] += 0;
     if(S.bienestar[t.eje]>=100 && Math.random()>.5){ S.nivel[t.eje]++; }
     toast(`+${suben} bienestar para ${EJES[t.eje].nombre} ✨`);
   }
