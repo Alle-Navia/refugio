@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Aplicar tema antes del render para evitar flash -->
+<script>
+(function(){
+  var t=localStorage.getItem('refugio-tema');
+  if(!t){ t=window.matchMedia('(prefers-color-scheme:dark)').matches?'oscuro':'claro'; }
+  document.documentElement.setAttribute('data-tema',t);
+})();
+</script>
 <meta name="theme-color" content="#2B2438">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -33,7 +41,7 @@
   .top{padding:20px 14px 8px;display:flex;justify-content:space-between;align-items:flex-start;}
   .top .fecha{font-size:.82rem;color:var(--gris);text-transform:capitalize;}
   .top h1{font-size:1.5rem;letter-spacing:-.02em;}
-  .racha{background:#fff;border:1px solid var(--linea);border-radius:20px;padding:6px 12px;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+  .racha{background:var(--panel);border:1px solid var(--linea);border-radius:20px;padding:6px 12px;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap;}
 
   /* ---- vistas ---- */
   .vista{display:none;padding:8px 14px 20px;animation:fade .25s;}
@@ -46,11 +54,11 @@
   .ciclo-fase{font-weight:700;font-size:1rem;}
   .ciclo-sug{font-size:.86rem;color:var(--gris);margin-top:6px;}
   .fase-pills{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;}
-  .fase-pill{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:5px 11px;font-size:.78rem;color:var(--gris);transition:.15s;}
+  .fase-pill{border:1px solid var(--linea);background:var(--panel);border-radius:16px;padding:5px 11px;font-size:.78rem;color:var(--gris);transition:.15s;}
   .fase-pill.on{background:var(--cuidado-bg);border-color:var(--cuidado);color:var(--cuidado-d);font-weight:600;}
   .energia-row{display:flex;gap:6px;margin-top:8px;align-items:center;}
   .energia-row .lbl{font-size:.78rem;color:var(--gris);margin-right:2px;}
-  .en-pill{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:4px 12px;font-size:.78rem;color:var(--gris);}
+  .en-pill{border:1px solid var(--linea);background:var(--panel);border-radius:16px;padding:4px 12px;font-size:.78rem;color:var(--gris);}
   .en-pill.on{background:var(--tinta);color:#fff;border-color:var(--tinta);font-weight:600;}
 
   /* ---- seccion titulo ---- */
@@ -115,7 +123,7 @@
   .add-tarea{display:flex;gap:6px;margin-top:10px;}
   .add-tarea input{flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:.85rem;}
   .add-tarea input:focus{outline:none;border-color:var(--proyectos);}
-  .add-tarea select{border:1px solid var(--linea);border-radius:10px;padding:0 6px;font-family:inherit;font-size:.8rem;background:#fff;}
+  .add-tarea select{border:1px solid var(--linea);border-radius:10px;padding:0 6px;font-family:inherit;font-size:.8rem;background:var(--panel);}
   .add-tarea button, .btn-add-inline{background:var(--proyectos);color:#fff;border-radius:10px;width:38px;font-size:1.1rem;flex-shrink:0;font-weight:700;}
 
   /* ---- refugio ---- */
@@ -171,7 +179,7 @@
 
   /* ---- google calendar ---- */
   .gcal-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-  .gcal-btn{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:7px 12px;font-size:.78rem;font-weight:600;color:var(--tinta);transition:.15s;flex-shrink:0;}
+  .gcal-btn{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:7px 12px;font-size:.78rem;font-weight:600;color:var(--tinta);transition:.15s;flex-shrink:0;}
   .gcal-btn:hover{border-color:var(--proyectos);}
   .gcal-btn.on{border-color:#34A853;color:#34A853;}
   .gcal-btn .gdot{width:8px;height:8px;border-radius:50%;background:var(--gris-cl);}
@@ -200,7 +208,7 @@
 
   /* ---- toggle mes/semana ---- */
   .cal-modo-toggle{display:flex;gap:6px;margin-bottom:12px;}
-  .cal-modo-btn{flex:1;border:1px solid var(--linea);background:#fff;border-radius:10px;padding:7px;font-size:.78rem;font-weight:600;color:var(--gris);transition:.15s;}
+  .cal-modo-btn{flex:1;border:1px solid var(--linea);background:var(--panel);border-radius:10px;padding:7px;font-size:.78rem;font-weight:600;color:var(--gris);transition:.15s;}
   .cal-modo-btn.on{background:var(--tinta);color:#fff;border-color:var(--tinta);}
 
   /* ---- vista semana ---- */
@@ -214,7 +222,7 @@
   .sem-dia.hoy .sem-dia-num{color:#fff;}
   .sem-sangrado-dot{width:5px;height:5px;border-radius:50%;background:var(--cuidado);margin-top:1px;}
   .sem-eventos{display:flex;flex-direction:column;gap:3px;}
-  .sem-ev{font-size:.64rem;background:#fff;border-radius:5px;padding:3px 4px;color:var(--tinta);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .sem-ev{font-size:.64rem;background:var(--panel);border-radius:5px;padding:3px 4px;color:var(--tinta);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .sem-dia.hoy .sem-ev{background:rgba(255,255,255,.14);color:#fff;}
   .sem-ev-mas{font-size:.62rem;color:var(--gris-cl);padding:1px 4px;}
   .sem-dia.hoy .sem-ev-mas{color:rgba(255,255,255,.7);}
@@ -232,7 +240,7 @@
   /* ---- selector de día (programar tarea en la semana) ---- */
   .dia-picker{display:flex;gap:4px;margin-top:6px;margin-bottom:4px;width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
   .dia-pill{flex-shrink:0;min-width:36px;display:flex;flex-direction:column;align-items:center;gap:1px;border:1px solid var(--linea);background:var(--hueso);border-radius:9px;padding:5px 4px;transition:.12s;}
-  .dia-pill:hover{border-color:var(--proyectos);background:#fff;}
+  .dia-pill:hover{border-color:var(--proyectos);background:var(--panel);}
   .dia-pill.festivo{border-color:var(--educacion);}
   .dp-dow{font-size:.6rem;color:var(--gris);font-weight:600;text-transform:capitalize;}
   .dp-num{font-size:.78rem;font-weight:700;color:var(--tinta);}
@@ -310,7 +318,7 @@
   }
 
   /* ---- acomodar secciones (editar layout) ---- */
-  .editar-layout-btn{display:block;margin:0 0 14px auto;background:#fff;border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris);}
+  .editar-layout-btn{display:block;margin:0 0 14px auto;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris);}
   .editar-layout-btn.on{background:var(--tinta);color:#fff;border-color:var(--tinta);}
   .panel-drag{position:relative;margin-bottom:16px;}
   .panel-drag:last-child{margin-bottom:0;}
@@ -333,7 +341,7 @@
   body.editando-layout .side-card, body.editando-layout .cal, body.editando-layout .sec-tit{pointer-events:none;}
 
   /* ---- nav ---- */
-  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;border-radius:20px 20px 0 0;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-top:1px solid var(--linea);display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:50;}
+  .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;border-radius:20px 20px 0 0;background:rgba(250,247,252,.94);backdrop-filter:blur(10px);border-top:1px solid var(--linea);display:flex;justify-content:space-around;padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:50;}
   .nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 14px;color:var(--gris-cl);font-size:.68rem;font-weight:600;border-radius:12px;transition:.15s;}
   .nav button.on{color:var(--proyectos-d);}
   .nav .ic{font-size:1.35rem;line-height:1;}
@@ -351,77 +359,87 @@
   .tag-curso{font-size:.68rem;font-weight:700;color:#fff;background:var(--proyectos);border-radius:10px;padding:1px 8px;}
   .reto.en-curso{border-color:var(--proyectos);box-shadow:0 0 0 2px var(--proyectos-bg);}
   .hora-editor{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--linea);}
-  .hora-editor input,.hora-editor select{border:1px solid var(--linea);border-radius:9px;padding:6px 8px;font-family:inherit;font-size:.82rem;color:var(--tinta);background:#fff;}
+  .hora-editor input,.hora-editor select{border:1px solid var(--linea);border-radius:9px;padding:6px 8px;font-family:inherit;font-size:.82rem;color:var(--tinta);background:var(--panel);}
   .hora-ok{background:var(--tinta);color:#fff;border-radius:9px;padding:7px 12px;font-size:.78rem;font-weight:600;}
   .hora-quitar{color:var(--gris);font-size:.76rem;padding:6px 6px;}
 
   /* ---- pausas activas + aviso flotante ---- */
   .pausa-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
-  .pausa-switch{border:1px solid var(--linea);background:#fff;border-radius:16px;padding:5px 12px;font-size:.78rem;font-weight:600;color:var(--gris);}
+  .pausa-switch{border:1px solid var(--linea);background:var(--panel);border-radius:16px;padding:5px 12px;font-size:.78rem;font-weight:600;color:var(--gris);}
   .pausa-switch.on{background:var(--cuidado-bg);border-color:var(--cuidado);color:var(--cuidado-d);}
-  .pausa-sel{border:1px solid var(--linea);border-radius:10px;padding:5px 8px;font-family:inherit;font-size:.78rem;background:#fff;color:var(--tinta);}
-  .aviso{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);width:calc(100% - 28px);max-width:440px;background:#fff;border:1.5px solid var(--proyectos);border-radius:18px;padding:14px 16px;box-shadow:0 12px 36px rgba(43,36,56,.22);z-index:150;gap:12px;align-items:flex-start;animation:fade .2s;}
+  .pausa-sel{border:1px solid var(--linea);border-radius:10px;padding:5px 8px;font-family:inherit;font-size:.78rem;background:var(--panel);color:var(--tinta);}
+  .aviso{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);width:calc(100% - 28px);max-width:440px;background:var(--panel);border:1.5px solid var(--proyectos);border-radius:18px;padding:14px 16px;box-shadow:0 12px 36px rgba(43,36,56,.22);z-index:150;gap:12px;align-items:flex-start;animation:fade .2s;}
   .aviso-ic{font-size:1.6rem;line-height:1;}
   .aviso-body{flex:1;min-width:0;}
   .aviso-tit{font-weight:700;font-size:.95rem;}
   .aviso-txt{font-size:.86rem;color:var(--gris);margin-top:3px;word-break:break-word;}
   .aviso-acc{display:flex;gap:8px;margin-top:11px;}
-  .aviso-btn{border:1px solid var(--linea);border-radius:10px;padding:7px 13px;font-size:.8rem;font-weight:600;color:var(--gris);background:#fff;}
+  .aviso-btn{border:1px solid var(--linea);border-radius:10px;padding:7px 13px;font-size:.8rem;font-weight:600;color:var(--gris);background:var(--panel);}
   .aviso-btn.pri{background:var(--tinta);border-color:var(--tinta);color:#fff;}
 
-  /* ---- Modo oscuro ---- */
+  /* ---- Toggle día/noche ---- */
+  .tema-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--linea);background:var(--panel);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;}
+  .tema-btn:hover{border-color:var(--proyectos);}
+
+  /* ---- Variables modo oscuro (aplicadas por media O por body.noche) ---- */
+  @media (prefers-color-scheme: dark) { :root { --modo-oscuro:1; } }
+
+  /* Mixin de oscuro — se aplica tanto por OS como por toggle manual */
   @media (prefers-color-scheme: dark) {
-    :root {
-      --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#7A6E8A;
+    :root:not([data-tema="claro"]) {
+      --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#6A6078;
       --hueso:#1A1525; --panel:#241D35; --linea:#3A3050;
-      --trabajo-bg:#1A2A14; --proyectos-bg:#231A40; --educacion-bg:#2E2206; --cuidado-bg:#2E1020;
+      --trabajo-bg:#162210; --proyectos-bg:#1E1640; --educacion-bg:#261C04; --cuidado-bg:#260F18;
     }
-    body { background:var(--hueso); color:var(--tinta); }
-    button:not([class]) { color:var(--tinta); }
-    /* Botones de fondo sólido con --tinta: en oscuro usar color de acento en vez de blanco puro */
-    .add-tarea button,
-    .add-habito button[style*="background:var(--tinta)"] {
-      background:var(--proyectos) !important;
-      color:#fff !important;
-    }
-    /* Toast: fondo oscuro explícito, texto legible */
-    .toast { background:#2B2438 !important; color:#EDE9F4 !important; border:1px solid var(--linea); }
-    /* Paneles blancos */
-    .racha, .ciclo, .panel-card, .aviso, .hora-editor { background:var(--panel); border-color:var(--linea); }
-    /* Inputs y selects */
-    input, select, textarea {
-      background:var(--panel) !important;
-      color:var(--tinta) !important;
-      border-color:var(--linea) !important;
-    }
-    /* Botones con fondo blanco explícito */
-    [style*="background:#fff"], [style*='background: #fff'] {
-      background:var(--panel) !important;
-    }
-    .fase-pill, .en-pill, .add-tarea select, .pausa-sel, .pausa-switch {
-      background:var(--panel);
-      border-color:var(--linea);
-      color:var(--gris);
-    }
-    .reto, .et { background:var(--panel); }
-    /* Fondo del área de semana */
-    .sem-ev { background:var(--panel); color:var(--tinta); }
-    /* Botón primario: ya usa --tinta que en oscuro es claro, texto oscuro */
-    .btn-primary { color:#1A1525; }
-    /* Nav bottom */
-    .nav { background:var(--panel); border-color:var(--linea); }
+  }
+  /* Toggle manual fuerza oscuro aunque el OS sea claro */
+  :root[data-tema="oscuro"] {
+    --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#6A6078;
+    --hueso:#1A1525; --panel:#241D35; --linea:#3A3050;
+    --trabajo-bg:#162210; --proyectos-bg:#1E1640; --educacion-bg:#261C04; --cuidado-bg:#260F18;
+  }
+  /* Toggle manual fuerza claro aunque el OS sea oscuro */
+  :root[data-tema="claro"] {
+    --tinta:#2B2438; --gris:#786E86; --gris-cl:#B8AEC6;
+    --hueso:#FAF7FC; --panel:#FFFFFF; --linea:#ECE4F5;
+    --trabajo-bg:#EAF3DE; --proyectos-bg:#EEEAFB; --educacion-bg:#FBEED9; --cuidado-bg:#FBE7F0;
   }
 
-  /* Toggle manual: class body.noche */
-  body.noche {
-    --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#7A6E8A;
-    --hueso:#1A1525; --panel:#241D35; --linea:#3A3050;
-    --trabajo-bg:#1A2A14; --proyectos-bg:#231A40; --educacion-bg:#2E2206; --cuidado-bg:#2E1020;
-    background:#1A1525; color:#EDE9F4;
+  /* Reglas estructurales que dependen de --panel pero no usan background:var(--panel) automáticamente */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) body { background:var(--hueso); }
+    :root:not([data-tema="claro"]) .nav { background:rgba(26,21,37,.94); }
+    :root:not([data-tema="claro"]) input,
+    :root:not([data-tema="claro"]) select,
+    :root:not([data-tema="claro"]) textarea { background:var(--panel) !important; color:var(--tinta) !important; }
+    :root:not([data-tema="claro"]) .cal-dia.hoy.sangrado::after { background:var(--panel); }
   }
-  body.noche .add-tarea button,
-  body.noche .add-habito button { background:var(--proyectos) !important; color:#fff !important; }
-  body.noche .toast { background:#2B2438 !important; color:#EDE9F4 !important; border:1px solid var(--linea); }
+  :root[data-tema="oscuro"] body { background:var(--hueso); }
+  :root[data-tema="oscuro"] .nav { background:rgba(26,21,37,.94); }
+  :root[data-tema="oscuro"] input,
+  :root[data-tema="oscuro"] select,
+  :root[data-tema="oscuro"] textarea { background:var(--panel) !important; color:var(--tinta) !important; }
+  :root[data-tema="oscuro"] .cal-dia.hoy.sangrado::after { background:var(--panel); }
+  :root[data-tema="oscuro"] .toast { background:#241D35 !important; color:#EDE9F4 !important; border:1px solid #3A3050; }
+  :root[data-tema="oscuro"] .casa { background:linear-gradient(180deg,#1F1830 0%,#251428 100%); }
+  :root[data-tema="oscuro"] .hab:nth-child(1),
+  :root[data-tema="oscuro"] .hab:nth-child(2) { border-bottom-color:#3A3050; }
+  :root[data-tema="oscuro"] .hab:nth-child(1),
+  :root[data-tema="oscuro"] .hab:nth-child(3) { border-right-color:#3A3050; }
+  :root[data-tema="oscuro"] .energia-banner { background:linear-gradient(100deg,#1A1530,#251428); }
+  :root[data-tema="oscuro"] .fase-pill { background:var(--panel); }
+  :root[data-tema="oscuro"] .en-pill { background:var(--panel); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) .toast { background:#241D35 !important; color:#EDE9F4 !important; border:1px solid #3A3050; }
+    :root:not([data-tema="claro"]) .casa { background:linear-gradient(180deg,#1F1830 0%,#251428 100%); }
+    :root:not([data-tema="claro"]) .hab:nth-child(1),
+    :root:not([data-tema="claro"]) .hab:nth-child(2) { border-bottom-color:#3A3050; }
+    :root:not([data-tema="claro"]) .hab:nth-child(1),
+    :root:not([data-tema="claro"]) .hab:nth-child(3) { border-right-color:#3A3050; }
+    :root:not([data-tema="claro"]) .energia-banner { background:linear-gradient(100deg,#1A1530,#251428); }
+    :root:not([data-tema="claro"]) .fase-pill { background:var(--panel); }
+    :root:not([data-tema="claro"]) .en-pill { background:var(--panel); }
+  }
 </style>
 </head>
 <body>
@@ -431,7 +449,10 @@
     <div class="fecha" id="fecha"></div>
     <h1 id="saludo">Refugio</h1>
   </div>
-  <div class="racha" id="racha">🔥 <span id="racha-n">0</span></div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="tema-btn" id="tema-btn" onclick="toggleTema()" title="Cambiar modo día/noche">☀️</button>
+    <div class="racha" id="racha">🔥 <span id="racha-n">0</span></div>
+  </div>
 </div>
 
 <!-- ============ HOY ============ -->
@@ -465,7 +486,7 @@
   </div>
 
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:14px;">
-    <button id="restablecer-layout" onclick="restablecerLayout()" style="background:#fff;border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris-cl);">↺ Restablecer diseño</button>
+    <button id="restablecer-layout" onclick="restablecerLayout()" style="background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:7px 13px;font-size:.78rem;font-weight:600;color:var(--gris-cl);">↺ Restablecer diseño</button>
     <button id="toggle-editar-layout" class="editar-layout-btn" style="margin:0;" onclick="toggleEditarLayout()">✥ Acomodar secciones</button>
   </div>
   <div class="hoy-layout">
@@ -473,7 +494,7 @@
     <div class="hoy-col zona-drag" data-zona="col1">
     <div class="panel-drag" data-card="cal">
       <span class="drag-handle">⠿⠿</span>
-      <button id="toggle-cal" style="width:100%;margin-bottom:16px;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📅 Ver mi mes <span id="cal-badge" style="font-size:.72rem;color:var(--gris);font-weight:500;"></span></button>
+      <button id="toggle-cal" style="width:100%;margin-bottom:16px;background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📅 Ver mi mes <span id="cal-badge" style="font-size:.72rem;color:var(--gris);font-weight:500;"></span></button>
       <div class="cal" id="cal-panel" style="display:none;">
         <div class="gcal-bar" id="gcal-bar">
           <button class="gcal-btn" id="gcal-btn" onclick="gcalToggle()"><span class="gdot"></span><span id="gcal-label">Conectar Google Calendar</span></button>
@@ -491,13 +512,13 @@
         <div class="cal-grid" id="cal-grid"></div>
         <div class="cal-semana" id="cal-semana" style="display:none;"></div>
         <div class="cal-eventos" id="cal-eventos"></div>
-        <button id="cal-add" style="width:100%;margin-top:8px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:8px;font-size:.8rem;font-weight:600;color:var(--gris);">+ Añadir evento</button>
+        <button id="cal-add" style="width:100%;margin-top:8px;background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:8px;font-size:.8rem;font-weight:600;color:var(--gris);">+ Añadir evento</button>
 
         <div id="evento-form" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--linea);">
           <div style="font-size:.78rem;color:var(--gris);margin-bottom:8px;" id="evento-form-fecha"></div>
           <input type="text" id="evento-txt" placeholder="¿Qué evento o tarea?" style="width:100%;border:1px solid var(--linea);border-radius:10px;padding:9px 10px;font-family:inherit;font-size:.85rem;margin-bottom:8px;color:var(--tinta);">
           <div style="display:flex;gap:6px;margin-bottom:8px;">
-            <div id="evento-hora-wrap" style="flex:1;display:flex;gap:4px;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:0 8px;background:#fff;">
+            <div id="evento-hora-wrap" style="flex:1;display:flex;gap:4px;align-items:center;border:1px solid var(--linea);border-radius:10px;padding:0 8px;background:var(--panel);">
               <select id="evento-hora-h" class="hora-select" aria-label="Hora">
                 <option value="">--</option>
               </select>
@@ -506,10 +527,10 @@
                 <option value="">--</option>
               </select>
             </div>
-            <select id="evento-eje" style="flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:#fff;color:var(--tinta);">
+            <select id="evento-eje" style="flex:1;border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:var(--panel);color:var(--tinta);">
               <option value="">Sin eje (solo evento)</option>
             </select>
-            <select id="evento-dif" style="border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:#fff;">
+            <select id="evento-dif" style="border:1px solid var(--linea);border-radius:10px;padding:8px 6px;font-family:inherit;font-size:.82rem;background:var(--panel);">
               <option value="1">⭐</option>
               <option value="2">⭐⭐</option>
               <option value="3">⭐⭐⭐</option>
@@ -517,7 +538,7 @@
           </div>
           <div style="font-size:.7rem;color:var(--gris-cl);margin-bottom:8px;">Si eliges un eje, aparecerá solo en "Mis retos de hoy" el día del evento.</div>
           <div style="display:flex;gap:6px;">
-            <button onclick="cerrarFormEvento()" style="flex:1;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:9px;font-size:.82rem;font-weight:600;color:var(--gris);">Cancelar</button>
+            <button onclick="cerrarFormEvento()" style="flex:1;background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:9px;font-size:.82rem;font-weight:600;color:var(--gris);">Cancelar</button>
             <button onclick="guardarEvento()" style="flex:2;background:var(--proyectos);color:#fff;border-radius:10px;padding:9px;font-size:.82rem;font-weight:600;">Guardar</button>
           </div>
         </div>
@@ -532,7 +553,7 @@
         <span class="hint" id="retos-hint">máx 3 · la #1 es sagrada</span>
       </div>
       <div id="retos-hoy"></div>
-      <button class="btn-primary" style="background:#fff;color:var(--tinta);border:1px solid var(--linea);" onclick="irA('ejes')">+ Tomar un reto de mis ejes</button>
+      <button class="btn-primary" style="background:var(--panel);color:var(--tinta);border:1px solid var(--linea);" onclick="irA('ejes')">+ Tomar un reto de mis ejes</button>
       <div style="margin-top:8px;">
         <button class="btn-primary" style="background:var(--cuidado-bg);color:var(--cuidado-d);" onclick="activarModoBajo()" id="btn-modo-bajo">🌸 Hoy es día de descanso</button>
       </div>
@@ -631,7 +652,7 @@
   <div id="mascota-detalle" style="display:none;"></div>
   <div class="ref-foot" id="ref-foot"></div>
 
-  <button id="toggle-informe" style="width:100%;margin-top:14px;background:#fff;border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📊 Ver informe semanal</button>
+  <button id="toggle-informe" style="width:100%;margin-top:14px;background:var(--panel);border:1px solid var(--linea);border-radius:14px;padding:11px;font-size:.86rem;font-weight:600;color:var(--tinta);display:flex;align-items:center;justify-content:center;gap:8px;">📊 Ver informe semanal</button>
   <div id="informe-semanal" style="display:none;"></div>
 </section>
 
@@ -800,6 +821,23 @@ function cargar(){
   };
 }
 function guardar(){ localStorage.setItem('refugio-ale', JSON.stringify(S)); }
+
+// ============ TOGGLE TEMA DÍA/NOCHE ============
+function initTema(){
+  // data-tema ya fue puesto por el script inline en <head> (sin flash)
+  // Aquí solo sincronizamos el emoji del botón
+  const btn = document.getElementById('tema-btn');
+  const tema = document.documentElement.getAttribute('data-tema') || 'claro';
+  if(btn) btn.textContent = tema === 'oscuro' ? '☀️' : '🌙';
+}
+function toggleTema(){
+  const actual = document.documentElement.getAttribute('data-tema') || 'claro';
+  const nuevo = actual === 'oscuro' ? 'claro' : 'oscuro';
+  document.documentElement.setAttribute('data-tema', nuevo);
+  localStorage.setItem('refugio-tema', nuevo);
+  const btn = document.getElementById('tema-btn');
+  if(btn) btn.textContent = nuevo === 'oscuro' ? '☀️' : '🌙';
+}
 
 // ============ CÁLCULO DEL CICLO ============
 function diasEntre(a, b){
@@ -1458,7 +1496,7 @@ function abrirDiaModal(fISO){
   document.getElementById('dia-modal-box').innerHTML = `
     <div class="modal-head"><h3>${titulo}</h3><button class="modal-close" onclick="cerrarDiaModal()">×</button></div>
     ${body}
-    ${fISO>=HOY ? `<button class="btn-primary" style="background:#fff;color:var(--tinta);border:1px solid var(--linea);margin-top:4px;" onclick="irAEventoDesdeModal('${fISO}')">+ Añadir evento este día</button>` : ''}`;
+    ${fISO>=HOY ? `<button class="btn-primary" style="background:var(--panel);color:var(--tinta);border:1px solid var(--linea);margin-top:4px;" onclick="irAEventoDesdeModal('${fISO}')">+ Añadir evento este día</button>` : ''}`;
   document.getElementById('dia-modal-overlay').classList.add('show');
 }
 function cerrarDiaModal(){
@@ -2310,6 +2348,7 @@ function initDragLayout(){
 }
 
 // ============ INICIO ============
+initTema();
 chequearRacha();
 render();
 aplicarLayoutGuardado();
