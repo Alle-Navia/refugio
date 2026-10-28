@@ -568,13 +568,6 @@
 
     <!-- columna 2: mi semana + energía -->
     <div class="hoy-col zona-drag" data-zona="col2">
-      <div class="panel-drag" data-card="semana">
-        <span class="drag-handle">⠿⠿</span>
-        <div class="side-card">
-          <div class="side-tit">Mi semana <span id="ms-hint" style="font-size:.68rem;color:var(--gris-cl);font-weight:500;">toca ✦ Ejes para programar</span></div>
-          <div class="ms-row" id="mi-semana"></div>
-        </div>
-      </div>
       <div class="panel-drag" data-card="energia">
         <span class="drag-handle">⠿⠿</span>
         <div class="side-card">
@@ -1001,7 +994,7 @@ function renderSemana(){
       return `<div class="sem-ev" style="${borde}" title="${escapeHtml((ev.hora?ev.hora+' · ':'')+ev.txt)}">${ev.origen==='google'?'<span style="color:#4285F4;font-size:.6rem;">G</span> ':''}${ev.hora?ev.hora+' ':''}${escapeHtml(ev.txt)}</div>`;
     }).join('');
     if(evDia.length>maxEv) chips += `<div class="sem-ev-mas">+${evDia.length-maxEv} más</div>`;
-    html += `<div class="sem-dia${esHoy?' hoy':''}" onclick="abrirFormEvento('${fISO}')">
+    html += `<div class="sem-dia${esHoy?' hoy':''}" onclick="abrirDiaModal('${fISO}')">
       <div class="sem-dia-head"><span>${nombresCortos[i]}</span><span class="sem-dia-num">${d.getDate()}</span>${sangra?'<span class="sem-sangrado-dot"></span>':''}</div>
       <div class="sem-eventos">${chips || '<div class="sem-vacio">—</div>'}</div>
     </div>`;
