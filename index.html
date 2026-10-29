@@ -1408,7 +1408,13 @@ function renderCalendario(){
     const row=document.createElement('div');
     row.className='cal-ev' + (ev.origen==='google' ? ' google' : '');
     const delBtn = ev.origen==='google' ? '' : `<button class="ev-del" onclick="borrarEvento('${ev.id}')">✕</button>`;
-    row.innerHTML=`<span class="ev-fecha">${d}${hora}</span>${ev.origen==='google'?'<span style="color:#4285F4;font-size:.65rem;font-weight:600;">G</span>':''}${e?`<span class="eje-dot" style="background:${e.color}"></span>`:''}<span>${escapeHtml(ev.txt)}</span>${delBtn}`;
+    const gcalBadge = ev.origen==='google' ? `<span style="color:#4285F4;font-size:.65rem;font-weight:600;">G</span>` : '';
+    const ejeInfo = e
+      ? `<span class="eje-dot" style="background:${e.color}"></span>`
+      : (ev.origen==='google'
+          ? `<button onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',null)" style="font-size:.65rem;border:1px solid var(--linea);border-radius:6px;padding:1px 5px;background:var(--panel);color:var(--gris);flex-shrink:0;cursor:pointer;">⊕ eje</button>`
+          : '');
+    row.innerHTML=`<span class="ev-fecha">${d}${hora}</span>${gcalBadge}${ejeInfo}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(ev.txt)}</span>${delBtn}`;
     evCont.appendChild(row);
   });
   // llenar select de ejes del formulario (una sola vez)
