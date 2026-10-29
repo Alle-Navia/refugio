@@ -439,6 +439,77 @@
   :root[data-tema="oscuro"] .energia-banner { background:linear-gradient(100deg,#1A1530,#251428); }
   :root[data-tema="oscuro"] .fase-pill { background:var(--panel); }
   :root[data-tema="oscuro"] .en-pill { background:var(--panel); }
+  /* En dark, --tinta es #EDE9F4 (casi blanco) — todos los elementos que usan
+     background:var(--tinta);color:#fff quedan invisibles. Fix global: */
+  :root[data-tema="oscuro"] .cal-modo-btn.on,
+  :root[data-tema="oscuro"] .editar-layout-btn.on {
+    background:#5A4E78;
+    color:#EDE9F4;
+    border-color:#5A4E78;
+  }
+  :root[data-tema="oscuro"] .btn-primary {
+    background:#5A4E78;
+    color:#EDE9F4;
+  }
+  :root[data-tema="oscuro"] .btn-primary:not([style*="background"]) {
+    background:#5A4E78 !important;
+    color:#EDE9F4 !important;
+  }
+  :root[data-tema="oscuro"] .cal-dia.hoy {
+    background:#7C6FA0;
+    color:#fff;
+  }
+  :root[data-tema="oscuro"] .sem-dia.hoy {
+    background:#3A2F55;
+  }
+  :root[data-tema="oscuro"] .en-pill.on {
+    background:#5A4E78;
+    color:#EDE9F4;
+    border-color:#5A4E78;
+  }
+  :root[data-tema="oscuro"] .hora-ok {
+    background:#5A4E78;
+    color:#EDE9F4;
+  }
+  :root[data-tema="oscuro"] .aviso-btn.pri {
+    background:#5A4E78;
+    border-color:#5A4E78;
+    color:#EDE9F4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) .cal-modo-btn.on,
+    :root:not([data-tema="claro"]) .editar-layout-btn.on {
+      background:#5A4E78;
+      color:#EDE9F4;
+      border-color:#5A4E78;
+    }
+    :root:not([data-tema="claro"]) .btn-primary {
+      background:#5A4E78;
+      color:#EDE9F4;
+    }
+    :root:not([data-tema="claro"]) .cal-dia.hoy {
+      background:#7C6FA0;
+      color:#fff;
+    }
+    :root:not([data-tema="claro"]) .sem-dia.hoy {
+      background:#3A2F55;
+    }
+    :root:not([data-tema="claro"]) .en-pill.on {
+      background:#5A4E78;
+      color:#EDE9F4;
+      border-color:#5A4E78;
+    }
+    :root:not([data-tema="claro"]) .hora-ok {
+      background:#5A4E78;
+      color:#EDE9F4;
+    }
+    :root:not([data-tema="claro"]) .aviso-btn.pri {
+      background:#5A4E78;
+      border-color:#5A4E78;
+      color:#EDE9F4;
+    }
+  }
+
   /* Botones y elementos con colores de eje en modo oscuro — usar variables con contraste */
   :root[data-tema="oscuro"] .btn-eje-cuidado {
     background:var(--cuidado-btn-bg) !important;
