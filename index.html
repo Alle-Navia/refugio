@@ -390,6 +390,11 @@
       --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#6A6078;
       --hueso:#1A1525; --panel:#241D35; --linea:#3A3050;
       --trabajo-bg:#162210; --proyectos-bg:#1E1640; --educacion-bg:#261C04; --cuidado-bg:#260F18;
+      /* Variables de botón con fondo de eje — colores con contraste ok en dark */
+      --trabajo-btn-bg:#1E3A16; --trabajo-btn-c:#7FD46A;
+      --proyectos-btn-bg:#2A1F58; --proyectos-btn-c:#C4AFFE;
+      --educacion-btn-bg:#3A2A08; --educacion-btn-c:#F5CC6A;
+      --cuidado-btn-bg:#3D1028; --cuidado-btn-c:#F4A5C6;
     }
   }
   /* Toggle manual fuerza oscuro aunque el OS sea claro */
@@ -397,6 +402,11 @@
     --tinta:#EDE9F4; --gris:#A89BB8; --gris-cl:#6A6078;
     --hueso:#1A1525; --panel:#241D35; --linea:#3A3050;
     --trabajo-bg:#162210; --proyectos-bg:#1E1640; --educacion-bg:#261C04; --cuidado-bg:#260F18;
+    /* Variables de botón con fondo de eje — colores con contraste ok en dark */
+    --trabajo-btn-bg:#1E3A16; --trabajo-btn-c:#7FD46A;
+    --proyectos-btn-bg:#2A1F58; --proyectos-btn-c:#C4AFFE;
+    --educacion-btn-bg:#3A2A08; --educacion-btn-c:#F5CC6A;
+    --cuidado-btn-bg:#3D1028; --cuidado-btn-c:#F4A5C6;
   }
   /* Toggle manual fuerza claro aunque el OS sea oscuro */
   :root[data-tema="claro"] {
@@ -429,6 +439,43 @@
   :root[data-tema="oscuro"] .energia-banner { background:linear-gradient(100deg,#1A1530,#251428); }
   :root[data-tema="oscuro"] .fase-pill { background:var(--panel); }
   :root[data-tema="oscuro"] .en-pill { background:var(--panel); }
+  /* Botones y elementos con colores de eje en modo oscuro — usar variables con contraste */
+  :root[data-tema="oscuro"] .btn-eje-cuidado {
+    background:var(--cuidado-btn-bg) !important;
+    color:var(--cuidado-btn-c) !important;
+  }
+  :root[data-tema="oscuro"] .btn-eje-trabajo {
+    background:var(--trabajo-btn-bg) !important;
+    color:var(--trabajo-btn-c) !important;
+  }
+  :root[data-tema="oscuro"] .btn-eje-proyectos {
+    background:var(--proyectos-btn-bg) !important;
+    color:var(--proyectos-btn-c) !important;
+  }
+  :root[data-tema="oscuro"] .btn-eje-educacion {
+    background:var(--educacion-btn-bg) !important;
+    color:var(--educacion-btn-c) !important;
+  }
+  :root[data-tema="oscuro"] .modo-bajo {
+    background:var(--cuidado-btn-bg);
+    color:var(--cuidado-btn-c);
+    border-color:var(--cuidado);
+  }
+  :root[data-tema="oscuro"] .pausa-switch.on {
+    background:var(--cuidado-btn-bg);
+    color:var(--cuidado-btn-c);
+    border-color:var(--cuidado);
+  }
+  :root[data-tema="oscuro"] .hora-chip.con-hora {
+    background:var(--proyectos-btn-bg);
+    color:var(--proyectos-btn-c);
+    border-color:var(--proyectos);
+  }
+  :root[data-tema="oscuro"] .fase-pill.on {
+    background:var(--cuidado-btn-bg);
+    border-color:var(--cuidado);
+    color:var(--cuidado-btn-c);
+  }
   @media (prefers-color-scheme: dark) {
     :root:not([data-tema="claro"]) .toast { background:#241D35 !important; color:#EDE9F4 !important; border:1px solid #3A3050; }
     :root:not([data-tema="claro"]) .casa { background:linear-gradient(180deg,#1F1830 0%,#251428 100%); }
@@ -439,6 +486,187 @@
     :root:not([data-tema="claro"]) .energia-banner { background:linear-gradient(100deg,#1A1530,#251428); }
     :root:not([data-tema="claro"]) .fase-pill { background:var(--panel); }
     :root:not([data-tema="claro"]) .en-pill { background:var(--panel); }
+    :root:not([data-tema="claro"]) .btn-eje-cuidado {
+      background:var(--cuidado-btn-bg) !important;
+      color:var(--cuidado-btn-c) !important;
+    }
+    :root:not([data-tema="claro"]) .btn-eje-trabajo {
+      background:var(--trabajo-btn-bg) !important;
+      color:var(--trabajo-btn-c) !important;
+    }
+    :root:not([data-tema="claro"]) .btn-eje-proyectos {
+      background:var(--proyectos-btn-bg) !important;
+      color:var(--proyectos-btn-c) !important;
+    }
+    :root:not([data-tema="claro"]) .btn-eje-educacion {
+      background:var(--educacion-btn-bg) !important;
+      color:var(--educacion-btn-c) !important;
+    }
+    :root:not([data-tema="claro"]) .modo-bajo {
+      background:var(--cuidado-btn-bg);
+      color:var(--cuidado-btn-c);
+      border-color:var(--cuidado);
+    }
+    :root:not([data-tema="claro"]) .pausa-switch.on {
+      background:var(--cuidado-btn-bg);
+      color:var(--cuidado-btn-c);
+      border-color:var(--cuidado);
+    }
+    :root:not([data-tema="claro"]) .hora-chip.con-hora {
+      background:var(--proyectos-btn-bg);
+      color:var(--proyectos-btn-c);
+      border-color:var(--proyectos);
+    }
+    :root:not([data-tema="claro"]) .fase-pill.on {
+      background:var(--cuidado-btn-bg);
+      border-color:var(--cuidado);
+      color:var(--cuidado-btn-c);
+    }
+  }
+
+  /* ---- Overlay semana fullscreen ---- */
+  .semana-overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:var(--hueso);
+    z-index:1000;
+    flex-direction:column;
+    overflow-y:auto;
+  }
+  .semana-overlay.show { display:flex; }
+  .semana-overlay-head {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px 10px;
+    border-bottom:1px solid var(--linea);
+    background:var(--panel);
+    position:sticky;
+    top:0;
+    z-index:2;
+  }
+  .semana-overlay-head h2 { flex:1; font-size:1rem; font-weight:700; color:var(--tinta); margin:0; }
+  .semana-overlay-head button.nav-sem { width:30px;height:30px;border-radius:8px;background:var(--hueso);color:var(--tinta);font-size:1.1rem;font-weight:700; }
+  .semana-overlay-head button.cerrar-sem { width:32px;height:32px;border-radius:50%;background:var(--hueso);color:var(--gris);font-size:1.1rem; }
+  .semana-fs-grid {
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    padding:0 0 80px;
+  }
+  .sem-fs-dia {
+    padding:14px 16px;
+    border-bottom:1px solid var(--linea);
+  }
+  .sem-fs-dia.hoy { background:var(--proyectos-bg); }
+  .sem-fs-dia-head {
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .sem-fs-dia-label {
+    font-size:.72rem;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--gris);
+    letter-spacing:.04em;
+  }
+  .sem-fs-dia.hoy .sem-fs-dia-label { color:var(--proyectos-d); }
+  .sem-fs-dia-num {
+    font-size:1.5rem;
+    font-weight:800;
+    color:var(--tinta);
+    line-height:1;
+  }
+  .sem-fs-dia.hoy .sem-fs-dia-num { color:var(--proyectos); }
+  .sem-fs-fest { font-size:.75rem; color:var(--educacion-d); font-weight:600; margin-bottom:6px; }
+  .sem-fs-ev {
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    padding:7px 10px;
+    border-radius:10px;
+    background:var(--panel);
+    margin-bottom:5px;
+    font-size:.83rem;
+    color:var(--tinta);
+  }
+  .sem-fs-ev .ev-hora { font-weight:700; color:var(--gris); flex-shrink:0; min-width:36px; }
+  .sem-fs-ev .ev-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px; }
+  .sem-fs-ev .ev-txt { flex:1; line-height:1.35; }
+  .sem-fs-ev .ev-eje-sel { margin-left:auto; flex-shrink:0; }
+  .sem-fs-vacio { font-size:.8rem; color:var(--gris-cl); padding:4px 0; }
+  .sem-fs-add {
+    display:block;
+    width:100%;
+    margin-top:8px;
+    background:none;
+    border:1px dashed var(--linea);
+    border-radius:10px;
+    padding:7px;
+    font-size:.8rem;
+    color:var(--gris);
+    text-align:center;
+  }
+  .sem-fs-add:active { background:var(--linea); }
+  .eje-sel-mini {
+    font-size:.72rem;
+    border:1px solid var(--linea);
+    border-radius:8px;
+    padding:3px 6px;
+    background:var(--panel);
+    color:var(--tinta);
+    font-family:inherit;
+  }
+  /* Modal eje para evento gcal */
+  .eje-modal-overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:1100;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .eje-modal-overlay.show { display:flex; }
+  .eje-modal-box {
+    background:var(--panel);
+    border-radius:20px 20px 0 0;
+    padding:20px 16px 32px;
+    width:100%;
+    max-width:480px;
+  }
+  .eje-modal-box h3 { font-size:.95rem; font-weight:700; color:var(--tinta); margin:0 0 4px; }
+  .eje-modal-box p { font-size:.8rem; color:var(--gris); margin:0 0 14px; }
+  .eje-opciones { display:flex; flex-direction:column; gap:8px; }
+  .eje-opcion {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    border-radius:12px;
+    border:1px solid var(--linea);
+    background:var(--panel);
+    color:var(--tinta);
+    font-size:.88rem;
+    font-weight:600;
+    text-align:left;
+  }
+  .eje-opcion:active { opacity:.8; }
+  .eje-opcion .eje-dot-lg { width:12px;height:12px;border-radius:50%; }
+  .eje-opcion.sel { border-width:2px; }
+  .eje-modal-sineje {
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    border-radius:12px;
+    border:1px solid var(--linea);
+    background:var(--panel);
+    color:var(--gris);
+    font-size:.84rem;
+    font-weight:600;
   }
 </style>
 </head>
@@ -473,7 +701,7 @@
     </div>
     <div class="fase-pills" id="fase-pills"></div>
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--linea);">
-      <button id="toggle-registro" style="width:100%;background:var(--cuidado-bg);color:var(--cuidado-d);border-radius:12px;padding:9px;font-size:.82rem;font-weight:600;">🩸 Registrar un periodo</button>
+      <button id="toggle-registro" class="btn-eje-cuidado" style="width:100%;background:var(--cuidado-bg);color:var(--cuidado-d);border-radius:12px;padding:9px;font-size:.82rem;font-weight:600;">🩸 Registrar un periodo</button>
       <div id="registro-panel" style="display:none;margin-top:10px;">
         <div style="font-size:.8rem;color:var(--gris);margin-bottom:7px;">Elige la fecha en que empezó:</div>
         <div style="display:flex;gap:6px;">
@@ -555,7 +783,7 @@
       <div id="retos-hoy"></div>
       <button class="btn-primary" style="background:var(--panel);color:var(--tinta);border:1px solid var(--linea);" onclick="irA('ejes')">+ Tomar un reto de mis ejes</button>
       <div style="margin-top:8px;">
-        <button class="btn-primary" style="background:var(--cuidado-bg);color:var(--cuidado-d);" onclick="activarModoBajo()" id="btn-modo-bajo">🌸 Hoy es día de descanso</button>
+        <button class="btn-primary btn-eje-cuidado" style="background:var(--cuidado-bg);color:var(--cuidado-d);" onclick="activarModoBajo()" id="btn-modo-bajo">🌸 Hoy es día de descanso</button>
       </div>
       <div class="modo-bajo" id="modo-bajo" style="display:none;">
         <span>🌸 Día difícil. Hoy basta con estar. Tu racha está protegida.</span>
@@ -661,6 +889,27 @@
 
 <div class="modal-overlay" id="dia-modal-overlay" onclick="if(event.target===this)cerrarDiaModal()">
   <div class="modal-box" id="dia-modal-box"></div>
+</div>
+
+<!-- Overlay semana fullscreen -->
+<div class="semana-overlay" id="semana-overlay">
+  <div class="semana-overlay-head">
+    <button class="nav-sem" onclick="semanaOverlayNav(-1)" aria-label="Semana anterior">‹</button>
+    <h2 id="semana-overlay-titulo"></h2>
+    <button class="nav-sem" onclick="semanaOverlayNav(1)" aria-label="Semana siguiente">›</button>
+    <button class="cerrar-sem" onclick="cerrarSemanaOverlay()" aria-label="Cerrar">×</button>
+  </div>
+  <div class="semana-fs-grid" id="semana-fs-grid"></div>
+</div>
+
+<!-- Modal asignar eje a evento Google Calendar -->
+<div class="eje-modal-overlay" id="eje-modal-overlay" onclick="if(event.target===this)cerrarEjeModal()">
+  <div class="eje-modal-box" id="eje-modal-box">
+    <h3 id="eje-modal-titulo">Conectar evento a un eje</h3>
+    <p id="eje-modal-sub"></p>
+    <div class="eje-opciones" id="eje-opciones"></div>
+    <button class="eje-modal-sineje" onclick="asignarEjeEvento(null)">Sin eje (solo evento)</button>
+  </div>
 </div>
 
 <script>
@@ -961,7 +1210,11 @@ function calNav(delta){
   }
 }
 function setCalModo(modo){
-  window._calModo = modo;
+  if(modo==='semana'){
+    abrirSemanaOverlay();
+    return;
+  }
+  window._calModo = 'mes';
   renderCalendario();
 }
 // ¿está sangrando en la fecha f? (según ciclos registrados)
@@ -1462,9 +1715,16 @@ function abrirDiaModal(fISO){
   if(eventosDia.length){
     body += eventosDia.map(ev=>{
       const e = ev.eje ? EJES[ev.eje] : null;
+      const isGcal = ev.origen==='google';
+      const dotColor = isGcal && !e ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      const ejeChip = e
+        ? `<span style="font-size:.68rem;font-weight:700;color:${e.color};margin-left:4px;">[${e.eje}]</span>`
+        : (isGcal ? `<button onclick="abrirEjeModalDesdeDia('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}','${fISO}')" style="font-size:.68rem;border:1px solid var(--linea);border-radius:6px;padding:2px 6px;background:var(--panel);color:var(--gris);margin-left:4px;">⊕ eje</button>` : '');
+      const gcalDot = isGcal ? `<span style="font-size:.6rem;color:#4285F4;font-weight:700;margin-right:2px;">G</span>` : '';
       return `<div class="modal-item">
-        ${e?`<span class="eje-dot" style="background:${e.color}"></span>`:'<span style="font-size:.9rem;">📌</span>'}
-        <span class="modal-item-txt">${ev.hora?'<b>'+ev.hora+'</b> · ':''}${escapeHtml(ev.txt)}</span>
+        <span class="eje-dot" style="background:${dotColor}"></span>
+        ${gcalDot}
+        <span class="modal-item-txt">${ev.hora?'<b>'+ev.hora+'</b> · ':''}${escapeHtml(ev.txt)}${ejeChip}</span>
       </div>`;
     }).join('');
   }
@@ -1500,6 +1760,147 @@ function irAEventoDesdeModal(fISO){
   window._calAbierto = true;
   render();
   abrirFormEvento(fISO);
+}
+
+// ============ SEMANA FULLSCREEN OVERLAY ============
+let _semFsOffset = 0;
+
+function abrirSemanaOverlay(){
+  _semFsOffset = window._semanaOffset || 0;
+  renderSemanaOverlay();
+  document.getElementById('semana-overlay').classList.add('show');
+}
+function cerrarSemanaOverlay(){
+  document.getElementById('semana-overlay').classList.remove('show');
+}
+function semanaOverlayNav(delta){
+  _semFsOffset += delta;
+  renderSemanaOverlay();
+}
+function renderSemanaOverlay(){
+  const base = new Date(inicioSemana(HOY)+'T00:00');
+  base.setDate(base.getDate() + _semFsOffset * 7);
+  const fin = new Date(base); fin.setDate(fin.getDate()+6);
+  const opts={day:'numeric',month:'short'};
+  document.getElementById('semana-overlay-titulo').textContent =
+    base.toLocaleDateString('es',opts)+' – '+fin.toLocaleDateString('es',opts);
+
+  const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  const grid = document.getElementById('semana-fs-grid');
+  let html = '';
+  for(let i=0;i<7;i++){
+    const d = new Date(base); d.setDate(d.getDate()+i);
+    const fISO = fechaISO(d);
+    const esHoy = fISO===HOY;
+    const evDia = S.eventos.filter(ev=>ev.fecha===fISO).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
+    const tareasDia = S.tareas.filter(t=>!t.hecho && (t.fechaObjetivo===fISO||(fISO===HOY&&t.enHoy)));
+    const fest = festivoEnFecha(fISO);
+    const sangra = sangradoEnFecha(fISO);
+
+    let evsHtml = '';
+    if(fest) evsHtml += `<div class="sem-fs-fest">🎉 ${escapeHtml(fest)}</div>`;
+    evDia.forEach(ev=>{
+      const e = ev.eje ? EJES[ev.eje] : null;
+      const color = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      const ejeLabel = e ? `<span style="font-size:.68rem;font-weight:600;color:${e.color};flex-shrink:0;">[${e.eje}]</span>` : '';
+      const gcalBadge = ev.origen==='google' ? `<span style="font-size:.65rem;color:#4285F4;font-weight:700;flex-shrink:0;">G</span>` : '';
+      const asignarBtn = ev.origen==='google'
+        ? `<button class="eje-sel-mini" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
+        : '';
+      evsHtml += `<div class="sem-fs-ev">
+        <span class="ev-dot" style="background:${color};"></span>
+        ${gcalBadge}
+        <span class="ev-hora">${ev.hora||''}</span>
+        <span class="ev-txt">${escapeHtml(ev.txt)}${e?'':''}</span>
+        ${ejeLabel}
+        <span class="ev-eje-sel">${asignarBtn}</span>
+      </div>`;
+    });
+    tareasDia.filter(t=>!t.eventoId).forEach(t=>{
+      const e2 = EJES[t.eje];
+      evsHtml += `<div class="sem-fs-ev" style="border-left:3px solid ${e2.color};">
+        <span class="ev-dot" style="background:${e2.color};"></span>
+        <span class="ev-hora">${t.hora||''}</span>
+        <span class="ev-txt">${escapeHtml(t.txt)} <span style="font-size:.72rem;color:var(--gris);">${ESTRELLAS[t.dif]||''}</span></span>
+        <span style="font-size:.68rem;font-weight:600;color:${e2.color};">[${e2.eje}]</span>
+      </div>`;
+    });
+    if(!evDia.length && !tareasDia.length && !fest){
+      evsHtml = `<div class="sem-fs-vacio">Sin eventos</div>`;
+    }
+
+    const addBtn = fISO>=HOY
+      ? `<button class="sem-fs-add" onclick="cerrarSemanaOverlay();setTimeout(()=>{window._calAbierto=true;render();abrirFormEvento('${fISO}')},80)">+ Añadir</button>`
+      : '';
+
+    html += `<div class="sem-fs-dia${esHoy?' hoy':''}">
+      <div class="sem-fs-dia-head">
+        <span class="sem-fs-dia-label">${DIAS[i]}${sangra?' 🩸':''}</span>
+        <span class="sem-fs-dia-num">${d.getDate()}</span>
+      </div>
+      ${evsHtml}
+      ${addBtn}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+// ============ ASIGNAR EJE A EVENTO GOOGLE CALENDAR ============
+let _ejeModalEventoId = null;
+
+function abrirEjeModal(eventoId, nombreEvento, ev){
+  if(ev) ev.stopPropagation();
+  _ejeModalEventoId = eventoId;
+  document.getElementById('eje-modal-sub').textContent = nombreEvento;
+  const evento = S.eventos.find(e=>e.id===eventoId);
+  const ejeSel = evento ? evento.eje : null;
+
+  const opc = Object.entries(EJES).map(([k,e])=>`
+    <button class="eje-opcion${ejeSel===k?' sel':''}" style="${ejeSel===k?'border-color:'+e.color+';':''}" onclick="asignarEjeEvento('${k}')">
+      <span class="eje-dot-lg" style="background:${e.color};"></span>
+      <span>${e.eje}</span>
+      <span style="font-size:.78rem;font-weight:400;color:var(--gris);margin-left:auto;">${e.nombre}</span>
+    </button>`).join('');
+  document.getElementById('eje-opciones').innerHTML = opc;
+  document.getElementById('eje-modal-overlay').classList.add('show');
+}
+function cerrarEjeModal(){
+  document.getElementById('eje-modal-overlay').classList.remove('show');
+  _ejeModalEventoId = null;
+}
+function asignarEjeEvento(eje){
+  if(!_ejeModalEventoId) return;
+  const ev = S.eventos.find(e=>e.id===_ejeModalEventoId);
+  if(!ev){ cerrarEjeModal(); return; }
+
+  // Quitar tarea vinculada anterior si existía
+  S.tareas = S.tareas.filter(t=>t.eventoId !== _ejeModalEventoId);
+
+  ev.eje = eje || null;
+  ev.dif = eje ? 2 : null;
+
+  // Crear tarea si se asigna eje
+  if(eje){
+    S.tareas.push({
+      id:nid(), txt:ev.txt, eje:eje, dif:2, hecho:false, enHoy:false,
+      notionId:null, fechaObjetivo:ev.fecha, eventoId:ev.id, hora:ev.hora, durMin:null
+    });
+    toast('Evento vinculado a '+EJES[eje].eje+' ✓');
+  } else {
+    toast('Eje desvinculado');
+  }
+
+  cerrarEjeModal();
+  renderSemanaOverlay();
+  render();
+}
+
+// abre el modal de eje desde el modal de día (para eventos google)
+function abrirEjeModalDesdeDia(eventoId, nombreEvento, fISO){
+  cerrarDiaModal();
+  abrirEjeModal(eventoId, nombreEvento, null);
+  // reabre el día modal al cerrar eje modal
+  window._reAbrirDia = fISO;
 }
 
 function renderHoy(){
