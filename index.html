@@ -621,8 +621,8 @@
     background:var(--panel);
     border-radius:18px;
     width:100%;
-    max-width:900px;
-    max-height:90vh;
+    max-width:1140px;
+    max-height:92vh;
     display:flex;
     flex-direction:column;
     box-shadow:0 8px 40px rgba(0,0,0,.35);
@@ -651,7 +651,7 @@
   /* Cabecera sticky: etiqueta horas vacía + 7 columnas de días */
   .sem-grid-head {
     display:grid;
-    grid-template-columns:36px repeat(7,1fr);
+    grid-template-columns:28px repeat(7,1fr);
     border-bottom:1px solid var(--linea);
     background:var(--panel);
     flex-shrink:0;
@@ -691,7 +691,7 @@
   /* Banda de "todo el día" */
   .sem-allday-row {
     display:grid;
-    grid-template-columns:36px repeat(7,1fr);
+    grid-template-columns:28px repeat(7,1fr);
     border-bottom:2px solid var(--linea);
     flex-shrink:0;
     min-height:0;
@@ -731,7 +731,7 @@
   }
   .sem-timegrid-inner {
     display:grid;
-    grid-template-columns:36px repeat(7,1fr);
+    grid-template-columns:28px repeat(7,1fr);
     position:relative;
     /* 17 horas × 60px = 1020px */
     height:1020px;
@@ -752,14 +752,14 @@
   /* Líneas horizontales de hora */
   .sem-hora-line {
     position:absolute;
-    left:36px;
+    left:28px;
     right:0;
     border-top:1px solid var(--linea);
     pointer-events:none;
   }
   .sem-hora-line-half {
     position:absolute;
-    left:36px;
+    left:28px;
     right:0;
     border-top:1px dashed var(--linea);
     opacity:.5;
@@ -783,10 +783,17 @@
     background:var(--hueso);
     border-left:3px solid var(--gris-cl);
     overflow:hidden;
-    cursor:default;
+    cursor:pointer;
     box-sizing:border-box;
     min-height:20px;
     line-height:1.3;
+    transition:filter .15s, box-shadow .15s;
+  }
+  .sem-tg-ev:hover {
+    filter:brightness(1.12);
+    box-shadow:0 2px 10px rgba(0,0,0,.25);
+    overflow:visible;
+    z-index:10;
   }
   .sem-tg-ev .tg-ev-hora { font-weight:700; color:var(--gris); display:block; font-size:.58rem; }
   .sem-tg-ev .tg-ev-txt { display:block; word-break:break-word; }
@@ -2145,7 +2152,8 @@ function renderSemanaOverlay(){
         const asignarBtn = (ev.origen==='google' && !e)
           ? `<button class="eje-sel-mini" style="font-size:.55rem;padding:1px 3px;display:block;margin-top:1px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
           : '';
-        eventsHtml += `<div class="sem-tg-ev" style="${stylePos}border-left-color:${bColor};background:${bgColor};">
+        const tooltipEv = [ev.hora+(ev.horaFin?' – '+ev.horaFin:''), ev.txt, e?e.eje:''].filter(Boolean).join('\n');
+        eventsHtml += `<div class="sem-tg-ev" title="${escapeHtml(tooltipEv)}" style="${stylePos}border-left-color:${bColor};background:${bgColor};">
           <span class="tg-ev-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
           <span class="tg-ev-txt">${escapeHtml(ev.txt)}</span>
           ${ejeSpan}${asignarBtn}
@@ -2153,7 +2161,8 @@ function renderSemanaOverlay(){
       } else {
         const t = item;
         const e2 = EJES[t.eje];
-        eventsHtml += `<div class="sem-tg-ev" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;">
+        const tooltipT = [t.hora+(t.horaFin?' – '+t.horaFin:''), t.txt, e2.eje].filter(Boolean).join('\n');
+        eventsHtml += `<div class="sem-tg-ev" title="${escapeHtml(tooltipT)}" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;">
           <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
           <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
           <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
