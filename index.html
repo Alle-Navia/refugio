@@ -117,6 +117,11 @@
   .et-star{font-size:.7rem;}
   .et-del{color:var(--gris-cl);font-size:1rem;padding:2px 5px;line-height:1;opacity:0;transition:.15s;flex-shrink:0;}
   .et:hover .et-del{opacity:1;}
+  /* Chip de hora en tareas de ejes */
+  .et-hora-chip{font-size:.68rem;font-weight:600;color:var(--proyectos-d);background:var(--proyectos-bg);border:1px solid var(--proyectos);border-radius:8px;padding:2px 6px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  .et-hora-chip.vacia{color:var(--gris);background:transparent;border-color:var(--linea);font-weight:400;}
+  .et-hora-chip:hover{opacity:.8;}
+  .hora-editor-eje{display:flex;gap:5px;align-items:center;flex-wrap:wrap;padding:6px 0 4px 30px;width:100%;}
   .tag-prog{font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;}
   .tag-x{color:inherit;opacity:.6;font-size:.85rem;line-height:1;}
   .tag-x:hover{opacity:1;}
@@ -765,8 +770,7 @@
   /* Evento posicionado en la rejilla */
   .sem-tg-ev {
     position:absolute;
-    left:2px;
-    right:2px;
+    /* left/right se ponen inline para solapamiento */
     border-radius:6px;
     padding:3px 5px;
     font-size:.62rem;
@@ -776,7 +780,7 @@
     overflow:hidden;
     cursor:default;
     box-sizing:border-box;
-    min-height:18px;
+    min-height:20px;
     line-height:1.3;
   }
   .sem-tg-ev .tg-ev-hora { font-weight:700; color:var(--gris); display:block; font-size:.58rem; }
@@ -2057,12 +2061,55 @@ function renderSemanaOverlay(){
     linesHtml += `<div class="sem-hora-label" style="top:${top}px;">${label}</div>`;
   }
 
-  // Columnas de días con eventos posicionados
+  // Helper: calcular inicio/fin en minutos desde medianoche
+  function itemRango(item){
+    const [hh,mm] = item.hora.split(':').map(Number);
+    const ini = hh*60+mm;
+    let dur = 60;
+    if(item.horaFin){
+      const [hf,mf] = item.horaFin.split(':').map(Number);
+      dur = Math.max(15, (hf*60+mf) - ini);
+    } else if(item.durMin){ dur = item.durMin; }
+    return {ini, fin: ini+dur};
+  }
+
+  // Algoritmo de columnas para solapamiento (greedy)
+  function calcularColumnas(items){
+    // Devuelve [{item, col, totalCols}]
+    const result = items.map(it=>({item:it, col:0, totalCols:1, ini:itemRango(it).ini, fin:itemRango(it).fin}));
+    // Ordenar por inicio
+    result.sort((a,b)=>a.ini-b.ini);
+    // Grupos de solapamiento
+    const grupos=[];
+    result.forEach(r=>{
+      let puesto=false;
+      for(const g of grupos){
+        if(r.ini < g.finMax){
+          g.items.push(r); g.finMax=Math.max(g.finMax,r.fin); puesto=true; break;
+        }
+      }
+      if(!puesto) grupos.push({items:[r], finMax:r.fin});
+    });
+    // Asignar columnas dentro de cada grupo
+    grupos.forEach(g=>{
+      const n=g.items.length;
+      g.items.forEach((r,i)=>{ r.col=i; r.totalCols=n; });
+    });
+    return result;
+  }
+
+  // Columnas de días con eventos posicionados y sin solapamiento
   let colsHtml = '';
   dias.forEach(({fISO, esHoy, evDia, tareasDia})=>{
-    const conHora = evDia.filter(ev=>ev.hora);
-    const tarConHora = tareasDia.filter(t=>t.hora);
+    // Unificar eventos y tareas con hora en un solo array
+    const conHora = evDia.filter(ev=>ev.hora && parseInt(ev.hora)>=HORA_INICIO && parseInt(ev.hora)<HORA_FIN);
+    const tarConHora = tareasDia.filter(t=>t.hora && parseInt(t.hora)>=HORA_INICIO && parseInt(t.hora)<HORA_FIN);
+    const todos = [
+      ...conHora.map(ev=>({...ev, _tipo:'ev'})),
+      ...tarConHora.map(t=>({...t, _tipo:'tarea'}))
+    ];
 
+    const layout = calcularColumnas(todos);
     let eventsHtml = '';
 
     // Línea "ahora" si es hoy
@@ -2070,54 +2117,43 @@ function renderSemanaOverlay(){
       const ahora = new Date();
       const hAhora = ahora.getHours(), mAhora = ahora.getMinutes();
       if(hAhora >= HORA_INICIO && hAhora < HORA_FIN){
-        const topNow = minAPx(hAhora, mAhora);
-        eventsHtml += `<div class="sem-now-line" style="top:${topNow}px;"><div class="sem-now-dot"></div></div>`;
+        eventsHtml += `<div class="sem-now-line" style="top:${minAPx(hAhora,mAhora)}px;"><div class="sem-now-dot"></div></div>`;
       }
     }
 
-    // Eventos GCal / propios con hora
-    conHora.forEach(ev=>{
-      const [hh,mm] = ev.hora.split(':').map(Number);
-      if(hh < HORA_INICIO || hh >= HORA_FIN) return;
-      const topPx = minAPx(hh, mm);
-      let durMin = 60; // duración por defecto 1h
-      if(ev.horaFin){
-        const [hf,mf] = ev.horaFin.split(':').map(Number);
-        durMin = Math.max(15, (hf*60+mf) - (hh*60+mm));
-      }
-      const heightPx = Math.max(18, durMin * PX_POR_HORA / 60);
-      const e = ev.eje ? EJES[ev.eje] : null;
-      const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
-      const bgColor = ev.origen==='google' ? 'rgba(66,133,244,.12)' : (e ? e.color+'22' : 'var(--hueso)');
-      const gcB = ev.origen==='google' ? '<span style="font-size:.55rem;color:#4285F4;font-weight:700;">G </span>' : '';
-      const ejeSpan = e ? `<span class="tg-ev-eje" style="color:${e.color};">${e.eje}</span>` : '';
-      const asignarBtn = (ev.origen==='google' && !e)
-        ? `<button class="eje-sel-mini" style="font-size:.55rem;padding:1px 3px;display:block;margin-top:1px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
-        : '';
-      eventsHtml += `<div class="sem-tg-ev" style="top:${topPx}px;height:${heightPx}px;border-left-color:${bColor};background:${bgColor};">
-        <span class="tg-ev-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
-        <span class="tg-ev-txt">${escapeHtml(ev.txt)}</span>
-        ${ejeSpan}${asignarBtn}
-      </div>`;
-    });
+    layout.forEach(({item, col, totalCols, ini, fin})=>{
+      const topPx = minAPx(Math.floor(ini/60), ini%60);
+      const durMin = fin - ini;
+      const heightPx = Math.max(20, durMin * PX_POR_HORA / 60);
+      // Posición horizontal: dividir el ancho disponible
+      const pctW = 100 / totalCols;
+      const leftPct = col * pctW;
+      const stylePos = `top:${topPx}px;height:${heightPx}px;left:calc(${leftPct}% + 2px);right:calc(${100-(leftPct+pctW)}% + 2px);`;
 
-    // Tareas con hora
-    tarConHora.forEach(t=>{
-      const [hh,mm] = t.hora.split(':').map(Number);
-      if(hh < HORA_INICIO || hh >= HORA_FIN) return;
-      const topPx = minAPx(hh, mm);
-      let durMin = 60;
-      if(t.horaFin){
-        const [hf,mf] = t.horaFin.split(':').map(Number);
-        durMin = Math.max(15, (hf*60+mf) - (hh*60+mm));
+      if(item._tipo==='ev'){
+        const ev = item;
+        const e = ev.eje ? EJES[ev.eje] : null;
+        const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+        const bgColor = ev.origen==='google' ? 'rgba(66,133,244,.12)' : (e ? e.color+'22' : 'var(--hueso)');
+        const gcB = ev.origen==='google' ? '<span style="font-size:.55rem;color:#4285F4;font-weight:700;">G </span>' : '';
+        const ejeSpan = e ? `<span class="tg-ev-eje" style="color:${e.color};">${e.eje}</span>` : '';
+        const asignarBtn = (ev.origen==='google' && !e)
+          ? `<button class="eje-sel-mini" style="font-size:.55rem;padding:1px 3px;display:block;margin-top:1px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
+          : '';
+        eventsHtml += `<div class="sem-tg-ev" style="${stylePos}border-left-color:${bColor};background:${bgColor};">
+          <span class="tg-ev-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
+          <span class="tg-ev-txt">${escapeHtml(ev.txt)}</span>
+          ${ejeSpan}${asignarBtn}
+        </div>`;
+      } else {
+        const t = item;
+        const e2 = EJES[t.eje];
+        eventsHtml += `<div class="sem-tg-ev" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;">
+          <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
+          <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
+          <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
+        </div>`;
       }
-      const heightPx = Math.max(18, durMin * PX_POR_HORA / 60);
-      const e2 = EJES[t.eje];
-      eventsHtml += `<div class="sem-tg-ev" style="top:${topPx}px;height:${heightPx}px;border-left-color:${e2.color};background:${e2.color}22;">
-        <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
-        <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
-        <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
-      </div>`;
     });
 
     colsHtml += `<div class="sem-day-col${esHoy?' hoy':''}">${eventsHtml}</div>`;
@@ -2286,6 +2322,27 @@ function quitarHora(id){
   const t=S.tareas.find(x=>x.id===id); if(!t) return;
   t.hora=null; t.durMin=null; t.avisadoDia=null;
   window._horaEditando=null;
+  render();
+}
+
+// ---- Hora en tareas de la lista de ejes ----
+function editarHoraTarea(id){
+  window._horaEditandoEje = (window._horaEditandoEje===id) ? null : id;
+  renderEjes();
+}
+function guardarHoraEje(id){
+  const t=S.tareas.find(x=>x.id===id); if(!t) return;
+  const ini = (document.getElementById('hora-ini-eje-'+id)||{}).value||null;
+  const fin = (document.getElementById('hora-fin-eje-'+id)||{}).value||null;
+  t.hora = ini||null;
+  t.horaFin = fin||null;
+  window._horaEditandoEje=null;
+  render();
+}
+function quitarHoraEje(id){
+  const t=S.tareas.find(x=>x.id===id); if(!t) return;
+  t.hora=null; t.horaFin=null; t.durMin=null;
+  window._horaEditandoEje=null;
   render();
 }
 
@@ -2551,13 +2608,26 @@ function renderEjes(){
         acciones = `<button class="mini" style="padding:3px 8px;color:${e.d}" onclick="togglePicker('${t.id}')">📅 programar</button>`;
         if(window._pickerAbierto===t.id) pickerHtml = renderPickerDias(t.id);
       }
+      const horaChip = (t.hora)
+        ? `<span class="et-hora-chip" onclick="editarHoraTarea('${t.id}')" title="Editar hora">🕐 ${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>`
+        : `<span class="et-hora-chip vacia" onclick="editarHoraTarea('${t.id}')" title="Añadir hora">🕐</span>`;
+      const horaEditorHtml = (window._horaEditandoEje===t.id)
+        ? `<div class="hora-editor-eje">
+            <input type="time" id="hora-ini-eje-${t.id}" value="${t.hora||''}" style="font-size:.75rem;padding:3px 6px;border-radius:7px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);">
+            <span style="font-size:.72rem;color:var(--gris);">–</span>
+            <input type="time" id="hora-fin-eje-${t.id}" value="${t.horaFin||''}" style="font-size:.75rem;padding:3px 6px;border-radius:7px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);">
+            <button class="hora-ok" style="font-size:.7rem;padding:3px 8px;" onclick="guardarHoraEje('${t.id}')">OK</button>
+            ${t.hora?`<button class="hora-quitar" onclick="quitarHoraEje('${t.id}')">×</button>`:''}
+          </div>`
+        : '';
       tareasHtml+=`<div class="et" id="et-${t.id}">
         <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
         <span class="et-txt">${escapeHtml(t.txt)}</span>
+        ${horaChip}
         <span class="et-star">${ESTRELLAS[t.dif]}</span>
         ${acciones}
         <button class="et-del" onclick="borrarTarea('${t.id}')" title="Eliminar">×</button>
-      </div>${pickerHtml}`;
+      </div>${horaEditorHtml}${pickerHtml}`;
     });
     if(tareas.length===0) tareasHtml='<p style="font-size:.82rem;color:var(--gris-cl);padding:6px 0;">Sin tareas pendientes aquí.</p>';
     card.innerHTML=`
