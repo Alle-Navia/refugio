@@ -243,13 +243,18 @@
   .sem-fest-dot{width:5px;height:5px;border-radius:50%;background:var(--educacion);margin-top:1px;}
 
   /* ---- selector de día (programar tarea en la semana) ---- */
-  .dia-picker{display:flex;gap:4px;margin-top:6px;margin-bottom:4px;width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
+  .dia-picker-wrap{padding:4px 0 6px;}
+  .dia-picker{display:flex;gap:4px;margin-bottom:6px;width:100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;}
   .dia-pill{flex-shrink:0;min-width:36px;display:flex;flex-direction:column;align-items:center;gap:1px;border:1px solid var(--linea);background:var(--hueso);border-radius:9px;padding:5px 4px;transition:.12s;}
   .dia-pill:hover{border-color:var(--proyectos);background:var(--panel);}
   .dia-pill.festivo{border-color:var(--educacion);}
   .dp-dow{font-size:.6rem;color:var(--gris);font-weight:600;text-transform:capitalize;}
   .dp-num{font-size:.78rem;font-weight:700;color:var(--tinta);}
   .dp-fest{font-size:.6rem;line-height:1;}
+  /* Fila de hora dentro del picker de días */
+  .dp-horas-row{display:flex;align-items:center;gap:6px;padding:4px 2px 0;}
+  .dp-hora-label{font-size:.68rem;color:var(--gris);flex-shrink:0;}
+  .dp-hora-input{font-size:.75rem;padding:3px 6px;border-radius:8px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);flex:1;min-width:0;}
 
   /* ---- mi semana (resumen en Hoy) ---- */
   .ms-row{display:flex;justify-content:space-between;gap:3px;}
@@ -2648,12 +2653,6 @@ function renderEjes(){
           <select id="dif-${k}"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3">⭐⭐⭐</option></select>
           <button onclick="addTarea('${k}')">+</button>
         </div>
-        <div class="add-tarea-horas" style="display:flex;gap:6px;margin-top:6px;align-items:center;">
-          <label style="font-size:.72rem;color:var(--gris);flex-shrink:0;">🕐 Inicio</label>
-          <input type="time" id="hora-ini-${k}" style="font-size:.75rem;padding:4px 6px;border-radius:8px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);flex:1;">
-          <label style="font-size:.72rem;color:var(--gris);flex-shrink:0;">Fin</label>
-          <input type="time" id="hora-fin-${k}" style="font-size:.75rem;padding:4px 6px;border-radius:8px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);flex:1;">
-        </div>
       </div>`;
     cont.appendChild(card);
   }
@@ -2861,12 +2860,8 @@ function addTarea(k){
   const dif=parseInt(document.getElementById('dif-'+k).value);
   const t=inp.value.trim();
   if(!t) return;
-  const horaIni = (document.getElementById('hora-ini-'+k)||{}).value || null;
-  const horaFin = (document.getElementById('hora-fin-'+k)||{}).value || null;
-  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null,hora:horaIni||null,horaFin:horaFin||null});
+  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null,hora:null,horaFin:null});
   inp.value='';
-  const hIni=document.getElementById('hora-ini-'+k); if(hIni) hIni.value='';
-  const hFin=document.getElementById('hora-fin-'+k); if(hFin) hFin.value='';
   render();
 }
 function maxRetosHoy(){
@@ -2892,7 +2887,10 @@ function togglePicker(id){
   renderEjes();
 }
 function renderPickerDias(taskId){
-  let html = '<div class="dia-picker">';
+  const t = S.tareas.find(x=>x.id===taskId);
+  let html = '<div class="dia-picker-wrap">';
+  // Fila de días
+  html += '<div class="dia-picker">';
   for(let i=0;i<7;i++){
     const d=new Date(); d.setDate(d.getDate()+i);
     const fISO=fechaISO(d);
@@ -2903,13 +2901,31 @@ function renderPickerDias(taskId){
     </button>`;
   }
   html += '</div>';
+  // Fila de horas debajo de los días
+  html += `<div class="dp-horas-row">
+    <span class="dp-hora-label">🕐 Inicio</span>
+    <input type="time" id="dp-hora-ini-${taskId}" value="${(t&&t.hora)||''}" class="dp-hora-input" placeholder="--:--">
+    <span class="dp-hora-label">Fin</span>
+    <input type="time" id="dp-hora-fin-${taskId}" value="${(t&&t.horaFin)||''}" class="dp-hora-input" placeholder="--:--">
+  </div>`;
+  html += '</div>';
   return html;
 }
 function aFecha(id, fISO){
+  // Leer horas del picker antes de cerrar
+  const iniEl = document.getElementById('dp-hora-ini-'+id);
+  const finEl = document.getElementById('dp-hora-fin-'+id);
+  const hora = iniEl ? iniEl.value||null : null;
+  const horaFin = finEl ? finEl.value||null : null;
   window._pickerAbierto = null;
-  if(fISO===HOY){ aHoy(id); return; }
   const t=S.tareas.find(x=>x.id===id);
-  if(t){ t.fechaObjetivo=fISO; toast('Programado para '+etiquetaDiaCorta(fISO)+' 📅'); }
+  if(t){
+    if(hora) t.hora = hora;
+    if(horaFin) t.horaFin = horaFin;
+    if(fISO===HOY){ aHoy(id); return; }
+    t.fechaObjetivo=fISO;
+    toast('Programado para '+etiquetaDiaCorta(fISO)+(hora?' a las '+hora:'')+' 📅');
+  }
   render();
 }
 function quitarPrograma(id){
