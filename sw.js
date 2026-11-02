@@ -1,5 +1,5 @@
 // Refugio — Service Worker v2
-const CACHE = 'refugio-v2';
+const CACHE = 'refugio-v3';
 const ASSETS = [
   '/refugio/',
   '/refugio/index.html',

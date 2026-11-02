@@ -630,96 +630,193 @@
   .semana-overlay-head h2 { flex:1; font-size:.95rem; font-weight:700; color:var(--tinta); margin:0; }
   .semana-overlay-head button.nav-sem { width:30px;height:30px;border-radius:8px;background:var(--hueso);color:var(--tinta);font-size:1.1rem;font-weight:700; }
   .semana-overlay-head button.cerrar-sem { width:32px;height:32px;border-radius:50%;background:var(--hueso);color:var(--gris);font-size:1.1rem; }
-  /* Grid horizontal: 7 columnas */
+  /* ── Time-grid semana ── */
+  /* Wrapper scrolleable (contiene cabecera sticky + zona horaria) */
   .semana-fs-grid {
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
+    display:flex;
+    flex-direction:column;
     flex:1;
-    overflow-y:auto;
-    overflow-x:hidden;
+    overflow:hidden;
   }
-  .sem-fs-dia {
-    padding:10px 8px 12px;
-    border-right:1px solid var(--linea);
-    min-height:200px;
+  /* Cabecera sticky: etiqueta horas vacía + 7 columnas de días */
+  .sem-grid-head {
+    display:grid;
+    grid-template-columns:36px repeat(7,1fr);
+    border-bottom:1px solid var(--linea);
+    background:var(--panel);
+    flex-shrink:0;
   }
-  .sem-fs-dia:last-child { border-right:none; }
-  .sem-fs-dia.hoy { background:color-mix(in srgb,var(--proyectos) 8%,var(--panel)); }
+  .sem-grid-head-hcol { /* espacio vacío sobre la columna de horas */ }
   .sem-fs-dia-head {
+    padding:6px 4px 8px;
+    border-left:1px solid var(--linea);
     display:flex;
     flex-direction:column;
     align-items:center;
     gap:2px;
-    margin-bottom:8px;
-    padding-bottom:6px;
-    border-bottom:1px solid var(--linea);
   }
+  .sem-fs-dia-head:first-child { border-left:none; }
   .sem-fs-dia-label {
-    font-size:.62rem;
+    font-size:.6rem;
     font-weight:700;
     text-transform:uppercase;
     color:var(--gris);
     letter-spacing:.04em;
   }
-  .sem-fs-dia.hoy .sem-fs-dia-label { color:var(--proyectos); }
+  .sem-fs-dia-head.hoy .sem-fs-dia-label { color:var(--proyectos); }
   .sem-fs-dia-num {
-    font-size:1.3rem;
+    font-size:1.1rem;
     font-weight:800;
     color:var(--tinta);
     line-height:1;
   }
-  .sem-fs-dia.hoy .sem-fs-dia-num {
+  .sem-fs-dia-head.hoy .sem-fs-dia-num {
     background:var(--proyectos);
     color:#fff;
-    width:32px;height:32px;
+    width:30px;height:30px;
     border-radius:50%;
     display:flex;align-items:center;justify-content:center;
-    font-size:1rem;
+    font-size:.95rem;
   }
-  .sem-fs-fest { font-size:.62rem; color:var(--educacion-d); font-weight:600; margin-bottom:4px; text-align:center; }
-  .sem-fs-ev {
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-    padding:5px 6px;
-    border-radius:7px;
-    background:var(--hueso);
-    margin-bottom:4px;
-    font-size:.72rem;
-    color:var(--tinta);
-    border-left:3px solid var(--gris-cl);
+  /* Banda de "todo el día" */
+  .sem-allday-row {
+    display:grid;
+    grid-template-columns:36px repeat(7,1fr);
+    border-bottom:2px solid var(--linea);
+    flex-shrink:0;
+    min-height:0;
   }
-  .sem-fs-ev .ev-hora { font-weight:700; color:var(--gris); font-size:.65rem; }
-  .sem-fs-ev .ev-dot { display:none; }
-  .sem-fs-ev .ev-txt { line-height:1.3; word-break:break-word; }
-  .sem-fs-ev .ev-eje-sel { margin-top:2px; }
-  .sem-fs-vacio { font-size:.65rem; color:var(--gris-cl); text-align:center; padding:8px 0; }
-  .sem-fs-add {
-    width:100%;
-    margin-top:6px;
-    background:transparent;
-    border:1px dashed var(--linea);
-    border-radius:7px;
-    padding:4px;
-    font-size:.65rem;
+  .sem-allday-label {
+    font-size:.55rem;
     color:var(--gris);
-    cursor:pointer;
+    text-align:right;
+    padding:4px 4px 0 0;
+    line-height:1.2;
   }
-  .sem-fs-add:hover { background:var(--hueso); }
-  .sem-fs-vacio { font-size:.8rem; color:var(--gris-cl); padding:4px 0; }
+  .sem-allday-col {
+    border-left:1px solid var(--linea);
+    padding:3px 3px 4px;
+    min-height:22px;
+  }
+  .sem-allday-col:first-child { border-left:none; }
+  .sem-allday-pill {
+    display:block;
+    font-size:.6rem;
+    padding:2px 5px;
+    border-radius:4px;
+    background:var(--hueso);
+    border-left:3px solid var(--gris-cl);
+    color:var(--tinta);
+    margin-bottom:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  /* Zona scrolleable de horas */
+  .sem-timegrid-scroll {
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    position:relative;
+  }
+  .sem-timegrid-inner {
+    display:grid;
+    grid-template-columns:36px repeat(7,1fr);
+    position:relative;
+    /* 17 horas × 60px = 1020px */
+    height:1020px;
+  }
+  /* Columna de horas */
+  .sem-hora-col {
+    grid-column:1;
+    position:relative;
+  }
+  .sem-hora-label {
+    position:absolute;
+    right:4px;
+    font-size:.55rem;
+    color:var(--gris);
+    transform:translateY(-50%);
+    white-space:nowrap;
+  }
+  /* Líneas horizontales de hora */
+  .sem-hora-line {
+    position:absolute;
+    left:36px;
+    right:0;
+    border-top:1px solid var(--linea);
+    pointer-events:none;
+  }
+  .sem-hora-line-half {
+    position:absolute;
+    left:36px;
+    right:0;
+    border-top:1px dashed var(--linea);
+    opacity:.5;
+    pointer-events:none;
+  }
+  /* Columna de día dentro de la rejilla */
+  .sem-day-col {
+    position:relative;
+    border-left:1px solid var(--linea);
+    height:100%;
+  }
+  .sem-day-col.hoy { background:color-mix(in srgb,var(--proyectos) 5%,transparent); }
+  /* Evento posicionado en la rejilla */
+  .sem-tg-ev {
+    position:absolute;
+    left:2px;
+    right:2px;
+    border-radius:6px;
+    padding:3px 5px;
+    font-size:.62rem;
+    color:var(--tinta);
+    background:var(--hueso);
+    border-left:3px solid var(--gris-cl);
+    overflow:hidden;
+    cursor:default;
+    box-sizing:border-box;
+    min-height:18px;
+    line-height:1.3;
+  }
+  .sem-tg-ev .tg-ev-hora { font-weight:700; color:var(--gris); display:block; font-size:.58rem; }
+  .sem-tg-ev .tg-ev-txt { display:block; word-break:break-word; }
+  .sem-tg-ev .tg-ev-eje { font-size:.58rem; font-weight:700; display:block; margin-top:1px; }
+  /* Línea de "ahora" */
+  .sem-now-line {
+    position:absolute;
+    left:0;right:0;
+    height:2px;
+    background:var(--cuidado);
+    border-radius:2px;
+    pointer-events:none;
+    z-index:5;
+  }
+  .sem-now-dot {
+    position:absolute;
+    left:-4px;
+    top:-4px;
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--cuidado);
+  }
+  /* Botón añadir en cabecera */
   .sem-fs-add {
     display:block;
     width:100%;
-    margin-top:8px;
+    margin-top:3px;
     background:none;
     border:1px dashed var(--linea);
-    border-radius:10px;
-    padding:7px;
-    font-size:.8rem;
+    border-radius:6px;
+    padding:3px;
+    font-size:.6rem;
     color:var(--gris);
     text-align:center;
+    cursor:pointer;
   }
+  .sem-fs-add:hover { background:var(--hueso); }
   .sem-fs-add:active { background:var(--linea); }
+  .sem-fs-fest { font-size:.6rem; color:var(--educacion-d); font-weight:600; text-align:center; margin-bottom:2px; }
   .eje-sel-mini {
     font-size:.72rem;
     border:1px solid var(--linea);
@@ -1868,7 +1965,7 @@ function semanaOverlayNav(delta){
   renderSemanaOverlay();
 }
 function renderSemanaOverlay(){
-  // lunes de la semana actual + offset
+  // Lunes de la semana + offset
   const base = new Date(inicioSemana(HOY)+'T00:00');
   base.setDate(base.getDate() + _semFsOffset * 7);
   const fin = new Date(base); fin.setDate(fin.getDate()+6);
@@ -1876,70 +1973,175 @@ function renderSemanaOverlay(){
   document.getElementById('semana-overlay-titulo').textContent =
     base.toLocaleDateString('es',opts)+' – '+fin.toLocaleDateString('es',opts);
 
-  // Días abreviados en orden lunes→domingo
   const DIAS_CORTO=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const grid = document.getElementById('semana-fs-grid');
-  let html = '';
+  const HORA_INICIO = 6;   // primera hora visible (06:00)
+  const HORA_FIN    = 23;  // última hora (23:00, no incluida → 06–22)
+  const HORAS       = HORA_FIN - HORA_INICIO; // 17
+  const PX_POR_HORA = 60;
+
+  // Helper: minutos → px desde HORA_INICIO
+  function minAPx(h, m){ return ((h - HORA_INICIO) * 60 + m) * (PX_POR_HORA / 60); }
+
+  // Recopilar datos de los 7 días
+  const dias = [];
   for(let i=0;i<7;i++){
     const d = new Date(base); d.setDate(d.getDate()+i);
     const fISO = fechaISO(d);
-    const esHoy = fISO===HOY;
-    const evDia = S.eventos.filter(ev=>ev.fecha===fISO).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
-    const tareasDia = S.tareas.filter(t=>!t.hecho && (t.fechaObjetivo===fISO||(fISO===HOY&&t.enHoy)));
+    const evDia = S.eventos.filter(ev=>ev.fecha===fISO);
+    const tareasDia = S.tareas.filter(t=>!t.hecho && !t.eventoId &&
+      (t.fechaObjetivo===fISO||(fISO===HOY&&t.enHoy)));
     const fest = festivoEnFecha(fISO);
     const sangra = sangradoEnFecha(fISO);
+    dias.push({d, fISO, esHoy:fISO===HOY, evDia, tareasDia, fest, sangra});
+  }
 
-    let evsHtml = '';
-    if(fest) evsHtml += `<div class="sem-fs-fest">🎉 ${escapeHtml(fest)}</div>`;
-
-    evDia.forEach(ev=>{
-      const e = ev.eje ? EJES[ev.eje] : null;
-      const borderColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
-      const gcalBadge = ev.origen==='google' ? `<span style="font-size:.6rem;color:#4285F4;font-weight:700;">G</span> ` : '';
-      const ejeLabel = e ? `<span style="font-size:.62rem;font-weight:600;color:${e.color};">${e.eje}</span>` : '';
-      const asignarBtn = (ev.origen==='google' && !e)
-        ? `<button class="eje-sel-mini" style="font-size:.6rem;padding:1px 4px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
-        : '';
-      evsHtml += `<div class="sem-fs-ev" style="border-left-color:${borderColor};">
-        <span class="ev-hora">${gcalBadge}${ev.hora||''}</span>
-        <span class="ev-txt">${escapeHtml(ev.txt)}</span>
-        ${ejeLabel}${asignarBtn}
-      </div>`;
-    });
-
-    tareasDia.filter(t=>!t.eventoId).forEach(t=>{
-      const e2 = EJES[t.eje];
-      const horaStr = t.hora ? t.hora+(t.horaFin?' - '+t.horaFin:'') : '';
-      evsHtml += `<div class="sem-fs-ev" style="border-left-color:${e2.color};">
-        <span class="ev-hora">${horaStr}</span>
-        <span class="ev-txt">${escapeHtml(t.txt)}</span>
-        <span style="font-size:.62rem;font-weight:600;color:${e2.color};">${e2.eje}</span>
-      </div>`;
-    });
-
-    if(!evDia.length && !tareasDia.length && !fest){
-      evsHtml = `<div class="sem-fs-vacio">—</div>`;
-    }
-
+  // ── CABECERA: espacio hora + 7 columnas ──
+  let headHtml = `<div class="sem-grid-head"><div class="sem-grid-head-hcol"></div>`;
+  dias.forEach(({d, fISO, esHoy, sangra}, i)=>{
     const addBtn = fISO>=HOY
       ? `<button class="sem-fs-add" onclick="cerrarSemanaOverlay();setTimeout(()=>{window._calAbierto=true;render();abrirFormEvento('${fISO}')},80)">+ añadir</button>`
       : '';
-
-    // Número del día: círculo si es hoy
-    const numHtml = esHoy
-      ? `<span class="sem-fs-dia-num" style="background:var(--proyectos);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;">${d.getDate()}</span>`
-      : `<span class="sem-fs-dia-num" style="font-size:1rem;">${d.getDate()}</span>`;
-
-    html += `<div class="sem-fs-dia${esHoy?' hoy':''}">
-      <div class="sem-fs-dia-head">
-        <span class="sem-fs-dia-label">${DIAS_CORTO[i]}${sangra?' 🩸':''}</span>
-        ${numHtml}
-      </div>
-      ${evsHtml}
+    headHtml += `<div class="sem-fs-dia-head${esHoy?' hoy':''}">
+      <span class="sem-fs-dia-label">${DIAS_CORTO[i]}${sangra?' 🩸':''}</span>
+      <span class="sem-fs-dia-num">${d.getDate()}</span>
       ${addBtn}
     </div>`;
+  });
+  headHtml += `</div>`;
+
+  // ── BANDA TODO EL DÍA ──
+  // (eventos sin hora y festivos)
+  const hayAlldayContenido = dias.some(({evDia,tareasDia,fest})=>{
+    const sinHora = evDia.filter(ev=>!ev.hora);
+    const tarSinHora = tareasDia.filter(t=>!t.hora);
+    return fest || sinHora.length || tarSinHora.length;
+  });
+
+  let alldayHtml = '';
+  if(hayAlldayContenido){
+    alldayHtml = `<div class="sem-allday-row"><div class="sem-allday-label">todo<br>el día</div>`;
+    dias.forEach(({evDia, tareasDia, fest})=>{
+      const sinHora = evDia.filter(ev=>!ev.hora);
+      const tarSinHora = tareasDia.filter(t=>!t.hora);
+      let celdaHtml = '';
+      if(fest) celdaHtml += `<span class="sem-allday-pill" style="border-left-color:var(--educacion-d);">🎉 ${escapeHtml(fest)}</span>`;
+      sinHora.forEach(ev=>{
+        const e = ev.eje ? EJES[ev.eje] : null;
+        const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+        const gcB = ev.origen==='google' ? 'G · ' : '';
+        celdaHtml += `<span class="sem-allday-pill" style="border-left-color:${bColor};">${gcB}${escapeHtml(ev.txt)}</span>`;
+      });
+      tarSinHora.forEach(t=>{
+        const e2 = EJES[t.eje];
+        celdaHtml += `<span class="sem-allday-pill" style="border-left-color:${e2.color};">${escapeHtml(t.txt)}</span>`;
+      });
+      alldayHtml += `<div class="sem-allday-col">${celdaHtml}</div>`;
+    });
+    alldayHtml += `</div>`;
   }
-  grid.innerHTML = html;
+
+  // ── ZONA HORARIA ──
+  const totalPx = HORAS * PX_POR_HORA;
+
+  // Líneas de hora y etiquetas
+  let linesHtml = '';
+  for(let h=HORA_INICIO; h<=HORA_FIN; h++){
+    const top = (h - HORA_INICIO) * PX_POR_HORA;
+    if(h < HORA_FIN){
+      linesHtml += `<div class="sem-hora-line" style="top:${top}px;"></div>`;
+      // media hora
+      const topH = top + PX_POR_HORA/2;
+      linesHtml += `<div class="sem-hora-line-half" style="top:${topH}px;"></div>`;
+    }
+    const label = h < 10 ? '0'+h+':00' : h+':00';
+    linesHtml += `<div class="sem-hora-label" style="top:${top}px;">${label}</div>`;
+  }
+
+  // Columnas de días con eventos posicionados
+  let colsHtml = '';
+  dias.forEach(({fISO, esHoy, evDia, tareasDia})=>{
+    const conHora = evDia.filter(ev=>ev.hora);
+    const tarConHora = tareasDia.filter(t=>t.hora);
+
+    let eventsHtml = '';
+
+    // Línea "ahora" si es hoy
+    if(esHoy){
+      const ahora = new Date();
+      const hAhora = ahora.getHours(), mAhora = ahora.getMinutes();
+      if(hAhora >= HORA_INICIO && hAhora < HORA_FIN){
+        const topNow = minAPx(hAhora, mAhora);
+        eventsHtml += `<div class="sem-now-line" style="top:${topNow}px;"><div class="sem-now-dot"></div></div>`;
+      }
+    }
+
+    // Eventos GCal / propios con hora
+    conHora.forEach(ev=>{
+      const [hh,mm] = ev.hora.split(':').map(Number);
+      if(hh < HORA_INICIO || hh >= HORA_FIN) return;
+      const topPx = minAPx(hh, mm);
+      let durMin = 60; // duración por defecto 1h
+      if(ev.horaFin){
+        const [hf,mf] = ev.horaFin.split(':').map(Number);
+        durMin = Math.max(15, (hf*60+mf) - (hh*60+mm));
+      }
+      const heightPx = Math.max(18, durMin * PX_POR_HORA / 60);
+      const e = ev.eje ? EJES[ev.eje] : null;
+      const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      const bgColor = ev.origen==='google' ? 'rgba(66,133,244,.12)' : (e ? e.color+'22' : 'var(--hueso)');
+      const gcB = ev.origen==='google' ? '<span style="font-size:.55rem;color:#4285F4;font-weight:700;">G </span>' : '';
+      const ejeSpan = e ? `<span class="tg-ev-eje" style="color:${e.color};">${e.eje}</span>` : '';
+      const asignarBtn = (ev.origen==='google' && !e)
+        ? `<button class="eje-sel-mini" style="font-size:.55rem;padding:1px 3px;display:block;margin-top:1px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
+        : '';
+      eventsHtml += `<div class="sem-tg-ev" style="top:${topPx}px;height:${heightPx}px;border-left-color:${bColor};background:${bgColor};">
+        <span class="tg-ev-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
+        <span class="tg-ev-txt">${escapeHtml(ev.txt)}</span>
+        ${ejeSpan}${asignarBtn}
+      </div>`;
+    });
+
+    // Tareas con hora
+    tarConHora.forEach(t=>{
+      const [hh,mm] = t.hora.split(':').map(Number);
+      if(hh < HORA_INICIO || hh >= HORA_FIN) return;
+      const topPx = minAPx(hh, mm);
+      let durMin = 60;
+      if(t.horaFin){
+        const [hf,mf] = t.horaFin.split(':').map(Number);
+        durMin = Math.max(15, (hf*60+mf) - (hh*60+mm));
+      }
+      const heightPx = Math.max(18, durMin * PX_POR_HORA / 60);
+      const e2 = EJES[t.eje];
+      eventsHtml += `<div class="sem-tg-ev" style="top:${topPx}px;height:${heightPx}px;border-left-color:${e2.color};background:${e2.color}22;">
+        <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
+        <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
+        <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
+      </div>`;
+    });
+
+    colsHtml += `<div class="sem-day-col${esHoy?' hoy':''}">${eventsHtml}</div>`;
+  });
+
+  const scrollHtml = `<div class="sem-timegrid-scroll">
+    <div class="sem-timegrid-inner" style="height:${totalPx}px;">
+      <div class="sem-hora-col">${linesHtml}</div>
+      ${colsHtml}
+    </div>
+  </div>`;
+
+  const grid = document.getElementById('semana-fs-grid');
+  grid.innerHTML = headHtml + alldayHtml + scrollHtml;
+
+  // Scroll automático a la hora actual (o a las 08:00 si es otro día)
+  const scrollEl = grid.querySelector('.sem-timegrid-scroll');
+  if(scrollEl){
+    const ahora = new Date();
+    const hScroll = (ahora.getHours() >= HORA_INICIO && ahora.getHours() < HORA_FIN)
+      ? ahora.getHours() - 1
+      : 8;
+    scrollEl.scrollTop = Math.max(0, (hScroll - HORA_INICIO) * PX_POR_HORA);
+  }
 }
 
 // ============ ASIGNAR EJE A EVENTO GOOGLE CALENDAR ============
