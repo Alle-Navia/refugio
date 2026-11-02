@@ -595,79 +595,117 @@
     }
   }
 
-  /* ---- Overlay semana fullscreen ---- */
+  /* ---- Ventana semana — modal flotante horizontal tipo GCal ---- */
   .semana-overlay {
     display:none;
     position:fixed;
     inset:0;
-    background:var(--hueso);
+    background:rgba(0,0,0,.45);
     z-index:1000;
-    flex-direction:column;
-    overflow-y:auto;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
   }
   .semana-overlay.show { display:flex; }
+  .semana-modal {
+    background:var(--panel);
+    border-radius:18px;
+    width:100%;
+    max-width:900px;
+    max-height:90vh;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 8px 40px rgba(0,0,0,.35);
+    overflow:hidden;
+  }
   .semana-overlay-head {
     display:flex;
     align-items:center;
     gap:10px;
-    padding:14px 16px 10px;
+    padding:14px 16px 12px;
     border-bottom:1px solid var(--linea);
     background:var(--panel);
-    position:sticky;
-    top:0;
-    z-index:2;
+    flex-shrink:0;
   }
-  .semana-overlay-head h2 { flex:1; font-size:1rem; font-weight:700; color:var(--tinta); margin:0; }
+  .semana-overlay-head h2 { flex:1; font-size:.95rem; font-weight:700; color:var(--tinta); margin:0; }
   .semana-overlay-head button.nav-sem { width:30px;height:30px;border-radius:8px;background:var(--hueso);color:var(--tinta);font-size:1.1rem;font-weight:700; }
   .semana-overlay-head button.cerrar-sem { width:32px;height:32px;border-radius:50%;background:var(--hueso);color:var(--gris);font-size:1.1rem; }
+  /* Grid horizontal: 7 columnas */
   .semana-fs-grid {
-    display:flex;
-    flex-direction:column;
-    gap:0;
-    padding:0 0 80px;
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
   }
   .sem-fs-dia {
-    padding:14px 16px;
-    border-bottom:1px solid var(--linea);
+    padding:10px 8px 12px;
+    border-right:1px solid var(--linea);
+    min-height:200px;
   }
-  .sem-fs-dia.hoy { background:var(--proyectos-bg); }
+  .sem-fs-dia:last-child { border-right:none; }
+  .sem-fs-dia.hoy { background:color-mix(in srgb,var(--proyectos) 8%,var(--panel)); }
   .sem-fs-dia-head {
     display:flex;
-    align-items:baseline;
-    gap:8px;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
     margin-bottom:8px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--linea);
   }
   .sem-fs-dia-label {
-    font-size:.72rem;
+    font-size:.62rem;
     font-weight:700;
     text-transform:uppercase;
     color:var(--gris);
     letter-spacing:.04em;
   }
-  .sem-fs-dia.hoy .sem-fs-dia-label { color:var(--proyectos-d); }
+  .sem-fs-dia.hoy .sem-fs-dia-label { color:var(--proyectos); }
   .sem-fs-dia-num {
-    font-size:1.5rem;
+    font-size:1.3rem;
     font-weight:800;
     color:var(--tinta);
     line-height:1;
   }
-  .sem-fs-dia.hoy .sem-fs-dia-num { color:var(--proyectos); }
-  .sem-fs-fest { font-size:.75rem; color:var(--educacion-d); font-weight:600; margin-bottom:6px; }
+  .sem-fs-dia.hoy .sem-fs-dia-num {
+    background:var(--proyectos);
+    color:#fff;
+    width:32px;height:32px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1rem;
+  }
+  .sem-fs-fest { font-size:.62rem; color:var(--educacion-d); font-weight:600; margin-bottom:4px; text-align:center; }
   .sem-fs-ev {
     display:flex;
-    align-items:flex-start;
-    gap:8px;
-    padding:7px 10px;
-    border-radius:10px;
-    background:var(--panel);
-    margin-bottom:5px;
-    font-size:.83rem;
+    flex-direction:column;
+    gap:2px;
+    padding:5px 6px;
+    border-radius:7px;
+    background:var(--hueso);
+    margin-bottom:4px;
+    font-size:.72rem;
     color:var(--tinta);
+    border-left:3px solid var(--gris-cl);
   }
-  .sem-fs-ev .ev-hora { font-weight:700; color:var(--gris); flex-shrink:0; min-width:36px; }
-  .sem-fs-ev .ev-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px; }
-  .sem-fs-ev .ev-txt { flex:1; line-height:1.35; }
-  .sem-fs-ev .ev-eje-sel { margin-left:auto; flex-shrink:0; }
+  .sem-fs-ev .ev-hora { font-weight:700; color:var(--gris); font-size:.65rem; }
+  .sem-fs-ev .ev-dot { display:none; }
+  .sem-fs-ev .ev-txt { line-height:1.3; word-break:break-word; }
+  .sem-fs-ev .ev-eje-sel { margin-top:2px; }
+  .sem-fs-vacio { font-size:.65rem; color:var(--gris-cl); text-align:center; padding:8px 0; }
+  .sem-fs-add {
+    width:100%;
+    margin-top:6px;
+    background:transparent;
+    border:1px dashed var(--linea);
+    border-radius:7px;
+    padding:4px;
+    font-size:.65rem;
+    color:var(--gris);
+    cursor:pointer;
+  }
+  .sem-fs-add:hover { background:var(--hueso); }
   .sem-fs-vacio { font-size:.8rem; color:var(--gris-cl); padding:4px 0; }
   .sem-fs-add {
     display:block;
@@ -963,14 +1001,16 @@
 </div>
 
 <!-- Overlay semana fullscreen -->
-<div class="semana-overlay" id="semana-overlay">
-  <div class="semana-overlay-head">
-    <button class="nav-sem" onclick="semanaOverlayNav(-1)" aria-label="Semana anterior">‹</button>
-    <h2 id="semana-overlay-titulo"></h2>
-    <button class="nav-sem" onclick="semanaOverlayNav(1)" aria-label="Semana siguiente">›</button>
-    <button class="cerrar-sem" onclick="cerrarSemanaOverlay()" aria-label="Cerrar">×</button>
+<div class="semana-overlay" id="semana-overlay" onclick="if(event.target===this)cerrarSemanaOverlay()">
+  <div class="semana-modal">
+    <div class="semana-overlay-head">
+      <button class="nav-sem" onclick="semanaOverlayNav(-1)" aria-label="Semana anterior">‹</button>
+      <h2 id="semana-overlay-titulo"></h2>
+      <button class="nav-sem" onclick="semanaOverlayNav(1)" aria-label="Semana siguiente">›</button>
+      <button class="cerrar-sem" onclick="cerrarSemanaOverlay()" aria-label="Cerrar">×</button>
+    </div>
+    <div class="semana-fs-grid" id="semana-fs-grid"></div>
   </div>
-  <div class="semana-fs-grid" id="semana-fs-grid"></div>
 </div>
 
 <!-- Modal asignar eje a evento Google Calendar -->
@@ -1386,37 +1426,10 @@ function renderCalendario(){
     grid.appendChild(cell);
   }
   // eventos del rango visible (mes o semana, según el modo) — solo hoy y futuros
+    // En modo mes: ocultar lista (muy larga), solo mostrar el botón añadir
   const evCont=document.getElementById('cal-eventos');
-  let evMes;
-  if(modo==='semana'){
-    const inicioSem = calRefSemanaInicio();
-    const finSem = new Date(inicioSem); finSem.setDate(finSem.getDate()+6);
-    const iniISO = fechaISO(inicioSem), finISO = fechaISO(finSem);
-    evMes = S.eventos.filter(ev=>ev.fecha>=iniISO && ev.fecha<=finISO && ev.fecha>=HOY);
-  } else {
-    evMes = S.eventos.filter(ev=>ev.fecha.slice(0,7)===`${y}-${String(m+1).padStart(2,'0')}` && ev.fecha>=HOY);
-  }
-  evMes.sort((a,b)=> (a.fecha+ (a.hora||'99:99')).localeCompare(b.fecha+(b.hora||'99:99')) );
   evCont.innerHTML='';
-  if(evMes.length===0){
-    evCont.innerHTML='<div style="font-size:.76rem;color:var(--gris-cl);padding:6px 2px;">Sin eventos próximos '+(modo==='semana'?'esta semana':'este mes')+' ✨</div>';
-  }
-  evMes.forEach(ev=>{
-    const d=new Date(ev.fecha+'T00:00').toLocaleDateString('es',{day:'numeric',month:'short'});
-    const hora = ev.hora ? ' · '+ev.hora : '';
-    const e = ev.eje ? EJES[ev.eje] : null;
-    const row=document.createElement('div');
-    row.className='cal-ev' + (ev.origen==='google' ? ' google' : '');
-    const delBtn = ev.origen==='google' ? '' : `<button class="ev-del" onclick="borrarEvento('${ev.id}')">✕</button>`;
-    const gcalBadge = ev.origen==='google' ? `<span style="color:#4285F4;font-size:.65rem;font-weight:600;">G</span>` : '';
-    const ejeInfo = e
-      ? `<span class="eje-dot" style="background:${e.color}"></span>`
-      : (ev.origen==='google'
-          ? `<button onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',null)" style="font-size:.65rem;border:1px solid var(--linea);border-radius:6px;padding:1px 5px;background:var(--panel);color:var(--gris);flex-shrink:0;cursor:pointer;">⊕ eje</button>`
-          : '');
-    row.innerHTML=`<span class="ev-fecha">${d}${hora}</span>${gcalBadge}${ejeInfo}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(ev.txt)}</span>${delBtn}`;
-    evCont.appendChild(row);
-  });
+  evCont.style.display='none';
   // llenar select de ejes del formulario (una sola vez)
   const ejeSel = document.getElementById('evento-eje');
   if(ejeSel && ejeSel.options.length<=1){
@@ -1855,6 +1868,7 @@ function semanaOverlayNav(delta){
   renderSemanaOverlay();
 }
 function renderSemanaOverlay(){
+  // lunes de la semana actual + offset
   const base = new Date(inicioSemana(HOY)+'T00:00');
   base.setDate(base.getDate() + _semFsOffset * 7);
   const fin = new Date(base); fin.setDate(fin.getDate()+6);
@@ -1862,7 +1876,8 @@ function renderSemanaOverlay(){
   document.getElementById('semana-overlay-titulo').textContent =
     base.toLocaleDateString('es',opts)+' – '+fin.toLocaleDateString('es',opts);
 
-  const DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  // Días abreviados en orden lunes→domingo
+  const DIAS_CORTO=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const grid = document.getElementById('semana-fs-grid');
   let html = '';
   for(let i=0;i<7;i++){
@@ -1876,44 +1891,49 @@ function renderSemanaOverlay(){
 
     let evsHtml = '';
     if(fest) evsHtml += `<div class="sem-fs-fest">🎉 ${escapeHtml(fest)}</div>`;
+
     evDia.forEach(ev=>{
       const e = ev.eje ? EJES[ev.eje] : null;
-      const color = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
-      const ejeLabel = e ? `<span style="font-size:.68rem;font-weight:600;color:${e.color};flex-shrink:0;">[${e.eje}]</span>` : '';
-      const gcalBadge = ev.origen==='google' ? `<span style="font-size:.65rem;color:#4285F4;font-weight:700;flex-shrink:0;">G</span>` : '';
-      const asignarBtn = ev.origen==='google'
-        ? `<button class="eje-sel-mini" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
+      const borderColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      const gcalBadge = ev.origen==='google' ? `<span style="font-size:.6rem;color:#4285F4;font-weight:700;">G</span> ` : '';
+      const ejeLabel = e ? `<span style="font-size:.62rem;font-weight:600;color:${e.color};">${e.eje}</span>` : '';
+      const asignarBtn = (ev.origen==='google' && !e)
+        ? `<button class="eje-sel-mini" style="font-size:.6rem;padding:1px 4px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
         : '';
-      evsHtml += `<div class="sem-fs-ev">
-        <span class="ev-dot" style="background:${color};"></span>
-        ${gcalBadge}
-        <span class="ev-hora">${ev.hora||''}</span>
-        <span class="ev-txt">${escapeHtml(ev.txt)}${e?'':''}</span>
-        ${ejeLabel}
-        <span class="ev-eje-sel">${asignarBtn}</span>
+      evsHtml += `<div class="sem-fs-ev" style="border-left-color:${borderColor};">
+        <span class="ev-hora">${gcalBadge}${ev.hora||''}</span>
+        <span class="ev-txt">${escapeHtml(ev.txt)}</span>
+        ${ejeLabel}${asignarBtn}
       </div>`;
     });
+
     tareasDia.filter(t=>!t.eventoId).forEach(t=>{
       const e2 = EJES[t.eje];
-      evsHtml += `<div class="sem-fs-ev" style="border-left:3px solid ${e2.color};">
-        <span class="ev-dot" style="background:${e2.color};"></span>
-        <span class="ev-hora">${t.hora||''}</span>
-        <span class="ev-txt">${escapeHtml(t.txt)} <span style="font-size:.72rem;color:var(--gris);">${ESTRELLAS[t.dif]||''}</span></span>
-        <span style="font-size:.68rem;font-weight:600;color:${e2.color};">[${e2.eje}]</span>
+      const horaStr = t.hora ? t.hora+(t.horaFin?' - '+t.horaFin:'') : '';
+      evsHtml += `<div class="sem-fs-ev" style="border-left-color:${e2.color};">
+        <span class="ev-hora">${horaStr}</span>
+        <span class="ev-txt">${escapeHtml(t.txt)}</span>
+        <span style="font-size:.62rem;font-weight:600;color:${e2.color};">${e2.eje}</span>
       </div>`;
     });
+
     if(!evDia.length && !tareasDia.length && !fest){
-      evsHtml = `<div class="sem-fs-vacio">Sin eventos</div>`;
+      evsHtml = `<div class="sem-fs-vacio">—</div>`;
     }
 
     const addBtn = fISO>=HOY
-      ? `<button class="sem-fs-add" onclick="cerrarSemanaOverlay();setTimeout(()=>{window._calAbierto=true;render();abrirFormEvento('${fISO}')},80)">+ Añadir</button>`
+      ? `<button class="sem-fs-add" onclick="cerrarSemanaOverlay();setTimeout(()=>{window._calAbierto=true;render();abrirFormEvento('${fISO}')},80)">+ añadir</button>`
       : '';
+
+    // Número del día: círculo si es hoy
+    const numHtml = esHoy
+      ? `<span class="sem-fs-dia-num" style="background:var(--proyectos);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;">${d.getDate()}</span>`
+      : `<span class="sem-fs-dia-num" style="font-size:1rem;">${d.getDate()}</span>`;
 
     html += `<div class="sem-fs-dia${esHoy?' hoy':''}">
       <div class="sem-fs-dia-head">
-        <span class="sem-fs-dia-label">${DIAS[i]}${sangra?' 🩸':''}</span>
-        <span class="sem-fs-dia-num">${d.getDate()}</span>
+        <span class="sem-fs-dia-label">${DIAS_CORTO[i]}${sangra?' 🩸':''}</span>
+        ${numHtml}
       </div>
       ${evsHtml}
       ${addBtn}
@@ -2356,6 +2376,12 @@ function renderEjes(){
           <select id="dif-${k}"><option value="1">⭐</option><option value="2">⭐⭐</option><option value="3">⭐⭐⭐</option></select>
           <button onclick="addTarea('${k}')">+</button>
         </div>
+        <div class="add-tarea-horas" style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+          <label style="font-size:.72rem;color:var(--gris);flex-shrink:0;">🕐 Inicio</label>
+          <input type="time" id="hora-ini-${k}" style="font-size:.75rem;padding:4px 6px;border-radius:8px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);flex:1;">
+          <label style="font-size:.72rem;color:var(--gris);flex-shrink:0;">Fin</label>
+          <input type="time" id="hora-fin-${k}" style="font-size:.75rem;padding:4px 6px;border-radius:8px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);flex:1;">
+        </div>
       </div>`;
     cont.appendChild(card);
   }
@@ -2563,8 +2589,12 @@ function addTarea(k){
   const dif=parseInt(document.getElementById('dif-'+k).value);
   const t=inp.value.trim();
   if(!t) return;
-  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null});
+  const horaIni = (document.getElementById('hora-ini-'+k)||{}).value || null;
+  const horaFin = (document.getElementById('hora-fin-'+k)||{}).value || null;
+  S.tareas.push({id:nid(),txt:t,eje:k,dif:dif,hecho:false,enHoy:false,notionId:null,fechaObjetivo:null,eventoId:null,hora:horaIni||null,horaFin:horaFin||null});
   inp.value='';
+  const hIni=document.getElementById('hora-ini-'+k); if(hIni) hIni.value='';
+  const hFin=document.getElementById('hora-fin-'+k); if(hFin) hFin.value='';
   render();
 }
 function maxRetosHoy(){
@@ -2929,10 +2959,16 @@ async function gcalSync(){
     const data = await resp.json();
     const items = data.items || [];
 
+    // guardar ejes y difs asignados antes de limpiar
+    const ejesGuardados = {};
+    S.eventos.filter(e => e.origen === 'google').forEach(e => {
+      if(e.eje) ejesGuardados[e.id] = { eje: e.eje, dif: e.dif };
+    });
+
     // quitar eventos google viejos
     S.eventos = S.eventos.filter(e => e.origen !== 'google');
 
-    // agregar los nuevos
+    // agregar los nuevos restaurando ejes previamente asignados
     items.forEach(ev => {
       if(ev.status === 'cancelled') return;
       const start = ev.start.dateTime || ev.start.date;
@@ -2942,15 +2978,17 @@ async function gcalSync(){
         const d = new Date(ev.start.dateTime);
         hora = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
       }
+      const evId = 'g_' + ev.id;
+      const savedEje = ejesGuardados[evId];
       S.eventos.push({
-        id: 'g_' + ev.id,
+        id: evId,
         googleId: ev.id,
         fecha: fecha,
         hora: hora,
         txt: ev.summary || '(sin título)',
         origen: 'google',
-        eje: null,
-        dif: null
+        eje: savedEje ? savedEje.eje : null,
+        dif: savedEje ? savedEje.dif : null
       });
     });
 
