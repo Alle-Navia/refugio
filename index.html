@@ -2330,26 +2330,6 @@ function quitarHora(id){
   render();
 }
 
-// ---- Hora en tareas de la lista de ejes ----
-function editarHoraTarea(id){
-  window._horaEditandoEje = (window._horaEditandoEje===id) ? null : id;
-  renderEjes();
-}
-function guardarHoraEje(id){
-  const t=S.tareas.find(x=>x.id===id); if(!t) return;
-  const ini = (document.getElementById('hora-ini-eje-'+id)||{}).value||null;
-  const fin = (document.getElementById('hora-fin-eje-'+id)||{}).value||null;
-  t.hora = ini||null;
-  t.horaFin = fin||null;
-  window._horaEditandoEje=null;
-  render();
-}
-function quitarHoraEje(id){
-  const t=S.tareas.find(x=>x.id===id); if(!t) return;
-  t.hora=null; t.horaFin=null; t.durMin=null;
-  window._horaEditandoEje=null;
-  render();
-}
 
 // ---- notificación del navegador (solo funciona con la app abierta en una pestaña) ----
 function pedirPermisoNotif(){
@@ -2613,17 +2593,8 @@ function renderEjes(){
         acciones = `<button class="mini" style="padding:3px 8px;color:${e.d}" onclick="togglePicker('${t.id}')">📅 programar</button>`;
         if(window._pickerAbierto===t.id) pickerHtml = renderPickerDias(t.id);
       }
-      const horaChip = (t.hora)
-        ? `<span class="et-hora-chip" onclick="editarHoraTarea('${t.id}')" title="Editar hora">🕐 ${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>`
-        : `<span class="et-hora-chip vacia" onclick="editarHoraTarea('${t.id}')" title="Añadir hora">🕐</span>`;
-      const horaEditorHtml = (window._horaEditandoEje===t.id)
-        ? `<div class="hora-editor-eje">
-            <input type="time" id="hora-ini-eje-${t.id}" value="${t.hora||''}" style="font-size:.75rem;padding:3px 6px;border-radius:7px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);">
-            <span style="font-size:.72rem;color:var(--gris);">–</span>
-            <input type="time" id="hora-fin-eje-${t.id}" value="${t.horaFin||''}" style="font-size:.75rem;padding:3px 6px;border-radius:7px;border:1px solid var(--linea);background:var(--panel);color:var(--tinta);">
-            <button class="hora-ok" style="font-size:.7rem;padding:3px 8px;" onclick="guardarHoraEje('${t.id}')">OK</button>
-            ${t.hora?`<button class="hora-quitar" onclick="quitarHoraEje('${t.id}')">×</button>`:''}
-          </div>`
+      const horaChip = t.hora
+        ? `<span class="et-hora-chip" onclick="togglePicker('${t.id}')" title="Editar hora">🕐 ${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>`
         : '';
       tareasHtml+=`<div class="et" id="et-${t.id}">
         <button class="check" onclick="toggleHecho('${t.id}')">${t.hecho?'✓':''}</button>
@@ -2632,7 +2603,7 @@ function renderEjes(){
         <span class="et-star">${ESTRELLAS[t.dif]}</span>
         ${acciones}
         <button class="et-del" onclick="borrarTarea('${t.id}')" title="Eliminar">×</button>
-      </div>${horaEditorHtml}${pickerHtml}`;
+      </div>${pickerHtml}`;
     });
     if(tareas.length===0) tareasHtml='<p style="font-size:.82rem;color:var(--gris-cl);padding:6px 0;">Sin tareas pendientes aquí.</p>';
     card.innerHTML=`
@@ -2902,14 +2873,24 @@ function renderPickerDias(taskId){
   }
   html += '</div>';
   // Fila de horas debajo de los días
+  const quitarBtn = (t && t.hora)
+    ? `<button class="hora-quitar" onclick="quitarHoraTarea('${taskId}')" title="Quitar hora">×</button>`
+    : '';
   html += `<div class="dp-horas-row">
-    <span class="dp-hora-label">🕐 Inicio</span>
-    <input type="time" id="dp-hora-ini-${taskId}" value="${(t&&t.hora)||''}" class="dp-hora-input" placeholder="--:--">
-    <span class="dp-hora-label">Fin</span>
-    <input type="time" id="dp-hora-fin-${taskId}" value="${(t&&t.horaFin)||''}" class="dp-hora-input" placeholder="--:--">
+    <span class="dp-hora-label">🕐</span>
+    <input type="time" id="dp-hora-ini-${taskId}" value="${(t&&t.hora)||''}" class="dp-hora-input" placeholder="inicio">
+    <span class="dp-hora-label">–</span>
+    <input type="time" id="dp-hora-fin-${taskId}" value="${(t&&t.horaFin)||''}" class="dp-hora-input" placeholder="fin">
+    ${quitarBtn}
   </div>`;
   html += '</div>';
   return html;
+}
+function quitarHoraTarea(id){
+  const t=S.tareas.find(x=>x.id===id); if(!t) return;
+  t.hora=null; t.horaFin=null; t.durMin=null;
+  // mantener el picker abierto para que puedan cambiar la fecha igual
+  render();
 }
 function aFecha(id, fISO){
   // Leer horas del picker antes de cerrar
