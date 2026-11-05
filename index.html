@@ -798,6 +798,24 @@
   .sem-tg-ev .tg-ev-hora { font-weight:700; color:var(--gris); display:block; font-size:.58rem; }
   .sem-tg-ev .tg-ev-txt { display:block; word-break:break-word; }
   .sem-tg-ev .tg-ev-eje { font-size:.58rem; font-weight:700; display:block; margin-top:1px; }
+  .sem-tg-ev[data-tipo="tarea"] { cursor:pointer; }
+  .sem-tg-ev[data-tipo="tarea"]:active { opacity:.7; }
+  /* Badge de progreso en nav */
+  .nav-badge {
+    display:none;
+    position:absolute;
+    top:4px;right:4px;
+    background:var(--gris);
+    color:#fff;
+    font-size:.55rem;
+    font-weight:700;
+    border-radius:20px;
+    padding:1px 5px;
+    line-height:1.4;
+    pointer-events:none;
+  }
+  .nav-badge.show { display:inline-block; }
+  .nav-badge.completo { background:var(--trabajo); }
   /* Línea de "ahora" */
   .sem-now-line {
     position:absolute;
@@ -1100,7 +1118,7 @@
 </section>
 
 <nav class="nav">
-  <button class="on" data-v="hoy" onclick="irA('hoy')"><span class="ic">☀️</span>Hoy</button>
+  <button class="on" data-v="hoy" onclick="irA('hoy')" style="position:relative;"><span class="ic">☀️</span>Hoy<span class="nav-badge" id="hoy-badge"></span></button>
   <button data-v="captura" onclick="irA('captura')"><span class="ic">💭</span>Parqueadero</button>
   <button data-v="ejes" onclick="irA('ejes')"><span class="ic">✦</span>Ejes</button>
   <button data-v="refugio" onclick="irA('refugio')"><span class="ic">🏡</span>Refugio</button>
@@ -2162,7 +2180,7 @@ function renderSemanaOverlay(){
         const t = item;
         const e2 = EJES[t.eje];
         const tooltipT = [t.hora+(t.horaFin?' – '+t.horaFin:''), t.txt, e2.eje].filter(Boolean).join('\n');
-        eventsHtml += `<div class="sem-tg-ev" title="${escapeHtml(tooltipT)}" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;">
+        eventsHtml += `<div class="sem-tg-ev" data-tipo="tarea" title="${escapeHtml(tooltipT)}\n✓ Clic para marcar hecha" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;" onclick="toggleHechoDesdeGrid('${t.id}')">
           <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
           <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
           <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
@@ -2307,6 +2325,19 @@ function renderHoy(){
       <button class="reto-del" onclick="quitarDeHoy('${t.id}')">×</button>`;
     cont.appendChild(d);
   });
+
+  // ---- badge de progreso en botón Hoy ----
+  const badge = document.getElementById('hoy-badge');
+  if(badge){
+    const total = S.tareas.filter(t=>t.enHoy).length;
+    const hechas = S.tareas.filter(t=>t.enHoy && t.hecho && t.fechaHecho===HOY).length;
+    if(total>0){
+      badge.textContent = `${hechas}/${total}`;
+      badge.className = 'nav-badge show' + (hechas===total?' completo':'');
+    } else {
+      badge.className = 'nav-badge';
+    }
+  }
 }
 
 // ============ HORAS DE LOS RETOS + AVISOS + PAUSAS ACTIVAS ============
@@ -2960,6 +2991,14 @@ function toggleHecho(id){
     t.hechoSesion = null;
   }
   render();
+}
+
+function toggleHechoDesdeGrid(id){
+  toggleHecho(id);
+  // renderSemanaOverlay re-lee el estado ya actualizado por toggleHecho → render()
+  if(document.getElementById('semana-overlay')?.style.display!=='none'){
+    renderSemanaOverlay();
+  }
 }
 
 function sugeridoPorFase(){
