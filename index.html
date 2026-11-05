@@ -1358,6 +1358,15 @@ function actualizarFaseAuto(){
     S.fase = calc.fase;
     S.faseManual = null;
   }
+  // ---- auto-sugerir energía según fase si no se ha editado hoy ----
+  if(!S.historialEnergia[HOY]){
+    S.energia = energiaSugeridaPorFase();
+    S.historialEnergia[HOY] = S.energia;
+  }
+}
+// energía por defecto coherente con la fase del ciclo
+function energiaSugeridaPorFase(){
+  return {menstrual:'baja', folicular:'media', ovulatoria:'alta', lutea:'media'}[S.fase] || 'media';
 }
 
 function nid(){ return Date.now()+''+Math.floor(Math.random()*999); }
@@ -1725,7 +1734,18 @@ function renderCiclo(){
   }
   renderListaPeriodos();
   document.getElementById('modo-bajo').style.display = S.modoBajo?'flex':'none';
-  document.getElementById('btn-modo-bajo').style.display = S.modoBajo?'none':'block';
+  const btnModo = document.getElementById('btn-modo-bajo');
+  btnModo.style.display = S.modoBajo?'none':'block';
+  // En menstrual: destacar el botón de descanso para invitar a usarlo
+  if(S.fase==='menstrual' && !S.modoBajo){
+    btnModo.style.background='var(--cuidado)';
+    btnModo.style.color='#fff';
+    btnModo.textContent='🌙 Nubi sugiere: hoy es buen día para descansar';
+  } else {
+    btnModo.style.background='var(--cuidado-bg)';
+    btnModo.style.color='var(--cuidado-d)';
+    btnModo.textContent='🌸 Hoy es día de descanso';
+  }
 }
 
 function franjaCircadiana(){
@@ -1749,7 +1769,11 @@ function renderEnergiaBanner(calc){
       extra = `Estás en el día ${calc.dia} de tu ciclo. `;
       if(calc.diasParaProximo<=5 && calc.diasParaProximo>=0) extra += `Tu próximo periodo llega en ~${calc.diasParaProximo} ${calc.diasParaProximo===1?'día':'días'}. `;
     }
-    notaEl.innerHTML = `<b>${cir.tramo.charAt(0).toUpperCase()+cir.tramo.slice(1)}:</b> ${cir.tip}<br><span style="color:var(--gris-cl)">${extra}Toca el mensaje de arriba para ver tu ciclo.</span>`;
+    // Nubi habla cuando la fase sugiere ir suave
+    const nubiMsg = (S.fase==='menstrual' || S.fase==='lutea')
+      ? `<div style="margin-top:6px;padding:7px 10px;background:var(--cuidado-bg);border-radius:10px;font-size:.78rem;color:var(--cuidado-d);line-height:1.4;">🐾 <b>Nubi:</b> ${S.fase==='menstrual'?'Hoy tu cuerpo pide ir suave. Está bien hacer menos. 🌸':'Fase de cierre — lo que no alcances hoy puede esperar. 🍂'}</div>`
+      : '';
+    notaEl.innerHTML = `<b>${cir.tramo.charAt(0).toUpperCase()+cir.tramo.slice(1)}:</b> ${cir.tip}<br><span style="color:var(--gris-cl)">${extra}Toca el mensaje de arriba para ver tu ciclo.</span>${nubiMsg}`;
   }
 }
 function toggleCiclo(){
