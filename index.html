@@ -919,24 +919,22 @@
   .sem-blocks-body {
     display:grid;
     grid-template-columns:repeat(7,1fr);
-    min-height:100%;
   }
   .sem-block-day {
     border-left:1px solid var(--linea);
     display:flex;
     flex-direction:column;
-    min-height:300px;
   }
   .sem-block-day:first-child { border-left:none; }
   .sem-block-day.hoy { background:color-mix(in srgb,var(--proyectos) 5%,transparent); }
   .sem-block-zone {
-    flex:1;
+    flex:0 0 auto;
     padding:4px 3px;
-    min-height:80px;
+    min-height:60px;
     transition:background .2s;
     display:flex;
     flex-direction:column;
-    gap:2px;
+    gap:3px;
   }
   .sem-block-zone.drop-hover { background:color-mix(in srgb,var(--proyectos) 12%,transparent); }
   .sem-block-zone-label {
