@@ -651,7 +651,7 @@
   /* Cabecera sticky: etiqueta horas vacía + 7 columnas de días */
   .sem-grid-head {
     display:grid;
-    grid-template-columns:28px repeat(7,1fr);
+    grid-template-columns:repeat(7,1fr);
     border-bottom:1px solid var(--linea);
     background:var(--panel);
     flex-shrink:0;
@@ -851,6 +851,167 @@
   .sem-fs-add:hover { background:var(--hueso); }
   .sem-fs-add:active { background:var(--linea); }
   .sem-fs-fest { font-size:.6rem; color:var(--educacion-d); font-weight:600; text-align:center; margin-bottom:2px; }
+
+  /* ── Sidebar de tareas + layout flex del overlay ── */
+  .semana-layout { display:flex; flex:1; overflow:hidden; min-height:0; }
+  .sem-sidebar {
+    width:200px;
+    min-width:160px;
+    border-right:1px solid var(--linea);
+    overflow-y:auto;
+    padding:8px 6px;
+    flex-shrink:0;
+    background:var(--panel);
+  }
+  @media(max-width:700px){ .sem-sidebar { width:140px; min-width:120px; } }
+  .sem-sb-titulo {
+    font-size:.68rem;
+    font-weight:700;
+    color:var(--gris);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin:0 0 6px 2px;
+  }
+  .sem-sb-eje-group { margin-bottom:10px; }
+  .sem-sb-eje-label {
+    font-size:.65rem;
+    font-weight:700;
+    padding:3px 6px;
+    border-radius:6px;
+    margin-bottom:3px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .sem-sb-eje-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sem-sb-tarea {
+    font-size:.7rem;
+    padding:5px 7px;
+    margin:2px 0;
+    border-radius:6px;
+    background:var(--hueso);
+    border-left:3px solid var(--gris-cl);
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
+    line-height:1.3;
+    transition:box-shadow .15s, opacity .15s;
+    word-break:break-word;
+  }
+  .sem-sb-tarea:active { cursor:grabbing; }
+  .sem-sb-tarea.dragging { opacity:.4; }
+  .sem-sb-tarea .sb-t-star { font-size:.6rem; display:block; margin-top:1px; }
+
+  /* ── Zonas AM/PM en la rejilla semanal ── */
+  .sem-blocks-grid {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    min-width:0;
+  }
+  .sem-blocks-scroll {
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .sem-blocks-body {
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    min-height:100%;
+  }
+  .sem-block-day {
+    border-left:1px solid var(--linea);
+    display:flex;
+    flex-direction:column;
+    min-height:300px;
+  }
+  .sem-block-day:first-child { border-left:none; }
+  .sem-block-day.hoy { background:color-mix(in srgb,var(--proyectos) 5%,transparent); }
+  .sem-block-zone {
+    flex:1;
+    padding:4px 3px;
+    min-height:80px;
+    transition:background .2s;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .sem-block-zone.drop-hover { background:color-mix(in srgb,var(--proyectos) 12%,transparent); }
+  .sem-block-zone-label {
+    font-size:.55rem;
+    font-weight:700;
+    text-transform:uppercase;
+    color:var(--gris);
+    letter-spacing:.04em;
+    padding:2px 3px 1px;
+    flex-shrink:0;
+  }
+  .sem-block-divider {
+    height:1px;
+    background:var(--linea);
+    flex-shrink:0;
+  }
+  /* Eventos fijos de Google Calendar dentro de un bloque */
+  .sem-block-event {
+    font-size:.62rem;
+    padding:4px 5px;
+    border-radius:6px;
+    border-left:3px solid #4285F4;
+    background:rgba(66,133,244,.1);
+    color:var(--tinta);
+    line-height:1.3;
+    flex-shrink:0;
+  }
+  .sem-block-event .be-hora { font-weight:700; color:#4285F4; font-size:.58rem; }
+  .sem-block-event .be-eje { font-size:.56rem; font-weight:700; display:block; margin-top:1px; }
+  /* Tareas colocadas en un bloque */
+  .sem-block-tarea {
+    font-size:.65rem;
+    padding:4px 6px;
+    border-radius:6px;
+    background:var(--hueso);
+    border-left:3px solid var(--gris-cl);
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
+    line-height:1.3;
+    transition:box-shadow .15s, opacity .15s;
+    word-break:break-word;
+    position:relative;
+  }
+  .sem-block-tarea:active { cursor:grabbing; }
+  .sem-block-tarea.dragging { opacity:.4; }
+  .sem-block-tarea .bt-check {
+    position:absolute; top:3px; right:3px;
+    width:16px; height:16px; border-radius:50%;
+    border:1.5px solid var(--gris-cl);
+    background:none; font-size:.5rem; color:var(--gris);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; padding:0;
+  }
+  .sem-block-tarea .bt-check:hover { background:var(--linea); }
+  .sem-block-tarea .bt-txt { display:block; padding-right:18px; }
+  .sem-block-tarea .bt-eje { font-size:.56rem; font-weight:700; display:block; margin-top:1px; }
+  /* Ghost mientras se arrastra */
+  .sem-drag-ghost {
+    position:fixed;
+    pointer-events:none;
+    z-index:2000;
+    opacity:.85;
+    transform:rotate(2deg) scale(1.04);
+    box-shadow:0 6px 24px rgba(0,0,0,.3);
+    max-width:170px;
+    border-radius:6px;
+    padding:5px 7px;
+    font-size:.68rem;
+    background:var(--hueso);
+    border-left:3px solid var(--gris-cl);
+    color:var(--tinta);
+    line-height:1.3;
+  }
   .eje-sel-mini {
     font-size:.72rem;
     border:1px solid var(--linea);
@@ -1140,7 +1301,10 @@
       <button class="nav-sem" onclick="semanaOverlayNav(1)" aria-label="Semana siguiente">›</button>
       <button class="cerrar-sem" onclick="cerrarSemanaOverlay()" aria-label="Cerrar">×</button>
     </div>
-    <div class="semana-fs-grid" id="semana-fs-grid"></div>
+    <div class="semana-layout">
+      <div class="sem-sidebar" id="sem-sidebar"></div>
+      <div class="semana-fs-grid" id="semana-fs-grid"></div>
+    </div>
   </div>
 </div>
 
@@ -1268,6 +1432,12 @@ function cargar(){
       if(!s.layout) s.layout=null;
       if(!s.pausas) s.pausas={activas:false, cadaMin:50, dias:{}, sonido:true};
       if(s.pausas.sonido===undefined) s.pausas.sonido=true;
+      // migración: campos para planificación por bloques (drag-and-drop semana)
+      if(s.tareas) s.tareas.forEach(t=>{
+        if(t.bloque===undefined) t.bloque=null;
+        if(t.bloqueFecha===undefined) t.bloqueFecha=null;
+        if(t.ordenBloque===undefined) t.ordenBloque=null;
+      });
       return s;
     }
   }catch(e){}
@@ -2032,208 +2202,315 @@ function renderSemanaOverlay(){
     base.toLocaleDateString('es',opts)+' – '+fin.toLocaleDateString('es',opts);
 
   const DIAS_CORTO=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const HORA_INICIO = 6;   // primera hora visible (06:00)
-  const HORA_FIN    = 23;  // última hora (23:00, no incluida → 06–22)
-  const HORAS       = HORA_FIN - HORA_INICIO; // 17
-  const PX_POR_HORA = 60;
 
-  // Helper: minutos → px desde HORA_INICIO
-  function minAPx(h, m){ return ((h - HORA_INICIO) * 60 + m) * (PX_POR_HORA / 60); }
+  // Fechas ISO de los 7 días de la semana
+  const diasISO = [];
+  for(let i=0;i<7;i++){
+    const d = new Date(base); d.setDate(d.getDate()+i);
+    diasISO.push(fechaISO(d));
+  }
 
-  // Recopilar datos de los 7 días
+  // ── SIDEBAR: tareas pendientes no colocadas en un bloque de esta semana ──
+  const enEstaSemana = new Set(diasISO);
+  const sinAsignar = S.tareas.filter(t =>
+    !t.hecho && !t.eventoId &&
+    !(t.bloque && t.bloqueFecha && enEstaSemana.has(t.bloqueFecha))
+  );
+
+  let sbHtml = `<div class="sem-sb-titulo">Tareas</div>`;
+  const ESTRELLAS_MINI = {1:'⭐',2:'⭐⭐',3:'⭐⭐⭐'};
+  for(const k in EJES){
+    const e = EJES[k];
+    const tarEje = sinAsignar.filter(t=>t.eje===k);
+    if(tarEje.length===0) continue;
+    sbHtml += `<div class="sem-sb-eje-group">
+      <div class="sem-sb-eje-label" style="color:${e.d};background:${e.bg};">
+        <span class="sem-sb-eje-dot" style="background:${e.color};"></span>${e.eje}
+        <span style="margin-left:auto;font-size:.6rem;font-weight:400;">${tarEje.length}</span>
+      </div>`;
+    tarEje.forEach(t=>{
+      sbHtml += `<div class="sem-sb-tarea" draggable="true" data-tarea-id="${t.id}"
+        style="border-left-color:${e.color};"
+        title="${escapeHtml(t.txt)}">
+        ${escapeHtml(t.txt.length>40?t.txt.slice(0,38)+'…':t.txt)}
+        <span class="sb-t-star">${ESTRELLAS_MINI[t.dif]||'⭐'}</span>
+      </div>`;
+    });
+    sbHtml += `</div>`;
+  }
+  if(sinAsignar.length===0){
+    sbHtml += `<div style="font-size:.75rem;color:var(--gris);padding:12px 4px;text-align:center;">🌿 Todas tus tareas<br>están en la semana</div>`;
+  }
+  document.getElementById('sem-sidebar').innerHTML = sbHtml;
+
+  // ── GRID POR DÍA: cabecera + bloques AM/PM ──
   const dias = [];
   for(let i=0;i<7;i++){
     const d = new Date(base); d.setDate(d.getDate()+i);
     const fISO = fechaISO(d);
-    const evDia = S.eventos.filter(ev=>ev.fecha===fISO);
-    const tareasDia = S.tareas.filter(t=>!t.hecho && !t.eventoId &&
-      (t.fechaObjetivo===fISO||(fISO===HOY&&t.enHoy)));
+    // Eventos con hora (Google + locales)
+    const evDia = S.eventos.filter(ev=>ev.fecha===fISO && ev.hora).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+    const evAllday = S.eventos.filter(ev=>ev.fecha===fISO && !ev.hora);
+    // Tareas asignadas a este día (por bloqueFecha — puestas via drag)
+    const tareasAsignadas = S.tareas.filter(t=>!t.hecho && !t.eventoId &&
+      t.bloque && t.bloqueFecha===fISO);
     const fest = festivoEnFecha(fISO);
     const sangra = sangradoEnFecha(fISO);
-    dias.push({d, fISO, esHoy:fISO===HOY, evDia, tareasDia, fest, sangra});
+    dias.push({d, fISO, esHoy:fISO===HOY, evDia, evAllday, tareasAsignadas, fest, sangra});
   }
 
-  // ── CABECERA: espacio hora + 7 columnas ──
-  let headHtml = `<div class="sem-grid-head"><div class="sem-grid-head-hcol"></div>`;
+  // Cabecera
+  let headHtml = `<div class="sem-grid-head">`;
   dias.forEach(({d, fISO, esHoy, sangra}, i)=>{
-    const addBtn = fISO>=HOY
-      ? `<button class="sem-fs-add" onclick="cerrarSemanaOverlay();setTimeout(()=>{window._calAbierto=true;render();abrirFormEvento('${fISO}')},80)">+ añadir</button>`
-      : '';
     headHtml += `<div class="sem-fs-dia-head${esHoy?' hoy':''}">
       <span class="sem-fs-dia-label">${DIAS_CORTO[i]}${sangra?' 🩸':''}</span>
       <span class="sem-fs-dia-num">${d.getDate()}</span>
-      ${addBtn}
     </div>`;
   });
   headHtml += `</div>`;
 
-  // ── BANDA TODO EL DÍA ──
-  // (eventos sin hora y festivos)
-  const hayAlldayContenido = dias.some(({evDia,tareasDia,fest})=>{
-    const sinHora = evDia.filter(ev=>!ev.hora);
-    const tarSinHora = tareasDia.filter(t=>!t.hora);
-    return fest || sinHora.length || tarSinHora.length;
-  });
+  // Cuerpo: bloques AM y PM por día
+  let bodyHtml = `<div class="sem-blocks-body">`;
+  dias.forEach(({fISO, esHoy, evDia, evAllday, tareasAsignadas, fest})=>{
+    // Separar eventos en AM (<12) y PM (>=12)
+    const evAM = evDia.filter(ev=>{ const h=parseInt(ev.hora); return h<12; });
+    const evPM = evDia.filter(ev=>{ const h=parseInt(ev.hora); return h>=12; });
+    // Separar tareas por bloque
+    const tarAM = tareasAsignadas.filter(t=>t.bloque==='am').sort((a,b)=>(a.ordenBloque||0)-(b.ordenBloque||0));
+    const tarPM = tareasAsignadas.filter(t=>t.bloque==='pm').sort((a,b)=>(a.ordenBloque||0)-(b.ordenBloque||0));
+    // (ya no hay tarSinBloque — todas las asignadas tienen bloque)
 
-  let alldayHtml = '';
-  if(hayAlldayContenido){
-    alldayHtml = `<div class="sem-allday-row"><div class="sem-allday-label">todo<br>el día</div>`;
-    dias.forEach(({evDia, tareasDia, fest})=>{
-      const sinHora = evDia.filter(ev=>!ev.hora);
-      const tarSinHora = tareasDia.filter(t=>!t.hora);
-      let celdaHtml = '';
-      if(fest) celdaHtml += `<span class="sem-allday-pill" style="border-left-color:var(--educacion-d);">🎉 ${escapeHtml(fest)}</span>`;
-      sinHora.forEach(ev=>{
-        const e = ev.eje ? EJES[ev.eje] : null;
-        const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
-        const gcB = ev.origen==='google' ? 'G · ' : '';
-        celdaHtml += `<span class="sem-allday-pill" style="border-left-color:${bColor};">${gcB}${escapeHtml(ev.txt)}</span>`;
-      });
-      tarSinHora.forEach(t=>{
-        const e2 = EJES[t.eje];
-        celdaHtml += `<span class="sem-allday-pill" style="border-left-color:${e2.color};">${escapeHtml(t.txt)}</span>`;
-      });
-      alldayHtml += `<div class="sem-allday-col">${celdaHtml}</div>`;
-    });
-    alldayHtml += `</div>`;
-  }
-
-  // ── ZONA HORARIA ──
-  const totalPx = HORAS * PX_POR_HORA;
-
-  // Líneas de hora y etiquetas
-  let linesHtml = '';
-  for(let h=HORA_INICIO; h<=HORA_FIN; h++){
-    const top = (h - HORA_INICIO) * PX_POR_HORA;
-    if(h < HORA_FIN){
-      linesHtml += `<div class="sem-hora-line" style="top:${top}px;"></div>`;
-      // media hora
-      const topH = top + PX_POR_HORA/2;
-      linesHtml += `<div class="sem-hora-line-half" style="top:${topH}px;"></div>`;
-    }
-    const label = h < 10 ? '0'+h+':00' : h+':00';
-    linesHtml += `<div class="sem-hora-label" style="top:${top}px;">${label}</div>`;
-  }
-
-  // Helper: calcular inicio/fin en minutos desde medianoche
-  function itemRango(item){
-    const [hh,mm] = item.hora.split(':').map(Number);
-    const ini = hh*60+mm;
-    let dur = 60;
-    if(item.horaFin){
-      const [hf,mf] = item.horaFin.split(':').map(Number);
-      dur = Math.max(15, (hf*60+mf) - ini);
-    } else if(item.durMin){ dur = item.durMin; }
-    return {ini, fin: ini+dur};
-  }
-
-  // Algoritmo de columnas para solapamiento (greedy)
-  function calcularColumnas(items){
-    // Devuelve [{item, col, totalCols}]
-    const result = items.map(it=>({item:it, col:0, totalCols:1, ini:itemRango(it).ini, fin:itemRango(it).fin}));
-    // Ordenar por inicio
-    result.sort((a,b)=>a.ini-b.ini);
-    // Grupos de solapamiento
-    const grupos=[];
-    result.forEach(r=>{
-      let puesto=false;
-      for(const g of grupos){
-        if(r.ini < g.finMax){
-          g.items.push(r); g.finMax=Math.max(g.finMax,r.fin); puesto=true; break;
-        }
-      }
-      if(!puesto) grupos.push({items:[r], finMax:r.fin});
-    });
-    // Asignar columnas dentro de cada grupo
-    grupos.forEach(g=>{
-      const n=g.items.length;
-      g.items.forEach((r,i)=>{ r.col=i; r.totalCols=n; });
-    });
-    return result;
-  }
-
-  // Columnas de días con eventos posicionados y sin solapamiento
-  let colsHtml = '';
-  dias.forEach(({fISO, esHoy, evDia, tareasDia})=>{
-    // Unificar eventos y tareas con hora en un solo array
-    const conHora = evDia.filter(ev=>ev.hora && parseInt(ev.hora)>=HORA_INICIO && parseInt(ev.hora)<HORA_FIN);
-    const tarConHora = tareasDia.filter(t=>t.hora && parseInt(t.hora)>=HORA_INICIO && parseInt(t.hora)<HORA_FIN);
-    const todos = [
-      ...conHora.map(ev=>({...ev, _tipo:'ev'})),
-      ...tarConHora.map(t=>({...t, _tipo:'tarea'}))
-    ];
-
-    const layout = calcularColumnas(todos);
-    let eventsHtml = '';
-
-    // Línea "ahora" si es hoy
-    if(esHoy){
-      const ahora = new Date();
-      const hAhora = ahora.getHours(), mAhora = ahora.getMinutes();
-      if(hAhora >= HORA_INICIO && hAhora < HORA_FIN){
-        eventsHtml += `<div class="sem-now-line" style="top:${minAPx(hAhora,mAhora)}px;"><div class="sem-now-dot"></div></div>`;
-      }
+    function renderEvento(ev){
+      const e = ev.eje ? EJES[ev.eje] : null;
+      const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      const bgColor = ev.origen==='google' ? 'rgba(66,133,244,.1)' : (e ? e.color+'22' : 'var(--hueso)');
+      const gcB = ev.origen==='google' ? '<span style="font-size:.55rem;color:#4285F4;font-weight:700;">G</span> ' : '';
+      const ejeLabel = e ? `<span class="be-eje" style="color:${e.color};">${e.eje}</span>` : '';
+      return `<div class="sem-block-event" style="border-left-color:${bColor};background:${bgColor};">
+        <span class="be-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
+        ${escapeHtml(ev.txt)} ${ejeLabel}
+      </div>`;
     }
 
-    layout.forEach(({item, col, totalCols, ini, fin})=>{
-      const topPx = minAPx(Math.floor(ini/60), ini%60);
-      const durMin = fin - ini;
-      const heightPx = Math.max(20, durMin * PX_POR_HORA / 60);
-      // Posición horizontal: dividir el ancho disponible
-      const pctW = 100 / totalCols;
-      const leftPct = col * pctW;
-      const stylePos = `top:${topPx}px;height:${heightPx}px;left:calc(${leftPct}% + 2px);right:calc(${100-(leftPct+pctW)}% + 2px);`;
+    function renderTareaBloque(t){
+      const e = EJES[t.eje];
+      return `<div class="sem-block-tarea" draggable="true" data-tarea-id="${t.id}"
+        style="border-left-color:${e.color};background:${e.color}11;">
+        <button class="bt-check" onclick="event.stopPropagation();toggleHechoDesdeGrid('${t.id}')" title="Marcar hecha">✓</button>
+        <span class="bt-txt">${escapeHtml(t.txt)}</span>
+        <span class="bt-eje" style="color:${e.color};">${e.eje}</span>
+      </div>`;
+    }
 
-      if(item._tipo==='ev'){
-        const ev = item;
-        const e = ev.eje ? EJES[ev.eje] : null;
-        const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
-        const bgColor = ev.origen==='google' ? 'rgba(66,133,244,.12)' : (e ? e.color+'22' : 'var(--hueso)');
-        const gcB = ev.origen==='google' ? '<span style="font-size:.55rem;color:#4285F4;font-weight:700;">G </span>' : '';
-        const ejeSpan = e ? `<span class="tg-ev-eje" style="color:${e.color};">${e.eje}</span>` : '';
-        const asignarBtn = (ev.origen==='google' && !e)
-          ? `<button class="eje-sel-mini" style="font-size:.55rem;padding:1px 3px;display:block;margin-top:1px;" onclick="abrirEjeModal('${ev.id}','${escapeHtml(ev.txt).replace(/'/g,"\\'")}',event)">⊕ eje</button>`
-          : '';
-        const tooltipEv = [ev.hora+(ev.horaFin?' – '+ev.horaFin:''), ev.txt, e?e.eje:''].filter(Boolean).join('\n');
-        eventsHtml += `<div class="sem-tg-ev" title="${escapeHtml(tooltipEv)}" style="${stylePos}border-left-color:${bColor};background:${bgColor};">
-          <span class="tg-ev-hora">${gcB}${ev.hora}${ev.horaFin?' – '+ev.horaFin:''}</span>
-          <span class="tg-ev-txt">${escapeHtml(ev.txt)}</span>
-          ${ejeSpan}${asignarBtn}
-        </div>`;
-      } else {
-        const t = item;
-        const e2 = EJES[t.eje];
-        const tooltipT = [t.hora+(t.horaFin?' – '+t.horaFin:''), t.txt, e2.eje].filter(Boolean).join('\n');
-        eventsHtml += `<div class="sem-tg-ev" data-tipo="tarea" title="${escapeHtml(tooltipT)}\n✓ Clic para marcar hecha" style="${stylePos}border-left-color:${e2.color};background:${e2.color}22;" onclick="toggleHechoDesdeGrid('${t.id}')">
-          <span class="tg-ev-hora">${t.hora}${t.horaFin?' – '+t.horaFin:''}</span>
-          <span class="tg-ev-txt">${escapeHtml(t.txt)}</span>
-          <span class="tg-ev-eje" style="color:${e2.color};">${e2.eje}</span>
-        </div>`;
-      }
+    let topHtml = '';
+    if(fest) topHtml += `<div style="font-size:.58rem;color:var(--educacion-d);padding:2px 3px;font-weight:600;">🎉 ${escapeHtml(fest)}</div>`;
+    evAllday.forEach(ev=>{
+      const e = ev.eje ? EJES[ev.eje] : null;
+      const bColor = ev.origen==='google' ? '#4285F4' : (e ? e.color : 'var(--gris-cl)');
+      topHtml += `<div class="sem-block-event" style="border-left-color:${bColor};background:rgba(66,133,244,.06);font-size:.58rem;">
+        ${ev.origen==='google'?'<span style="color:#4285F4;font-weight:700;font-size:.5rem;">G</span> ':''}${escapeHtml(ev.txt)}
+      </div>`;
     });
 
-    colsHtml += `<div class="sem-day-col${esHoy?' hoy':''}">${eventsHtml}</div>`;
+    bodyHtml += `<div class="sem-block-day${esHoy?' hoy':''}">
+      ${topHtml}
+      <div class="sem-block-zone" data-fecha="${fISO}" data-bloque="am">
+        <div class="sem-block-zone-label">☀️ Mañana</div>
+        ${evAM.map(renderEvento).join('')}
+        ${tarAM.map(renderTareaBloque).join('')}
+      </div>
+      <div class="sem-block-divider"></div>
+      <div class="sem-block-zone" data-fecha="${fISO}" data-bloque="pm">
+        <div class="sem-block-zone-label">🌙 Tarde</div>
+        ${evPM.map(renderEvento).join('')}
+        ${tarPM.map(renderTareaBloque).join('')}
+      </div>
+    </div>`;
   });
-
-  const scrollHtml = `<div class="sem-timegrid-scroll">
-    <div class="sem-timegrid-inner" style="height:${totalPx}px;">
-      <div class="sem-hora-col">${linesHtml}</div>
-      ${colsHtml}
-    </div>
-  </div>`;
+  bodyHtml += `</div>`;
 
   const grid = document.getElementById('semana-fs-grid');
-  grid.innerHTML = headHtml + alldayHtml + scrollHtml;
+  grid.innerHTML = `<div class="sem-blocks-grid">${headHtml}<div class="sem-blocks-scroll">${bodyHtml}</div></div>`;
 
-  // Scroll automático a la hora actual (o a las 08:00 si es otro día)
-  const scrollEl = grid.querySelector('.sem-timegrid-scroll');
-  if(scrollEl){
-    const ahora = new Date();
-    const hScroll = (ahora.getHours() >= HORA_INICIO && ahora.getHours() < HORA_FIN)
-      ? ahora.getHours() - 1
-      : 8;
-    scrollEl.scrollTop = Math.max(0, (hScroll - HORA_INICIO) * PX_POR_HORA);
-  }
+  // ── Inicializar drag & drop ──
+  initSemanaDragDrop();
+}
+
+// ============ DRAG & DROP SEMANA ============
+let _dragTareaId = null;
+let _dragGhost = null;
+
+function initSemanaDragDrop(){
+  const overlay = document.getElementById('semana-overlay');
+
+  // Todas las tarjetas arrastrables (sidebar + grid)
+  overlay.querySelectorAll('[draggable="true"][data-tarea-id]').forEach(el=>{
+    // ── Mouse drag ──
+    el.addEventListener('dragstart', e=>{
+      _dragTareaId = el.dataset.tareaId;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', _dragTareaId);
+      // Ghost transparente nativo (lo reemplazamos con custom)
+      const ghost = document.createElement('div');
+      ghost.style.opacity='0'; ghost.style.position='absolute'; ghost.style.top='-1000px';
+      document.body.appendChild(ghost);
+      e.dataTransfer.setDragImage(ghost, 0, 0);
+      setTimeout(()=>document.body.removeChild(ghost),0);
+      // Custom ghost
+      _dragGhost = document.createElement('div');
+      _dragGhost.className = 'sem-drag-ghost';
+      const t = S.tareas.find(t=>t.id===_dragTareaId);
+      if(t){
+        const ej = EJES[t.eje];
+        _dragGhost.style.borderLeftColor = ej.color;
+        _dragGhost.textContent = t.txt.length>35?t.txt.slice(0,33)+'…':t.txt;
+      }
+      document.body.appendChild(_dragGhost);
+      moveDragGhost(e.clientX, e.clientY);
+    });
+    el.addEventListener('dragend', e=>{
+      el.classList.remove('dragging');
+      limpiarDragGhost();
+      _dragTareaId = null;
+    });
+
+    // ── Touch drag (móvil) ──
+    let touchStarted = false;
+    el.addEventListener('touchstart', e=>{
+      const touch = e.touches[0];
+      _dragTareaId = el.dataset.tareaId;
+      touchStarted = true;
+      // Crear ghost después de un pequeño delay (evitar scroll accidental)
+      el._touchTimer = setTimeout(()=>{
+        el.classList.add('dragging');
+        _dragGhost = document.createElement('div');
+        _dragGhost.className = 'sem-drag-ghost';
+        const t = S.tareas.find(t=>t.id===_dragTareaId);
+        if(t){
+          const ej = EJES[t.eje];
+          _dragGhost.style.borderLeftColor = ej.color;
+          _dragGhost.textContent = t.txt.length>35?t.txt.slice(0,33)+'…':t.txt;
+        }
+        document.body.appendChild(_dragGhost);
+        moveDragGhost(touch.clientX, touch.clientY);
+      }, 200);
+    }, {passive:true});
+    el.addEventListener('touchmove', e=>{
+      if(!_dragTareaId || !touchStarted) return;
+      if(_dragGhost){
+        e.preventDefault();
+        const touch = e.touches[0];
+        moveDragGhost(touch.clientX, touch.clientY);
+        updateDropZoneHover(touch.clientX, touch.clientY);
+      }
+    }, {passive:false});
+    el.addEventListener('touchend', e=>{
+      clearTimeout(el._touchTimer);
+      if(_dragGhost && _dragTareaId){
+        const touch = e.changedTouches[0];
+        const zone = getDropZoneAt(touch.clientX, touch.clientY);
+        if(zone) dropTareaEnBloque(_dragTareaId, zone.dataset.fecha, zone.dataset.bloque);
+      }
+      el.classList.remove('dragging');
+      limpiarDragGhost();
+      clearDropHovers();
+      _dragTareaId = null;
+      touchStarted = false;
+    });
+    el.addEventListener('touchcancel', ()=>{
+      clearTimeout(el._touchTimer);
+      el.classList.remove('dragging');
+      limpiarDragGhost();
+      clearDropHovers();
+      _dragTareaId = null;
+      touchStarted = false;
+    });
+  });
+
+  // Zonas de drop (bloques AM/PM)
+  overlay.querySelectorAll('.sem-block-zone').forEach(zone=>{
+    zone.addEventListener('dragover', e=>{
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drop-hover');
+      if(_dragGhost) moveDragGhost(e.clientX, e.clientY);
+    });
+    zone.addEventListener('dragleave', ()=>{
+      zone.classList.remove('drop-hover');
+    });
+    zone.addEventListener('drop', e=>{
+      e.preventDefault();
+      zone.classList.remove('drop-hover');
+      const tareaId = e.dataTransfer.getData('text/plain') || _dragTareaId;
+      if(tareaId) dropTareaEnBloque(tareaId, zone.dataset.fecha, zone.dataset.bloque);
+    });
+  });
+
+  // Drag sobre sidebar = devolver al backlog
+  const sidebar = document.getElementById('sem-sidebar');
+  sidebar.addEventListener('dragover', e=>{
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  });
+  sidebar.addEventListener('drop', e=>{
+    e.preventDefault();
+    const tareaId = e.dataTransfer.getData('text/plain') || _dragTareaId;
+    if(tareaId) devolverTareaAlBacklog(tareaId);
+  });
+}
+
+function moveDragGhost(x, y){
+  if(!_dragGhost) return;
+  _dragGhost.style.left = (x+12)+'px';
+  _dragGhost.style.top = (y-10)+'px';
+}
+function limpiarDragGhost(){
+  if(_dragGhost){ _dragGhost.remove(); _dragGhost=null; }
+}
+function getDropZoneAt(x, y){
+  // Encuentra la zona de drop bajo las coordenadas (para touch)
+  const els = document.elementsFromPoint(x, y);
+  return els.find(el=>el.classList.contains('sem-block-zone')) || null;
+}
+function updateDropZoneHover(x, y){
+  clearDropHovers();
+  const zone = getDropZoneAt(x, y);
+  if(zone) zone.classList.add('drop-hover');
+}
+function clearDropHovers(){
+  document.querySelectorAll('.sem-block-zone.drop-hover').forEach(z=>z.classList.remove('drop-hover'));
+}
+
+function dropTareaEnBloque(tareaId, fecha, bloque){
+  const t = S.tareas.find(t=>t.id===tareaId);
+  if(!t) return;
+  t.fechaObjetivo = fecha;
+  t.bloque = bloque; // 'am' o 'pm'
+  t.bloqueFecha = fecha;
+  // Orden: al final del bloque
+  const enMismoBloque = S.tareas.filter(x=>x.bloqueFecha===fecha && x.bloque===bloque && x.id!==tareaId);
+  t.ordenBloque = enMismoBloque.length;
+  // No poner hora fija — eso es exactamente lo que queremos evitar
+  t.hora = null;
+  t.horaFin = null;
+  guardar();
+  renderSemanaOverlay();
+  render();
+  toast(`${EJES[t.eje].eje}: ${t.txt.slice(0,20)}… → ${bloque==='am'?'mañana':'tarde'} ✓`);
+}
+
+function devolverTareaAlBacklog(tareaId){
+  const t = S.tareas.find(t=>t.id===tareaId);
+  if(!t) return;
+  t.fechaObjetivo = null;
+  t.bloque = null;
+  t.bloqueFecha = null;
+  t.ordenBloque = null;
+  guardar();
+  renderSemanaOverlay();
+  render();
+  toast('Tarea devuelta al backlog');
 }
 
 // ============ ASIGNAR EJE A EVENTO GOOGLE CALENDAR ============
